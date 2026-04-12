@@ -1,12 +1,24 @@
 import * as path from "node:path";
+/**
+ * Normalize project path by converting backslashes to forward slashes
+ */
 export function normalizeProjectPath(p) {
     return p.replace(/\\/g, "/");
 }
+/**
+ * Resolve novel root directory
+ * @param projectDir - Project directory
+ * @param root - Optional custom root (absolute or relative)
+ * @returns Resolved absolute path
+ */
 export function resolveNovelRoot(projectDir, root) {
     if (!root || root.trim().length === 0)
         return path.join(projectDir, "novel");
     return path.isAbsolute(root) ? root : path.join(projectDir, root);
 }
+/**
+ * Generate all template pack paths from a root directory
+ */
 export function novelTpPaths(root) {
     const metaDir = path.join(root, "meta");
     const templatesDir = path.join(root, "templates");

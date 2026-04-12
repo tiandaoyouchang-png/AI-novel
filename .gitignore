@@ -1,9 +1,42 @@
+```
 # Dependencies
-**/node_modules/
+node_modules/
+
+# Build artifacts
+dist/
+
+# Environment
+.env
+.env.local
+.env.
+
+# TypeScript/Node.js
+*.tsbuildinfo
+*.js.map
+*.d.ts.map
 
 # Logs
 *.log
 
-# OS / Editor
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Package lock
+package-lock.json
+.yarn/
+```

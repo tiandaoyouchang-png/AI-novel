@@ -1,4 +1,9 @@
-function parseModelRef(model) {
+/**
+ * Parse a model reference string into provider and model IDs
+ * @param model - Model reference in format "provider/model"
+ * @throws Error if model format is invalid
+ */
+export function parseModelRef(model) {
     const trimmed = model.trim();
     const idx = trimmed.indexOf("/");
     if (idx <= 0 || idx === trimmed.length - 1) {
@@ -6,7 +11,10 @@ function parseModelRef(model) {
     }
     return { providerID: trimmed.slice(0, idx), modelID: trimmed.slice(idx + 1) };
 }
-function extractTextFromParts(parts) {
+/**
+ * Extract text content from response parts
+ */
+export function extractTextFromParts(parts) {
     if (!Array.isArray(parts))
         return "";
     const chunks = [];
@@ -22,6 +30,9 @@ function extractTextFromParts(parts) {
     }
     return chunks.join("\n").trim();
 }
+/**
+ * Prompt the LLM and extract text response
+ */
 export async function promptText(opts) {
     const modelRef = parseModelRef(opts.model);
     const res = await opts.client.session.prompt({

@@ -4,16 +4,36 @@ import { ensureDir, readText, writeTextIfMissing, writeTextIfMissingOrEmpty } fr
 import { normalizeProjectPath, novelTpPaths } from "../lib/paths.js";
 import { nowISO } from "../lib/time.js";
 import type { ToolCtx } from "../plugin.js";
+import { TEMPLATE_PACK_VERSION } from "../constants/index.js";
 
-const TEMPLATE_PACK_VERSION = "1.0";
-
-function mkNovelId() {
+/**
+ * Generate a unique novel ID with timestamp and random component
+ */
+function mkNovelId(): string {
   const ts = nowISO().replace(/[-:]/g, "").slice(0, 15);
   const rand = crypto.randomBytes(3).toString("hex");
   return `novel-${ts}-${rand}`;
 }
 
-function templatesV1() {
+/**
+ * Template interfaces for different document types
+ */
+interface TemplatesV1 {
+  brief_template: string;
+  constraints_template: string;
+  style_profile_template: string;
+  world_bible_template: string;
+  character_card_template: string;
+  reviewer_checklist: string;
+  auditor_checklist: string;
+  humanizer_rules: string;
+  preflight_checklist: string;
+}
+
+/**
+ * Generate v1 template contents
+ */
+function templatesV1(): TemplatesV1 {
   return {
     brief_template: [
       "# Brief (Template)",
@@ -131,6 +151,9 @@ function templatesV1() {
   };
 }
 
+/**
+ * Create the novel_tp_init tool
+ */
 export function createNovelTpInit(ctx: ToolCtx) {
   return tool({
     description: "Initialize novel Template Pack workspace (novel/...) with v1.0 templates.",

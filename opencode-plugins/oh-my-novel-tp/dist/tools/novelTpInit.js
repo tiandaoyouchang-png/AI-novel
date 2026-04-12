@@ -3,12 +3,18 @@ import * as crypto from "node:crypto";
 import { ensureDir, readText, writeTextIfMissing, writeTextIfMissingOrEmpty } from "../lib/fs.js";
 import { normalizeProjectPath, novelTpPaths } from "../lib/paths.js";
 import { nowISO } from "../lib/time.js";
-const TEMPLATE_PACK_VERSION = "1.0";
+import { TEMPLATE_PACK_VERSION } from "../constants/index.js";
+/**
+ * Generate a unique novel ID with timestamp and random component
+ */
 function mkNovelId() {
     const ts = nowISO().replace(/[-:]/g, "").slice(0, 15);
     const rand = crypto.randomBytes(3).toString("hex");
     return `novel-${ts}-${rand}`;
 }
+/**
+ * Generate v1 template contents
+ */
 function templatesV1() {
     return {
         brief_template: [
@@ -126,6 +132,9 @@ function templatesV1() {
         ].join("\n")
     };
 }
+/**
+ * Create the novel_tp_init tool
+ */
 export function createNovelTpInit(ctx) {
     return tool({
         description: "Initialize novel Template Pack workspace (novel/...) with v1.0 templates.",

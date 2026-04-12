@@ -1,15 +1,57 @@
 import * as path from "node:path";
 
-export function normalizeProjectPath(p: string) {
+/**
+ * Normalize project path by converting backslashes to forward slashes
+ */
+export function normalizeProjectPath(p: string): string {
   return p.replace(/\\/g, "/");
 }
 
-export function resolveNovelRoot(projectDir: string, root?: string) {
+/**
+ * Resolve novel root directory
+ * @param projectDir - Project directory
+ * @param root - Optional custom root (absolute or relative)
+ * @returns Resolved absolute path
+ */
+export function resolveNovelRoot(projectDir: string, root?: string): string {
   if (!root || root.trim().length === 0) return path.join(projectDir, "novel");
   return path.isAbsolute(root) ? root : path.join(projectDir, root);
 }
 
-export function novelTpPaths(root: string) {
+/**
+ * Get all paths for the novel template pack
+ */
+export interface NovelTpPaths {
+  root: string;
+  metaDir: string;
+  templatesDir: string;
+  bibleDir: string;
+  chaptersDir: string;
+  novelIdPath: string;
+  templatePackVersionPath: string;
+  briefTemplatePath: string;
+  constraintsTemplatePath: string;
+  styleProfileTemplatePath: string;
+  worldBibleTemplatePath: string;
+  characterCardTemplatePath: string;
+  reviewerChecklistPath: string;
+  auditorChecklistPath: string;
+  humanizerRulesPath: string;
+  preflightChecklistPath: string;
+  briefPath: string;
+  constraintsPath: string;
+  styleProfilePath: string;
+  worldPath: string;
+  charactersPath: string;
+  chronologyPath: string;
+  outlinePath: string;
+  chapterBeatsPath: string;
+}
+
+/**
+ * Generate all template pack paths from a root directory
+ */
+export function novelTpPaths(root: string): NovelTpPaths {
   const metaDir = path.join(root, "meta");
   const templatesDir = path.join(root, "templates");
   const bibleDir = path.join(root, "bible");

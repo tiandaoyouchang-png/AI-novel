@@ -1,4 +1,7 @@
 import * as fs from "node:fs/promises";
+/**
+ * Check if a file exists
+ */
 export async function fileExists(p) {
     try {
         await fs.stat(p);
@@ -8,15 +11,26 @@ export async function fileExists(p) {
         return false;
     }
 }
+/**
+ * Ensure directory exists (creates recursively if needed)
+ */
 export async function ensureDir(p) {
     await fs.mkdir(p, { recursive: true });
 }
+/**
+ * Write text to file only if it doesn't exist
+ * @returns true if file was created, false if it already existed
+ */
 export async function writeTextIfMissing(p, content) {
     if (await fileExists(p))
         return false;
     await fs.writeFile(p, content, "utf8");
     return true;
 }
+/**
+ * Write text to file only if it doesn't exist or is empty
+ * @returns true if file was written, false if it already had content
+ */
 export async function writeTextIfMissingOrEmpty(p, content) {
     if (!(await fileExists(p))) {
         await fs.writeFile(p, content, "utf8");
@@ -28,9 +42,15 @@ export async function writeTextIfMissingOrEmpty(p, content) {
     await fs.writeFile(p, content, "utf8");
     return true;
 }
+/**
+ * Read text from file
+ */
 export async function readText(p) {
     return fs.readFile(p, "utf8");
 }
+/**
+ * Write text to file (overwrites if exists)
+ */
 export async function writeText(p, content) {
     await fs.writeFile(p, content, "utf8");
 }
