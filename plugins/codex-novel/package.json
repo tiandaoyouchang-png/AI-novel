@@ -1,7 +1,7 @@
 {
   "name": "@ai-novel/codex-novel",
-  "version": "0.1.0",
-  "description": "Codex-native market selection, writing, and continuity for long and short fiction.",
+  "version": "0.2.0",
+  "description": "Codex-native scene planning, selective context, review, retrieval, and continuity for long and short fiction.",
   "private": true,
   "type": "module",
   "bin": {

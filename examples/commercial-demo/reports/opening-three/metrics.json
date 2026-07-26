@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "milestone": "opening-three",
-  "generatedAt": "2026-07-26T10:30:59.546Z",
-  "bundleFingerprint": "63411e9168c03f8146c8a3a74484b8759d7ab704b23176bc2424dc0ba428f2be",
+  "generatedAt": "2026-07-26T13:20:51.017Z",
+  "bundleFingerprint": "1c84627232aa9200c718df7d57ae26e5acca772c78ae1fc81837f7fe106862a2",
   "ok": true,
   "blockingIssues": [],
   "chapters": [
@@ -19,7 +19,7 @@
       "sources": [
         {
           "path": "chapters/0001/contract.yaml",
-          "fingerprint": "0575b1ef05ffa6dc1c6c2dfc12e3dddc4d039d999cf050e87096ff5abbae9514"
+          "fingerprint": "b9fd0b02ed635ecb633dfa570cfd73bc34fe5d665a765c98504797f8888d6d47"
         },
         {
           "path": "chapters/0001/final.md",
@@ -27,7 +27,7 @@
         },
         {
           "path": "chapters/0001/review.yaml",
-          "fingerprint": "942e0230b1d591dc051bf1a2a1693df60563c755e958243b9b613d3a3724ebce"
+          "fingerprint": "a8e5808d0721847e898e3d1ddd6334dc99af505f0e93131e2df3cbe5b88fcc0a"
         },
         {
           "path": "chapters/0001/quality-final.json",
@@ -36,6 +36,10 @@
         {
           "path": "chapters/0001/delta.yaml",
           "fingerprint": "ed983f08b86dfd7f1470264a5db2fd5217857f026d4c82de8127bfedbcdbea3a"
+        },
+        {
+          "path": "chapters/0001/handoff.yaml",
+          "fingerprint": "e9fc5440e1ca3f458ff55267ba09e22e37e54cb67e4a585b65955266dbc46dfc"
         }
       ]
     },
@@ -52,7 +56,7 @@
       "sources": [
         {
           "path": "chapters/0002/contract.yaml",
-          "fingerprint": "0ddaef2d7c3d4698dbd7ba282c02efe243ae9e1cd7d13406dbfad1547bbccb66"
+          "fingerprint": "00c923b709bfed1dad9c2001549e674e9a798c14d5d2840d8edae4b2be44b779"
         },
         {
           "path": "chapters/0002/final.md",
@@ -60,7 +64,7 @@
         },
         {
           "path": "chapters/0002/review.yaml",
-          "fingerprint": "0bb3fe6752d80083a864d8b1705acf1e83f198837e963357077659d24019c7d0"
+          "fingerprint": "4587adfbb32d368daed3e9751873be7bd6fbf806188c357b168d5e9e75a4cae8"
         },
         {
           "path": "chapters/0002/quality-final.json",
@@ -69,6 +73,10 @@
         {
           "path": "chapters/0002/delta.yaml",
           "fingerprint": "a4d959c92a5e08bfb28db13f50a2aa96b10139b24a716addbf76f6970058a2fd"
+        },
+        {
+          "path": "chapters/0002/handoff.yaml",
+          "fingerprint": "64516bf06b1aeb2f53fc7a64623937885bb120511ae93b2e24862b9c468288e6"
         }
       ]
     },
@@ -85,7 +93,7 @@
       "sources": [
         {
           "path": "chapters/0003/contract.yaml",
-          "fingerprint": "38075a865b5df83fb536c7f18591dd97cd555c3bd3abf950a610f044c99694e7"
+          "fingerprint": "1670a595727cd8d36219bfa540188c0e8b5be074d8546378640fdfdde9c344b9"
         },
         {
           "path": "chapters/0003/final.md",
@@ -93,7 +101,7 @@
         },
         {
           "path": "chapters/0003/review.yaml",
-          "fingerprint": "3a0f3cdc1c394627f35b824535942afefeb996764236ce46c73e8dbbd900233c"
+          "fingerprint": "ec804d90c188aef2512dc155490a3edc4ae358a8ec31b9f323156b962856ec65"
         },
         {
           "path": "chapters/0003/quality-final.json",
@@ -102,6 +110,10 @@
         {
           "path": "chapters/0003/delta.yaml",
           "fingerprint": "7e446e06d751e16d31e130d8df621fb021a65020943a2692c3d08c328b405e41"
+        },
+        {
+          "path": "chapters/0003/handoff.yaml",
+          "fingerprint": "c0cf132da0b0e6c904c44acb69f981f2914bf6fca6b675fc25e1743cf7801f30"
         }
       ]
     }
@@ -146,6 +158,34 @@
     {
       "path": "planning/volumes/current-volume.md",
       "fingerprint": "13d062d5401af0d9786c115035c780707eda26c6ddaf951cc3e6e11e55965638"
+    },
+    {
+      "path": "planning/style-profile.yaml",
+      "fingerprint": "08c4d64a13f91e3c9672dbb59e81bda1b2bf1f72933603dca9744a0220763b51"
+    },
+    {
+      "path": "planning/style-examples.yaml",
+      "fingerprint": "7015b80b853312698ec3e523e77816f39212e28e3e388c30ffe8e9dd282d0b17"
+    },
+    {
+      "path": "planning/characters/char-gu-qingzhao.yaml",
+      "fingerprint": "b39f52f3b0250e7e852c3087fc73268599efd6045ff5824fc5c9eb819db4938b"
+    },
+    {
+      "path": "planning/characters/char-han-jiu.yaml",
+      "fingerprint": "6d2601820041ed763d33956920e07c11dc339850b22684b54f0a9fa25bb62cc7"
+    },
+    {
+      "path": "planning/characters/char-shen-he.yaml",
+      "fingerprint": "50448955b10392399101441cdd1bfd0fae327103568c4e8f7762a22dde88d48f"
+    },
+    {
+      "path": "planning/characters/char-shen-yan.yaml",
+      "fingerprint": "495f3c7cab1e579ac8983b1be638f5a4fee0d97a806824cb4978393ebb804e98"
+    },
+    {
+      "path": "planning/characters/char-zhou-song.yaml",
+      "fingerprint": "b5afde8eec8dec927f5ed2d838ef37684ee63c7afa0e408c6291d7854531efb7"
     },
     {
       "path": "continuity/facts.yaml",

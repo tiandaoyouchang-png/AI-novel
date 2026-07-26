@@ -35,9 +35,9 @@ Use `--json` for a machine-readable view. The command validates card references 
 
 ## Context selection
 
-Select context by current participants, locations, active threads, resources, and chapter obligations. Prefer exact YAML facts and recent handoffs over summaries. Use lexical or SQLite retrieval only to identify candidates, then read their authoritative sources.
+Select context by current participants, locations, active threads, resources, chapter scene beats, and obligations. Load only matching static character profiles and authorized style examples. Prefer exact YAML facts and fingerprint-bound `handoff.yaml` files over free-running summaries. Use the disposable SQLite full-text index only to identify candidates, then re-read their authoritative sources.
 
-An index may be deleted and rebuilt. It must never update continuity.
+Rebuild with `novelctl index`; inspect with `novelctl search --query "<terms>"`. An index may be deleted and rebuilt. Stale source fingerprints are discarded, and the index must never update continuity.
 
 ## Commit rule
 
@@ -53,6 +53,6 @@ Commit all related continuity modules as one journaled transaction. The CLI save
 
 ## Checkpoints
 
-Create a checkpoint every ten chapters and at volume boundaries. Include the last committed chapter, active threads, character/resource state, known quality debt, and index fingerprint.
+The CLI creates an interval checkpoint after `checkpointInterval` committed chapters. Run `novelctl checkpoint --label "<label>"` at manual boundaries; `milestone --type volume` creates a volume checkpoint. A checkpoint includes the state fingerprint, active continuity IDs, payoff debt, and exact source fingerprints.
 
 On recovery, trust `novel-state.yaml`, accepted prose, continuity YAML, and the latest valid checkpoint. Treat run logs as diagnostics, not authority.

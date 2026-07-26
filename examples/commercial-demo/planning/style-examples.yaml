@@ -1,0 +1,11 @@
+schemaVersion: 1
+examples:
+  - id: sample-evidence-reveal
+    title: 物证翻转微型样例
+    sceneTypes:
+      - investigation
+      - reveal
+    rights: user-owned
+    source: 本仓库原创回归样例《盐火照夜》第一章
+    excerpt: 沈砚没有碰那层盐。他先用指甲刮下袋口的蜡，再把蜡屑贴到灯罩背面。热气一烘，暗红里浮出第二道压痕。官封是真的，封口的次序却是假的。
+    guidance: 先展示可观察动作，再让结论改变角色的风险，而不是先解释答案。

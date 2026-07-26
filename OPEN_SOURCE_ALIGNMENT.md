@@ -31,7 +31,7 @@ Adopted:
 
 - explicit approval before prose production;
 - serial chapter generation;
-- previous-chapter handoff plus shared planning.
+- fingerprint-bound structured previous-chapter handoff plus shared planning.
 
 Changed:
 
@@ -48,6 +48,7 @@ Adopted:
 
 - modular continuity entries with stable IDs;
 - keyword and explicit-ID context selection;
+- rebuildable SQLite full-text candidate retrieval with source revalidation;
 - bounded context rather than loading the entire manuscript;
 - visible source fingerprints so context can be inspected and invalidated.
 
@@ -83,5 +84,7 @@ Codex Novel combines plain-text project durability, approval-gated serial produc
 - journaled multi-file continuity commits and recovery;
 - committed-chapter integrity audits;
 - structured market positioning and source-bound opening milestones.
+- separate short-complete and long-volume milestone rubrics;
+- schema-bound scene value changes, stable character voice profiles, and a two-round repair budget.
 
 The project deliberately remains a Codex-native production system rather than becoming another model-provider frontend.

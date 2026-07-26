@@ -1,0 +1,21 @@
+schemaVersion: 1
+chapter: 2
+sourceFingerprint: ee12f73fd632c6ba99d5d0518646fd6a51f32c5bb2aa966c411a987c295bfad9
+summary: 沈砚、顾青昭和韩九通过巡夜时间差离开义仓，火漆证明封条在雨夜被替换；沈砚与顾青昭形成低信任联盟，义仓随即起火。
+resolved:
+  - 封条并非旧封自然破损，而是在雨夜被重新加热压印。
+  - 顾青昭需要沈砚的账术且掌握他三年前补假账的底稿。
+unresolved:
+  - 无字凹痕代表的上层组织尚未确认。
+  - 义仓火灾的执行者和目标尚未确认。
+characterCarry:
+  - characterId: char-shen-yan
+    state: 同时持有青盐与半枚火漆，和顾青昭建立带把柄的临时合作。
+  - characterId: char-gu-qingzhao
+    state: 暗线身份只得到部分证明，必须通过独立承担风险建立可信度。
+  - characterId: char-han-jiu
+    state: 制造可核验时间差帮助离仓，但仍隐瞒夜航簿信息。
+emotionalCarry: 刚建立的合作没有带来安全感，第二件物证反而触发了立即灭证的火灾。
+nextConstraints:
+  - 火灾不能一次销毁全部可查信息。
+  - 顾青昭和沈砚不能突然完全互信。

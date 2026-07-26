@@ -1,4 +1,4 @@
-schemaVersion: 1
+schemaVersion: 2
 chapter: 2
 title: 半枚火漆
 goal: 沈砚必须带着青盐样本离开义仓，并在封仓令落下前找到能证明调包发生时间的第二类痕迹。
@@ -43,6 +43,29 @@ readerPromise: 读者将看到“封印”这项看似权威的记录如何反�
 keyTurn: 顾青昭并非来夺证，而是掌握沈砚三年前补假账的底稿，并需要他的账术。
 netChange: 沈砚与顾青昭形成带把柄的临时联盟，获得第二件高风险物证。
 endingPull: 义仓内骤然起火，火势从最潮湿、不该燃烧的盐垛底部窜出。
+emotionalTarget: 沈砚从被顾青昭拿住把柄，转为接受一段仍可相互验证的低信任合作。
+sceneBeats:
+  - id: scene-west-wall-bargain
+    type: dialogue
+    location: 临河县义仓西墙
+    participants:
+      - 沈砚
+      - 顾青昭
+      - 韩九
+    goal: 带着青盐离仓并确认顾青昭掌握的证据。
+    conflict: 县衙开始复查封口，三人互不完全信任。
+    valueShift: 被迫受制转为有条件的临时联盟。
+    emotionalChange: 戒备转为克制合作。
+  - id: scene-wax-time-proof
+    type: reveal
+    location: 废弃验盐亭
+    participants:
+      - 沈砚
+      - 顾青昭
+    goal: 从火漆判断封条被替换的时间。
+    conflict: 物证本身来路不明，不能直接作为合法官印。
+    valueShift: 抽象怀疑转为第二件可核验物证。
+    emotionalChange: 被动逃离转为看见反查路径。
 targetLength:
   min: 900
   target: 1400

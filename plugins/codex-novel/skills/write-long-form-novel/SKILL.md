@@ -20,9 +20,10 @@ When a workspace exists:
 1. Run `node <plugin-root>/dist/novelctl.cjs status <workspace>`.
 2. Read `novel-state.yaml`.
 3. Run `node <plugin-root>/dist/novelctl.cjs cards <workspace>` when the request involves character state, death, secrets, subplots, or current plot position.
-4. Read only the accepted artifacts needed for the current step.
-5. Preserve user-edited prose and accepted decisions unless replacement is explicit.
-6. Recommend one recoverable next action.
+4. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
+5. Read only the accepted artifacts needed for the current step.
+6. Preserve user-edited prose and accepted decisions unless replacement is explicit.
+7. Recommend one recoverable next action.
 
 When no workspace exists, remain in preview conversation until the user asks to create durable files. Then run:
 
@@ -75,6 +76,8 @@ node <plugin-root>/dist/novelctl.cjs phase <workspace> --to production
 
 Do not treat chat-only previews as accepted files. When an accepted upstream decision changes, stop and report downstream artifacts that must become stale; never silently rewrite them.
 
+Before foundation approval, create one structured `planning/characters/<character-id>.yaml` profile for every recurring character and complete `planning/style-profile.yaml`. Character profiles hold stable motivation, moral boundaries, decision patterns, voice rules, and OOC risks; `continuity/characters.yaml` holds only changing state. `planning/style-examples.yaml` may contain only user-owned, explicitly authorized, or public-domain excerpts. Never configure imitation of a named author's distinctive expression.
+
 If an accepted brief, foundation, or volume plan was edited, run:
 
 ```bash
@@ -92,19 +95,21 @@ Use this chain:
 For every chapter:
 
 1. Create and validate `contract.yaml`; keep its length range inside the accepted `planning/market-position.yaml` policy.
-2. Run `node <plugin-root>/dist/novelctl.cjs context <workspace>` to compile bounded `context.md` and its machine-checkable source manifest.
+   The schema-v2 contract must include an `emotionalTarget` and at least one structured `sceneBeat` with goal, conflict, value shift, and emotional change.
+2. Run `node <plugin-root>/dist/novelctl.cjs context <workspace>` to compile bounded `context.md` and its machine-checkable source manifest. It selects only participating character profiles, relevant dynamic cards, matching authorized style examples, the prior structured handoff, and current indexed candidates.
 3. Write one coherent `draft.md`.
 4. Run `node <plugin-root>/dist/novelctl.cjs quality <workspace> --source draft`.
-5. Write structured `review.yaml` bound to the exact draft SHA-256 fingerprint.
+5. Write schema-v2 `review.yaml` bound to the exact draft SHA-256 fingerprint. Record review round 1 or 2 and explicit evidence for character voice, information boundaries, and scene value changes.
 6. Apply targeted repair before considering a full rewrite.
 7. Copy the passing reviewed draft exactly to candidate `final.md`, then run the final quality check. Any prose change requires another draft and review round.
 8. Extract `delta.yaml` from the final prose and include its SHA-256 fingerprint.
-9. Commit continuity only after final prose is accepted.
-10. Start the next chapter only after continuity is committed.
+9. Write `handoff.yaml` from that exact accepted prose. Record resolved and unresolved items, character carry, emotional carry, and next-chapter constraints with the same fingerprint.
+10. Commit continuity only after final prose is accepted.
+11. Start the next chapter only after continuity is committed.
 
 Use the bundled CLI's `advance <workspace> --to <status>` at each gate and `next <workspace>` after the commit. A failed transition is a real blocker; fix the missing artifact instead of editing `novel-state.yaml` by hand.
 
-Limit review and repair to two rounds by default. If blocking issues remain, stop for author direction. Do not use an AI-detector score as the sole acceptance criterion.
+The CLI enforces a maximum of two review rounds. If blocking issues remain after round two, stop for author direction. Do not use an AI-detector score as the sole acceptance criterion.
 
 For `long-serial`, after chapters 1-3 are continuity-committed, run:
 
@@ -115,6 +120,20 @@ node <plugin-root>/dist/novelctl.cjs milestone <workspace> --type opening-three
 Read the generated metrics and commercial review template. Judge audience fit, hook, protagonist agency, payoff density, escalation, emotional investment, prose distinctiveness, and continuation intent with chapter-level evidence. Save the completed review as `reports/opening-three/review.yaml`. Treat the mechanical report as workflow evidence, not a market verdict; a passing internal review still requires a stated reader test.
 
 For `short-complete`, use the same per-section production chain, then review the whole accepted story for opening pull, compression, causality, emotional escalation, reversal, ending payoff, and platform fit before moving to `completed`. Do not pad a short story to satisfy a long-serial milestone.
+
+Run the form-specific milestone:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs milestone <workspace> --type short-complete
+```
+
+For a long-serial volume boundary, run:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs milestone <workspace> --type volume
+```
+
+The volume milestone also writes a named continuity checkpoint. The CLI automatically writes interval checkpoints after the configured number of committed chapters.
 
 ## Preserve bounded context
 
@@ -131,6 +150,14 @@ Prefer the smallest context package that preserves causality:
 Do not load the entire manuscript merely because it exists. Never promote planned events or reviewer suggestions into continuity facts.
 
 If validation reports an incomplete continuity transaction, run `node <plugin-root>/dist/novelctl.cjs recover <workspace>` before any other production action.
+
+For book-scale search, rebuild the disposable SQLite full-text index after accepted continuity changes:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs index <workspace>
+```
+
+The index can identify older handoffs, profiles, continuity entries, and authorized examples. A stale source fingerprint removes that result; the index never writes authoritative continuity.
 
 ## Export accepted prose
 

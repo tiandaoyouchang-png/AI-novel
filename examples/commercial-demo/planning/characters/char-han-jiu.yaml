@@ -1,0 +1,19 @@
+schemaVersion: 1
+id: char-han-jiu
+name: 韩九
+role: 义仓更夫，沈父旧识
+coreMotivation: 保住孙子并偿还欠沈父的一条命。
+moralBoundary: 不会主动把沈砚交给县丞，但会隐瞒足以牵连孙子的事实。
+decisionPattern: 先制造一个可核验的小帮助，再观察对方是否值得交出更多真相。
+voice:
+  rhythm: 咳嗽打断短句，重要信息常拆成两次才说完。
+  diction: 使用巡夜、码头、船期和旧人情等口语。
+  habits:
+    - 说谎前先摸铜哨。
+  avoids:
+    - 不一次交代全部夜航簿信息。
+oocRisks:
+  - 没有现实压力就彻底倒向任何一方。
+relationshipVoices:
+  - characterId: char-shen-yan
+    difference: 把关心藏在责备中，只在行动上补偿沈家。

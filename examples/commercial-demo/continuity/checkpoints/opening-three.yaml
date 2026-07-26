@@ -1,0 +1,58 @@
+schemaVersion: 1
+generatedAt: 2026-07-26T13:19:45.579Z
+label: opening-three
+lastCommittedChapter: 3
+stateFingerprint: d74eeca699f97e9f03919e2707fb2958f9a5f8beacac89913ce529a8399f2bb1
+active:
+  facts:
+    - fact-evidence-distributed
+    - fact-father-reverse-route
+    - fact-han-created-patrol-gap
+    - fact-ledger-handwriting-new
+    - fact-seal-replaced-rain-night
+    - fact-shen-right-hand-burn
+    - fact-warehouse-adulterated-salt
+  timeline:
+    - time-chapter-001-warehouse
+    - time-chapter-002-seal-and-fire
+    - time-chapter-003-fire-rescue
+  threads:
+    - thread-father-ledger
+    - thread-green-salt
+    - thread-sealless-mark
+    - thread-warehouse-fire
+  resources:
+    - res-blue-salt-grain
+    - res-father-ledger-page
+    - res-half-sealing-wax
+  relationships:
+    - rel-shen-gu
+    - rel-shen-han
+    - rel-shen-zhou
+  characters:
+    - char-gu-qingzhao
+    - char-han-jiu
+    - char-shen-father
+    - char-shen-yan
+    - char-zhou-song
+  storyCards:
+    - card-arc-shen-agency
+    - card-main-green-salt
+qualityDebt:
+  - "card-arc-shen-agency: 让沈砚正面承担三年前补假账的责任，而非只把它当作外部把柄。"
+  - "card-main-green-salt: 查明反向货路、纵火安排与周嵩控制沈砚之间的因果链。"
+sources:
+  - path: continuity/facts.yaml
+    fingerprint: 6a2b52de7d50a673dc9e7eda506ac39ebd0363136a2d88c7b630abed2601de44
+  - path: continuity/timeline.yaml
+    fingerprint: 828d5d0041ec0cd590fac62fc0f763548d094733963114c9af2f17f8f511e1a2
+  - path: continuity/threads.yaml
+    fingerprint: 78fa20cfd28d69cd1e59d358210f5ebe0bdea98ba61fbb4c4572c0e3abaca32f
+  - path: continuity/resources.yaml
+    fingerprint: 550b778625fb73062c768c0ed1bbf96de23f40e8dbc5317b8782de90da42e395
+  - path: continuity/relationships.yaml
+    fingerprint: f2cf93ff009790f756c6e363b4f631d9a0688d6acfc13bf8faf58a20bad12428
+  - path: continuity/characters.yaml
+    fingerprint: 097da709b4adc01466ccc53dc2494ad04a15eb24356374e41f3be048a96e19b7
+  - path: continuity/story-cards.yaml
+    fingerprint: d7220ee0fc783216928b4c9efdf3efea3f0af549a69e08a760aaf6004c4720fc

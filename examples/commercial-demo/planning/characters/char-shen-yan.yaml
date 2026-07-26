@@ -1,0 +1,21 @@
+schemaVersion: 1
+id: char-shen-yan
+name: 沈砚
+role: 主角，县衙外聘账房
+coreMotivation: 用可复核的账术查清父亲旧案并赎回妹妹的契纸。
+moralBoundary: 不拿无辜者的性命换取唯一证据。
+decisionPattern: 先找能复核的矛盾，再把风险分散给多个保存点。
+voice:
+  rhythm: 短句为主，压力下会先说数字和结果。
+  diction: 常用重量、脚程、利息、经手和复核等账房词。
+  habits:
+    - 回答前用指甲掐算盘珠留下的旧茧。
+  avoids:
+    - 不发表脱离证据的正义宣言。
+oocRisks:
+  - 为推进剧情突然相信无法核验的口头承诺。
+relationshipVoices:
+  - characterId: char-shen-he
+    difference: 对妹妹会把命令说成建议，但仍容易替她做决定。
+  - characterId: char-gu-qingzhao
+    difference: 合作时先谈交换条件，不主动暴露底牌。

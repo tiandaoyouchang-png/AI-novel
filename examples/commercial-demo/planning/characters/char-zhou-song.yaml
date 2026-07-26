@@ -1,0 +1,19 @@
+schemaVersion: 1
+id: char-zhou-song
+name: 周嵩
+role: 临河县令，主线权力对手
+coreMotivation: 维持清名和地方控制，让违法交易看起来是必要治理成本。
+moralBoundary: 不容忍下属留下能直接指向自己的单一证据。
+decisionPattern: 先公开给对手体面位置，再用职责和人质关系收紧选择。
+voice:
+  rhythm: 从容完整，威胁通常藏在赞许和请托里。
+  diction: 常用大局、体面、经手、补救和百姓等官样词。
+  habits:
+    - 当众抬高对手能力，再把责任交给对方。
+  avoids:
+    - 不在缺乏控制时公开承认违法事实。
+oocRisks:
+  - 因愤怒直接说出幕后计划。
+relationshipVoices:
+  - characterId: char-shen-yan
+    difference: 把控制包装成赏识，让拒绝看起来像辜负百姓。

@@ -22,6 +22,8 @@ Channel implication: model platform and form separately. This implementation sup
 
 ## Ten optimization points
 
+Status note for `0.2.0`: points 1–4 and 7 are implemented. Point 6 now has schema-bound chapter scene beats, emotional targets, value changes, dynamic plot/character cards, and volume checkpoints; a cross-volume visual beat matrix remains future work.
+
 | # | Gap | Competitor or market evidence | Optimization | Priority | Verification |
 |---|---|---|---|---|---|
 | 1 | No evidence-backed topic discovery | Platform tools expose reader data; industry reports show demand changes over time | Add dated market-signal records with source type, evidence, confidence, and freshness | P0 | Stale, weak, or single-source scans cannot pass topic selection |
@@ -29,7 +31,7 @@ Channel implication: model platform and form separately. This implementation sup
 | 3 | Market positioning begins after the topic is already chosen | Current `market-position.yaml` cannot explain why this topic beat alternatives | Bind the selected topic and source fingerprints into the accepted brief | P0 | Editing discovery evidence makes the brief stale |
 | 4 | Trend copying and saturation risk are not gated | Broad demand signals do not prove whitespace; culturally distinctive work has stronger IP/export potential | Add originality boundary, saturation risk, prohibited imitation, and two-source support for the selected candidate | P0 | Candidate fails when differentiation or evidence quality is below threshold |
 | 5 | No opening-hook experiment before committing a book | Novelcrafter/Sudowrite support brainstorming and review, but the current workflow accepts one hook | Generate 2–3 hook hypotheses and define a blind-test signal before foundation approval | P1 | One hook selected with rejected alternatives and test result |
-| 6 | No scene/subplot/character-arc grid | Dabble exposes parallel plot lines against scenes | Add a volume beat matrix with main plot, subplot, character arc, payoff, and debt columns | P1 | Missing or idle plot line is reported across a rolling window |
+| 6 | No cross-volume subplot/character-arc grid | Dabble exposes parallel plot lines against scenes | Chapter scene beats and dynamic story cards are implemented; add a cross-volume matrix with main plot, subplot, character arc, payoff, and debt columns | P1 | Current scene value changes validate; future matrix reports idle plot lines across a rolling window |
 | 7 | Context selection lacked dynamic character/plot state and explicit secret visibility | Sudowrite saliency supports card/trait visibility to prevent premature disclosure | Dynamic character/story cards, death-state blocking, knowledge separation, hidden-ID redaction; add chapter-number reveal policy next | P1 | Dead onstage participants are blocked; hidden IDs are redacted and cross-references validated |
 | 8 | Revision history is diagnostic, not author-facing | Novelcrafter exposes field and scene revision restoration | Add named prose revisions, diff summaries, and safe restore without editing authoritative state by hand | P2 | Restore round-trip test preserves review invalidation |
 | 9 | No serial-production cadence or backlog health | Dabble tracks writing goals; Yuewen exposes publishing and performance data | Add chapter backlog, cadence target, buffer, and blocked-day status | P2 | Report flags an empty buffer or missed cadence without weakening quality gates |
@@ -38,8 +40,8 @@ Channel implication: model platform and form separately. This implementation sup
 ## Delivery order
 
 1. Implement points 1–4 as the topic-selection gate before brief approval.
-2. Add point 5 and point 7 before scaling beyond the opening milestone.
-3. Add point 6 before planning a full volume.
+2. Point 7 is implemented; add point 5 before scaling blind reader tests.
+3. Extend the implemented chapter scene beats into the remaining cross-volume portion of point 6 before planning multiple distant volumes.
 4. Add points 8–10 when real publication and reader data are available.
 
 This order protects the expensive decision first: choosing a market-supported, original, serially sustainable book before generating large amounts of prose.
