@@ -1,0 +1,17 @@
+schemaVersion: 1
+targetPlatform: fanqie
+workForm: long-serial
+targetReader: 喜欢历史悬疑、官场博弈和小人物专业破局的中文男频读者
+audienceChannel: 番茄小说男频长篇
+publicationFormat: 章节制连续更新小说
+primaryPromise: 每章交付一处可回看的证据翻转、一次可见代价或进展，并留下由主角行动造成的新问题
+chapterLength:
+  min: 900
+  target: 1600
+  max: 2800
+commercialAssumptions:
+  - 目标读者愿意追读不依赖超能力、由账术和货路证据驱动的历史悬疑
+  - 开篇第三章的县令征用钩子能把单次查案转化为可持续的官场破局循环
+contentBoundaries:
+  - 不照搬现实案件、在世人物或已有作品的标志性设定与表达
+  - 不用无代价巧合或突然出现的超自然能力解决核心冲突

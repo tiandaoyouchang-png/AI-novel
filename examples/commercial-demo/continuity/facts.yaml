@@ -1,0 +1,58 @@
+schemaVersion: 1
+entries:
+  - id: fact-evidence-distributed
+    status: active
+    value:
+      statement: 东字三、地字十九、玄字七三个异常袋号已分别交由在场脚夫记忆，顾青昭掌握全部三个。
+      certainty: observed
+    sourceChapter: 3
+    evidence: 沈砚在火场喊出袋号，顾青昭复述并指定三名脚夫分别记忆。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: fact-father-reverse-route
+    status: active
+    value:
+      statement: 沈父旧纸记载三艘赈字船空载出城却按满载付脚，回程绕开南闸并直送城外安民营。
+      certainty: documented
+    sourceChapter: 3
+    evidence: 韩九从棉袄夹层交出一页沈父笔迹的夜航记录。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: fact-han-created-patrol-gap
+    status: active
+    value:
+      statement: 韩九故意将东南角梆子提前一刻钟，为沈砚离开义仓制造空当。
+      certainty: observed
+    sourceChapter: 2
+    evidence: 沈砚辨认出童年躲避官差时使用的手势，并听见提前的梆声。
+    updatedAt: 2026-07-26T08:25:58.178Z
+  - id: fact-ledger-handwriting-new
+    status: active
+    value:
+      statement: 地字十九袋号表面做旧，但数字九使用县衙书吏今年才改的短钩写法。
+      certainty: observed
+    sourceChapter: 1
+    evidence: 沈砚近距离查看袋角墨号。
+    updatedAt: 2026-07-26T08:23:26.175Z
+  - id: fact-seal-replaced-rain-night
+    status: active
+    value:
+      statement: 义仓封条所用朱蜡在雨夜刚被替换，蜡面存在先压印后贴回造成的逆向卷边。
+      certainty: observed
+    sourceChapter: 2
+    evidence: 沈砚与顾青昭在验盐亭检查仍有柔性的内深外浅蜡屑。
+    updatedAt: 2026-07-26T08:25:58.178Z
+  - id: fact-shen-right-hand-burn
+    status: active
+    value:
+      statement: 沈砚右掌被火场盐粒烫出水泡，后背被坍塌碎木擦伤。
+      certainty: observed
+    sourceChapter: 3
+    evidence: 沈砚从北窗入仓救韩九时受伤。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: fact-warehouse-adulterated-salt
+    status: active
+    value:
+      statement: 临河县义仓地字十九袋中混有北泽青盐和带硝涩味的劣盐。
+      certainty: observed
+    sourceChapter: 1
+    evidence: 沈砚从鼠洞处取样并通过颜色、气味和舌尖涩麻初验。
+    updatedAt: 2026-07-26T08:23:26.175Z

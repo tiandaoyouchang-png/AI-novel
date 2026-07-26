@@ -1,0 +1,26 @@
+schemaVersion: 1
+entries:
+  - id: time-chapter-001-warehouse
+    status: active
+    value:
+      when: 钦差验仓前一夜
+      event: 沈砚在临河县义仓发现调包赈盐并私藏样本。
+    sourceChapter: 1
+    evidence: 第一章全章。
+    updatedAt: 2026-07-26T08:23:26.175Z
+  - id: time-chapter-002-seal-and-fire
+    status: active
+    value:
+      when: 钦差验仓前一夜，沈砚离仓后
+      event: 沈砚与顾青昭取得火漆证据并建立合作，义仓随即起火。
+    sourceChapter: 2
+    evidence: 第二章全章。
+    updatedAt: 2026-07-26T08:25:58.178Z
+  - id: time-chapter-003-fire-rescue
+    status: active
+    value:
+      when: 钦差验仓前一夜，义仓火起后
+      event: 沈砚救出韩九、分散袋号证据、取得父亲残页，并被县令周嵩当众召见。
+    sourceChapter: 3
+    evidence: 第三章全章。
+    updatedAt: 2026-07-26T08:29:12.746Z

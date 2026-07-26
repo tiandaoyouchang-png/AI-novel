@@ -1,0 +1,44 @@
+schemaVersion: 1
+milestone: opening-three
+bundleFingerprint: 63411e9168c03f8146c8a3a74484b8759d7ab704b23176bc2424dc0ba428f2be
+verdict: revise
+dimensions:
+  audienceFit:
+    score: 1
+    evidence: &a1
+      - "TODO: cite a concrete chapter location and reader effect."
+    nextAction: "TODO: specify one bounded repair or validation action."
+  openingHook:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+  protagonistAgency:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+  payoffDensity:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+  escalation:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+  emotionalInvestment:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+  proseDistinctiveness:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+  continuationIntent:
+    score: 1
+    evidence: *a1
+    nextAction: "TODO: specify one bounded repair or validation action."
+blockingIssues:
+  - "TODO: replace with the highest-leverage commercial risk."
+marketTest:
+  hypothesis: "TODO: state which reader response this opening should cause."
+  targetReader: "TODO: state a narrow target reader segment."
+  successSignal: "TODO: state an observable signal such as chapter-3 continuation intent."

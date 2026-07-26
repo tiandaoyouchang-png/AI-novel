@@ -1,0 +1,53 @@
+schemaVersion: 1
+chapter: 4
+title: 请君重做假账
+goal: 沈砚必须在县衙监视下重做一份能通过钦差初验、又暗藏可被外部核验破绽的总账。
+resistance: 周嵩亲自限定账目口径，沈砚右手受伤，县丞安排两名书吏逐笔监看，任何明显暗号都会牵连韩九和脚夫。
+requiredEvents:
+  - 沈砚利用右手伤势争取由书吏代笔。
+  - 周嵩给出一套表面合理的赈盐损耗解释。
+  - 沈砚把三个异常袋号转译成可被沈禾识别的药方剂量。
+  - 顾青昭必须在县衙外独立决定是否动用尚未公开的御史渠道。
+protectedFacts:
+  - 沈砚右掌烫伤且后背受伤。
+  - 周嵩表面征用、实质控制沈砚。
+  - 三个异常袋号已分散给脚夫记忆。
+  - 沈砚仍持有火漆碎片与沈父残页。
+prohibitedCrossings:
+  - 不能让周嵩看不出普通的账目暗号。
+  - 不能让顾青昭轻易调用公开官权解决困局。
+  - 不能在本章击败周嵩或完成钦差验仓。
+participants:
+  - 沈砚
+  - 周嵩
+  - 顾青昭
+  - 沈禾
+locations:
+  - 临河县衙账房
+  - 回春铺
+threadIds:
+  - thread-green-salt
+  - thread-father-ledger
+  - thread-warehouse-fire
+resourceIds:
+  - res-half-sealing-wax
+  - res-father-ledger-page
+relationshipIds:
+  - rel-shen-gu
+  - rel-shen-zhou
+worldRuleIds:
+  - salt-trace-five
+  - official-seal-liability
+keywords:
+  - 假账
+  - 药方
+  - 袋号
+  - 钦差
+readerPromise: 读者将看到沈砚如何在敌人规定的账目里制造一条只有盟友能读懂的外部核验路径。
+keyTurn: 沈砚故意不在数字本身做假，而是把经手顺序变成沈禾熟悉的药方剂量。
+netChange: 主角从发现证据升级为主动设计可分发的证据协议，同时让妹妹正式进入行动线。
+endingPull: 代笔书吏写完最后一行后，用沈父才会使用的方式敲了三下砚台。
+targetLength:
+  min: 1800
+  target: 2200
+  max: 2800

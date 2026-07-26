@@ -1,0 +1,51 @@
+schemaVersion: 1
+milestone: opening-three
+bundleFingerprint: 63411e9168c03f8146c8a3a74484b8759d7ab704b23176bc2424dc0ba428f2be
+verdict: pass
+dimensions:
+  audienceFit:
+    score: 4
+    evidence:
+      - 第一章用账房、赈盐和县衙风险迅速建立历史悬疑与小人物专业破局的类型承诺。
+      - 三章都以可回看的重量、蜡印、巡夜时辰或货路痕迹推进，而非凭空揭密。
+    nextAction: 用五名偏好历史悬疑的目标读者测试他们能否无解释复述核心卖点。
+  openingHook:
+    score: 4
+    evidence:
+      - 第一章在义仓异常、北泽青盐和韩九旧称之间连续升级，并以父亲夜航簿问题收尾。
+    nextAction: 压缩开头关于木台和袋腹的解释，让第一处危险更早抵达。
+  protagonistAgency:
+    score: 4
+    evidence:
+      - 沈砚三次主动越过安全线：私藏青盐、与顾青昭互持物证、放弃诱饵总账救韩九。
+    nextAction: 第四章让他主动设计县衙重做假账的反制，而不是只应对周嵩命令。
+  payoffDensity:
+    score: 4
+    evidence:
+      - 每章分别交付调包物证、换封时间和反向货路，同时把结果转成新的身份风险。
+    nextAction: 后续继续保证阶段答案，不要让无字印记长期只作为空悬念。
+  escalation:
+    score: 4
+    evidence:
+      - 冲突从秘密验盐升级到互持把柄、纵火杀人，再升级到县令公开控制主角。
+    nextAction: 第四至八章避免立刻引入更大官阶，先让县域规则产生更具体的压迫。
+  emotionalInvestment:
+    score: 3
+    evidence:
+      - 沈砚救韩九的选择建立了人物底线，但妹妹沈禾与赎契目标在正文中仍主要停留于提及。
+    nextAction: 在第五章前安排沈禾作出影响证据链的独立选择，让家庭欲望进入当下行动。
+  proseDistinctiveness:
+    score: 3
+    evidence:
+      - 算盘、货重、账债比喻与主角职业一致，但部分危险场面的短句节奏仍偏通用类型文表达。
+    nextAction: 二修时删除可替换到任何悬疑小说的句子，只保留由账术、盐路和人物关系生成的表达。
+  continuationIntent:
+    score: 4
+    evidence:
+      - 第三章以县令要求沈砚重做假账收尾，既给出明确下一场戏，也迫使主角使用核心能力对敌。
+    nextAction: 用盲测记录目标读者读完第三章后最想追问的问题，确认钩子不是作者自评。
+blockingIssues: []
+marketTest:
+  hypothesis: 喜欢历史悬疑和小人物升级的男频读者会因“被迫重做假账”的第三章钩子继续阅读。
+  targetReader: 最近一年持续阅读过历史悬疑或官场破局连载的中文男频读者。
+  successSignal: 至少 5 名盲测读者中 4 名能复述核心卖点，且 3 名以上明确选择立即阅读第四章。

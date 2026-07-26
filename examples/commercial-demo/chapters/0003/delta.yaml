@@ -1,0 +1,169 @@
+schemaVersion: 1
+chapter: 3
+sourceFingerprint: 71ee78dd37f44c56fd7d9c1f32cd3043f0e474f06f097afdd8f125c48663a550
+changes:
+  - domain: facts
+    operation: upsert
+    id: fact-father-reverse-route
+    value:
+      statement: 沈父旧纸记载三艘赈字船空载出城却按满载付脚，回程绕开南闸并直送城外安民营。
+      certainty: documented
+    evidence: 韩九从棉袄夹层交出一页沈父笔迹的夜航记录。
+  - domain: facts
+    operation: upsert
+    id: fact-shen-right-hand-burn
+    value:
+      statement: 沈砚右掌被火场盐粒烫出水泡，后背被坍塌碎木擦伤。
+      certainty: observed
+    evidence: 沈砚从北窗入仓救韩九时受伤。
+  - domain: facts
+    operation: upsert
+    id: fact-evidence-distributed
+    value:
+      statement: 东字三、地字十九、玄字七三个异常袋号已分别交由在场脚夫记忆，顾青昭掌握全部三个。
+      certainty: observed
+    evidence: 沈砚在火场喊出袋号，顾青昭复述并指定三名脚夫分别记忆。
+  - domain: resources
+    operation: upsert
+    id: res-father-ledger-page
+    value:
+      owner: 沈砚
+      item: 沈父夜航簿残页
+      content: 赈字船三艘的反向货路与异常水脚
+      risk: 可证明走货异常，也会暴露沈父参与旧案
+    evidence: 韩九从棉袄夹层取出旧纸，沈砚将其攥在左掌。
+  - domain: threads
+    operation: upsert
+    id: thread-father-ledger
+    value:
+      question: 沈父为何记录赈字船反向货路，完整夜航簿其余部分在哪里？
+      status: partially_answered
+      urgency: high
+    evidence: 韩九只交出一页旧纸，没有交代完整簿册下落。
+  - domain: threads
+    operation: upsert
+    id: thread-green-salt
+    value:
+      question: 好盐是否先被运往城外安民营，再由反向货船将青盐和劣盐补回官仓？
+      status: narrowed
+      urgency: high
+    evidence: 沈父残页与官账记录的货流方向相反。
+  - domain: threads
+    operation: upsert
+    id: thread-warehouse-fire
+    value:
+      question: 谁布置了空袋、梁油和诱饵总账，试图制造盗账替罪羊？
+      status: open
+      urgency: high
+    evidence: 韩九获救且总账焚毁，但纵火者身份未被确认。
+  - domain: relationships
+    operation: upsert
+    id: rel-shen-gu
+    value:
+      parties:
+        - 沈砚
+        - 顾青昭
+      state: 顾青昭公开阻止封门并协助分散证据，双方合作从互持把柄升级为共同暴露。
+      trust: guarded
+    evidence: 顾青昭以雄黄阻拦衙役，并让脚夫分别记住异常袋号。
+  - domain: relationships
+    operation: upsert
+    id: rel-shen-han
+    value:
+      parties:
+        - 沈砚
+        - 韩九
+      state: 沈砚选择放弃诱饵总账救出韩九，韩九回报一页沈父夜航记录；完整真相仍被保留。
+      trust: fragile-alliance
+    evidence: 火场救人与旧纸交付。
+  - domain: relationships
+    operation: upsert
+    id: rel-shen-zhou
+    value:
+      parties:
+        - 沈砚
+        - 周嵩
+      state: 周嵩公开称赞并召沈砚重做焚毁总账，表面征用、实质控制。
+      trust: adversarial-courtesy
+    evidence: 周嵩在衙役和脚夫面前邀请沈砚回县衙做账。
+  - domain: timeline
+    operation: upsert
+    id: time-chapter-003-fire-rescue
+    value:
+      when: 钦差验仓前一夜，义仓火起后
+      event: 沈砚救出韩九、分散袋号证据、取得父亲残页，并被县令周嵩当众召见。
+    evidence: 第三章全章。
+  - domain: characters
+    operation: upsert
+    id: char-shen-yan
+    value:
+      name: 沈砚
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 在县令控制下重做假账并暗查反向货路
+      knowledgeIds: [fact-father-reverse-route, fact-evidence-distributed, fact-shen-right-hand-burn]
+      hiddenKnowledgeIds: []
+      condition: [右掌烫伤起泡, 后背擦伤, 已进入县令视野]
+    evidence: 沈砚救出韩九、取得残页并被周嵩当众召见。
+  - domain: characters
+    operation: upsert
+    id: char-gu-qingzhao
+    value:
+      name: 顾青昭
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 保护分散证据并查明县令与转运司的连接
+      knowledgeIds: [fact-evidence-distributed, fact-father-reverse-route]
+      hiddenKnowledgeIds: [thread-sealless-mark]
+      condition: [暗线身份风险上升, 与沈砚共同暴露]
+    evidence: 顾青昭公开阻止封门并记下全部异常袋号。
+  - domain: characters
+    operation: upsert
+    id: char-han-jiu
+    value:
+      name: 韩九
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 活下来并决定是否交出完整夜航簿
+      knowledgeIds: [fact-father-reverse-route]
+      hiddenKnowledgeIds: [thread-father-ledger]
+      condition: [已脱离火场, 咳喘严重, 完整真相仍隐瞒]
+    evidence: 沈砚把韩九拖出火场，韩九交出一页残纸。
+  - domain: characters
+    operation: upsert
+    id: char-zhou-song
+    value:
+      name: 周嵩
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 以重做总账为名控制沈砚和幸存证据
+      knowledgeIds: [fact-evidence-distributed]
+      hiddenKnowledgeIds: []
+      condition: [公开维持清名, 幕后责任未证实]
+    evidence: 周嵩当众召沈砚进入县衙重做焚毁总账。
+  - domain: storyCards
+    operation: upsert
+    id: card-main-green-salt
+    value:
+      type: main-plot
+      status: active
+      summary: 沈砚追查赈盐调包与反向货路。
+      currentBeat: 救人取代抢账，袋号证据被分散，父亲残页指向城外安民营。
+      nextPressure: 沈砚必须在县令眼皮下做出可被复核的假账。
+      characterIds: [char-shen-yan, char-gu-qingzhao, char-han-jiu, char-zhou-song]
+      threadIds: [thread-green-salt, thread-father-ledger, thread-warehouse-fire]
+      payoffDebt: 查明反向货路、纵火安排与周嵩控制沈砚之间的因果链。
+    evidence: 第三章终稿兑现韩九生还，并把主线升级到县衙内的强制合作。
+  - domain: storyCards
+    operation: upsert
+    id: card-arc-shen-agency
+    value:
+      type: character-arc
+      status: active
+      summary: 沈砚从替权力补账的被动账房转向让证据由普通人共同保存的行动者。
+      currentBeat: 放弃唯一总账，选择救人并分散证据。
+      nextPressure: 在再次被迫做假账时守住主动选择与妹妹安全。
+      characterIds: [char-shen-yan, char-zhou-song]
+      threadIds: [thread-father-ledger]
+      payoffDebt: 让沈砚正面承担三年前补假账的责任，而非只把它当作外部把柄。
+    evidence: 第三章终稿中沈砚用多份人证替代唯一账本。

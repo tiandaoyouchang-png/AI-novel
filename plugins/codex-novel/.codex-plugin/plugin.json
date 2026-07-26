@@ -1,0 +1,26 @@
+{
+  "name": "codex-novel",
+  "version": "0.1.0",
+  "description": "A Codex-native, local-first system for selecting, writing, reviewing, and maintaining long and short fiction.",
+  "author": {
+    "name": "tiandaoyouchang-png",
+    "url": "https://github.com/tiandaoyouchang-png"
+  },
+  "repository": "https://github.com/tiandaoyouchang-png/AI-novel",
+  "keywords": ["novel", "writing", "long-form", "short-form", "continuity", "codex"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Novel Studio",
+    "shortDescription": "Build market-backed long or short fiction with Codex.",
+    "longDescription": "Compare evidence-backed topics for Fanqie or Zhihu Salt, then plan, write, review, recover, and export fiction with approval gates, dynamic character cards, and continuity protection.",
+    "developerName": "tiandaoyouchang-png",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Compare market-backed topics for Fanqie or Zhihu Salt and create a resumable fiction workspace.",
+      "Create a completed short story with dynamic character and plot cards.",
+      "Continue my novel from its last accepted chapter.",
+      "Audit this chapter for continuity and repair only blocking issues."
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "policyDate": "2026-07-26",
+  "selectedId": "salt-ledger-mystery",
+  "selectedRank": 1,
+  "selectedScore": 4.8,
+  "ok": true,
+  "blockingIssues": [],
+  "rankings": [
+    {
+      "id": "salt-ledger-mystery",
+      "workingTitle": "盐火照夜",
+      "targetPlatform": "fanqie",
+      "workForm": "long-serial",
+      "rank": 1,
+      "weightedScore": 4.8,
+      "gateOk": true,
+      "issues": [],
+      "evidenceCount": 4
+    },
+    {
+      "id": "silver-folk-healing",
+      "workingTitle": "爷爷的失物招领处",
+      "targetPlatform": "zhihu-salt",
+      "workForm": "short-complete",
+      "rank": 2,
+      "weightedScore": 4.25,
+      "gateOk": true,
+      "issues": [],
+      "evidenceCount": 3
+    },
+    {
+      "id": "opera-apocalypse",
+      "workingTitle": "戏台熄灯以后",
+      "targetPlatform": "fanqie",
+      "workForm": "long-serial",
+      "rank": 3,
+      "weightedScore": 3.95,
+      "gateOk": true,
+      "issues": [],
+      "evidenceCount": 3
+    }
+  ],
+  "sources": [
+    {
+      "path": "discovery/market-scan.yaml",
+      "fingerprint": "bef34a15410c4bca0c5c24129e9788cb10ca3dd66a68704b7bdd7918981f1013"
+    },
+    {
+      "path": "discovery/topic-candidates.yaml",
+      "fingerprint": "a624f3a217d6e5d75273fd233957a643471ebf1408d70e6d22c3fab7026fef2f"
+    },
+    {
+      "path": "discovery/topic-decision.yaml",
+      "fingerprint": "c377f4fb52a73d764417f64bee762b47773f06d598192183fd65569e18cfb1ee"
+    }
+  ]
+}

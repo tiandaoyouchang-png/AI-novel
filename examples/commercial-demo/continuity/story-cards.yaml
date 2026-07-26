@@ -1,0 +1,30 @@
+schemaVersion: 1
+entries:
+  - id: card-arc-shen-agency
+    status: active
+    value:
+      type: character-arc
+      status: active
+      summary: 沈砚从替权力补账的被动账房转向让证据由普通人共同保存的行动者。
+      currentBeat: 放弃唯一总账，选择救人并分散证据。
+      nextPressure: 在再次被迫做假账时守住主动选择与妹妹安全。
+      characterIds: [char-shen-yan, char-zhou-song]
+      threadIds: [thread-father-ledger]
+      payoffDebt: 让沈砚正面承担三年前补假账的责任，而非只把它当作外部把柄。
+    sourceChapter: 3
+    evidence: 第三章终稿中沈砚用多份人证替代唯一账本。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: card-main-green-salt
+    status: active
+    value:
+      type: main-plot
+      status: active
+      summary: 沈砚追查赈盐调包与反向货路。
+      currentBeat: 救人取代抢账，袋号证据被分散，父亲残页指向城外安民营。
+      nextPressure: 沈砚必须在县令眼皮下做出可被复核的假账。
+      characterIds: [char-shen-yan, char-gu-qingzhao, char-han-jiu, char-zhou-song]
+      threadIds: [thread-green-salt, thread-father-ledger, thread-warehouse-fire]
+      payoffDebt: 查明反向货路、纵火安排与周嵩控制沈砚之间的因果链。
+    sourceChapter: 3
+    evidence: 第三章终稿兑现韩九生还，并把主线升级到县衙内的强制合作。
+    updatedAt: 2026-07-26T08:29:12.746Z

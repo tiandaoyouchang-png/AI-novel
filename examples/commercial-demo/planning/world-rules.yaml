@@ -1,0 +1,17 @@
+schemaVersion: 1
+rules:
+  - id: salt-trace-five
+    name: 官盐五痕
+    constraint: 每批官盐都会留下重量、封印、税票、脚程和经手人五类记录，伪造者最多只能同时抹平其中三类。
+    cost: 核验越多痕迹，越容易惊动更高级的经手人。
+    prohibitedCrossing: 不能凭肉眼直接断定盐的完整来源，必须有至少两类痕迹相互印证。
+  - id: official-seal-liability
+    name: 用印连坐
+    constraint: 官印离柜、破损或重复编号都会追责保管者，因此半枚火漆既是证据也是杀身之物。
+    cost: 持有者一旦被搜出，可被先按盗印收押。
+    prohibitedCrossing: 顾青昭不能仅凭密探身份合法化来路不明的官印。
+  - id: night-river-curfew
+    name: 漕河夜禁
+    constraint: 亥时以后民船不得过临河闸，只有赈运、军报和县令手令可以放行。
+    cost: 夜航必须收买闸卒或冒用公文，并留下可追查的时辰记录。
+    prohibitedCrossing: 角色不能无代价地在夜间快速跨越上下游。

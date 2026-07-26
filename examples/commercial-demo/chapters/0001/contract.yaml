@@ -1,0 +1,44 @@
+schemaVersion: 1
+chapter: 1
+title: 义仓里的青盐
+goal: 沈砚必须在天亮封仓前确认义仓盐袋为何比官账轻，并决定是否保留证据。
+resistance: 仓门已被县衙封条锁住，韩九在门外巡夜，而沈砚本人参与补过这批赈盐的账。
+requiredEvents:
+  - 沈砚用账术和现场痕迹确认盐袋被调包。
+  - 袋底出现来自禁运北泽盐场的青盐。
+  - 仓外咳嗽让沈砚认出更夫韩九。
+  - 沈砚主动藏下一粒青盐并抄走异常袋号。
+protectedFacts:
+  - 沈砚没有超自然能力。
+  - 韩九咳嗽带铜哨音。
+  - 钦差将在次日午前验仓。
+prohibitedCrossings:
+  - 不能直接揭露县令是幕后主使。
+  - 不能让沈砚无代价带走整本官账。
+participants:
+  - 沈砚
+  - 韩九
+locations:
+  - 临河县义仓
+threadIds:
+  - thread-green-salt
+  - thread-father-ledger
+resourceIds:
+  - res-blue-salt-grain
+relationshipIds:
+  - rel-shen-han
+worldRuleIds:
+  - salt-trace-five
+  - official-seal-liability
+keywords:
+  - 青盐
+  - 赈盐
+  - 袋号
+readerPromise: 读者将看到沈砚如何从重量与封口的矛盾中找出第一条可验证证据。
+keyTurn: 沈砚发现异常不是仓吏偷斤短两，而是有人用南盐外皮包进禁运青盐。
+netChange: 沈砚从可能的旁观者变成私藏证据的涉案者。
+endingPull: 仓外熟悉的咳嗽停住，有人准确叫出沈砚的小名。
+targetLength:
+  min: 900
+  target: 1400
+  max: 2200
