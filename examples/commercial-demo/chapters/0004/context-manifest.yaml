@@ -1,9 +1,9 @@
 schemaVersion: 1
 chapter: 4
-generatedAt: 2026-07-26T10:29:24.263Z
-maxChars: 12000
+generatedAt: 2026-07-26T13:19:45.430Z
+maxChars: 20000
 truncated: false
-outputFingerprint: 14f86e34262eb5fcfb5f331ab95277003384db202c5cb0125e9e686c079bba1e
+outputFingerprint: 86810ff5cf4d8e964797918577cb8474169f8364a61a06b35acece03c70e0c7e
 sources:
   - path: author-intent.md
     fingerprint: 5445d836225061392cb9aa7fddf971750b30eb0e2b6ed11af317888efd60018a
@@ -25,6 +25,18 @@ sources:
     fingerprint: 1bb3fe96eb05bd0b0bf6816edc2b0fcf99ad4d496f126541c593524d66d4974e
   - path: planning/volumes/current-volume.md
     fingerprint: 13d062d5401af0d9786c115035c780707eda26c6ddaf951cc3e6e11e55965638
+  - path: planning/style-profile.yaml
+    fingerprint: 08c4d64a13f91e3c9672dbb59e81bda1b2bf1f72933603dca9744a0220763b51
+  - path: planning/style-examples.yaml
+    fingerprint: 7015b80b853312698ec3e523e77816f39212e28e3e388c30ffe8e9dd282d0b17
+  - path: planning/characters/char-gu-qingzhao.yaml
+    fingerprint: b39f52f3b0250e7e852c3087fc73268599efd6045ff5824fc5c9eb819db4938b
+  - path: planning/characters/char-shen-he.yaml
+    fingerprint: 50448955b10392399101441cdd1bfd0fae327103568c4e8f7762a22dde88d48f
+  - path: planning/characters/char-shen-yan.yaml
+    fingerprint: 495f3c7cab1e579ac8983b1be638f5a4fee0d97a806824cb4978393ebb804e98
+  - path: planning/characters/char-zhou-song.yaml
+    fingerprint: b5afde8eec8dec927f5ed2d838ef37684ee63c7afa0e408c6291d7854531efb7
   - path: continuity/facts.yaml
     fingerprint: 6a2b52de7d50a673dc9e7eda506ac39ebd0363136a2d88c7b630abed2601de44
   - path: continuity/timeline.yaml
@@ -40,6 +52,8 @@ sources:
   - path: continuity/story-cards.yaml
     fingerprint: d7220ee0fc783216928b4c9efdf3efea3f0af549a69e08a760aaf6004c4720fc
   - path: chapters/0004/contract.yaml
-    fingerprint: decb836b569679165aa542b38093fa81941f312d071c0de176bc78fdf272f9e0
+    fingerprint: 4dbe585910af4c6f42145e8d11e5866197f8dbaf3cc3d88e8d983b2d574a81b8
   - path: chapters/0003/final.md
     fingerprint: 71ee78dd37f44c56fd7d9c1f32cd3043f0e474f06f097afdd8f125c48663a550
+  - path: chapters/0003/handoff.yaml
+    fingerprint: c0cf132da0b0e6c904c44acb69f981f2914bf6fca6b675fc25e1743cf7801f30

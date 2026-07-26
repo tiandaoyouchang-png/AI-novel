@@ -45,6 +45,7 @@ export const novelStateSchema = z
         phase: bookPhaseSchema,
         currentChapter: z.number().int().positive(),
         chapterStatus: chapterStatusSchema,
+        reviewRound: z.number().int().min(0).max(2).default(0),
         delegatedThroughChapter: z.number().int().positive().nullable(),
         blockingReason: z.string().min(1).nullable(),
         updatedAt: z.string().datetime()
@@ -68,7 +69,7 @@ export const novelStateSchema = z
 
 export const chapterContractSchema = z
   .object({
-    schemaVersion: z.literal(1),
+    schemaVersion: z.literal(2),
     chapter: z.number().int().positive(),
     title: z.string().min(1),
     goal: z.string().min(1),
@@ -88,6 +89,31 @@ export const chapterContractSchema = z
     keyTurn: z.string().min(1),
     netChange: z.string().min(1),
     endingPull: z.string().min(1),
+    emotionalTarget: z.string().min(1),
+    sceneBeats: z
+      .array(
+        z
+          .object({
+            id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+            type: z.enum([
+              "dialogue",
+              "action",
+              "investigation",
+              "intimacy",
+              "reveal",
+              "transition",
+              "other"
+            ]),
+            location: z.string().min(1),
+            participants: z.array(z.string().min(1)).min(1),
+            goal: z.string().min(1),
+            conflict: z.string().min(1),
+            valueShift: z.string().min(1),
+            emotionalChange: z.string().min(1)
+          })
+          .strict()
+      )
+      .min(1),
     targetLength: z
       .object({
         min: z.number().int().positive(),
@@ -106,18 +132,69 @@ export const chapterContractSchema = z
         message: "Expected min <= target <= max."
       });
     }
+    const sceneIds = new Set<string>();
+    for (const [index, scene] of contract.sceneBeats.entries()) {
+      if (sceneIds.has(scene.id)) {
+        context.addIssue({
+          code: "custom",
+          path: ["sceneBeats", index, "id"],
+          message: `Duplicate scene beat id: ${scene.id}`
+        });
+      }
+      for (const participant of scene.participants) {
+        if (!contract.participants.includes(participant)) {
+          context.addIssue({
+            code: "custom",
+            path: ["sceneBeats", index, "participants"],
+            message: `Scene participant is not declared by the chapter contract: ${participant}`
+          });
+        }
+      }
+      if (!contract.locations.includes(scene.location)) {
+        context.addIssue({
+          code: "custom",
+          path: ["sceneBeats", index, "location"],
+          message: `Scene location is not declared by the chapter contract: ${scene.location}`
+        });
+      }
+      sceneIds.add(scene.id);
+    }
   });
+
+const reviewCheckSchema = z
+  .object({
+    status: z.enum(["pass", "fail"]),
+    evidence: z.string().min(1)
+  })
+  .strict();
 
 export const chapterReviewSchema = z
   .object({
-    schemaVersion: z.literal(1),
+    schemaVersion: z.literal(2),
+    reviewRound: z.number().int().min(1).max(2),
     sourceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
     verdict: z.enum(["pass", "repair", "replan"]),
+    checks: z
+      .object({
+        characterVoice: reviewCheckSchema,
+        informationBoundaries: reviewCheckSchema,
+        sceneValueChanges: reviewCheckSchema
+      })
+      .strict(),
     blockingIssues: z.array(
       z
         .object({
           id: z.string().min(1),
-          category: z.enum(["continuity", "causality", "character", "pacing", "style", "contract"]),
+          category: z.enum([
+            "continuity",
+            "causality",
+            "character",
+            "information",
+            "scene",
+            "pacing",
+            "style",
+            "contract"
+          ]),
           evidence: z.string().min(1),
           repair: z.string().min(1)
         })
@@ -141,7 +218,144 @@ export const chapterReviewSchema = z
         message: "A non-passing review must contain a blocking issue."
       });
     }
+    const failedChecks = Object.entries(review.checks)
+      .filter(([, check]) => check.status === "fail")
+      .map(([name]) => name);
+    if (review.verdict === "pass" && failedChecks.length > 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["checks"],
+        message: `A passing review cannot contain failed checks: ${failedChecks.join(", ")}`
+      });
+    }
+    if (review.verdict !== "pass" && failedChecks.length === 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["checks"],
+        message: "A non-passing review must fail at least one explicit check."
+      });
+    }
   });
+
+export const characterProfileSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+    name: z.string().min(1),
+    role: z.string().min(1),
+    coreMotivation: z.string().min(1),
+    moralBoundary: z.string().min(1),
+    decisionPattern: z.string().min(1),
+    voice: z
+      .object({
+        rhythm: z.string().min(1),
+        diction: z.string().min(1),
+        habits: z.array(z.string().min(1)),
+        avoids: z.array(z.string().min(1))
+      })
+      .strict(),
+    oocRisks: z.array(z.string().min(1)).min(1),
+    relationshipVoices: z
+      .array(
+        z
+          .object({
+            characterId: z.string().min(1),
+            difference: z.string().min(1)
+          })
+          .strict()
+      )
+  })
+  .strict();
+
+export const styleProfileSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    pov: z.enum(["first", "third-limited", "third-omniscient"]),
+    tense: z.enum(["past", "present", "mixed-intentional"]),
+    pacing: z.enum(["compressed", "balanced", "expansive"]),
+    dialogueDensity: z.enum(["low", "medium", "high"]),
+    sentenceRhythm: z.string().min(1),
+    descriptionPreferences: z.array(z.string().min(1)).min(1),
+    bannedPatterns: z.array(z.string().min(1)),
+    sceneGuidance: z.record(
+      z.enum([
+        "dialogue",
+        "action",
+        "investigation",
+        "intimacy",
+        "reveal",
+        "transition",
+        "other"
+      ]),
+      z.array(z.string().min(1)).min(1)
+    )
+  })
+  .strict();
+
+export const styleExamplesSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    examples: z.array(
+      z
+        .object({
+          id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+          title: z.string().min(1),
+          sceneTypes: z
+            .array(
+              z.enum([
+                "dialogue",
+                "action",
+                "investigation",
+                "intimacy",
+                "reveal",
+                "transition",
+                "other"
+              ])
+            )
+            .min(1),
+          rights: z.enum(["user-owned", "authorized", "public-domain"]),
+          source: z.string().min(1),
+          excerpt: z.string().min(20).max(2_000),
+          guidance: z.string().min(1)
+        })
+        .strict()
+    )
+  })
+  .strict()
+  .superRefine((library, context) => {
+    const ids = new Set<string>();
+    for (const [index, example] of library.examples.entries()) {
+      if (ids.has(example.id)) {
+        context.addIssue({
+          code: "custom",
+          path: ["examples", index, "id"],
+          message: `Duplicate style example id: ${example.id}`
+        });
+      }
+      ids.add(example.id);
+    }
+  });
+
+export const chapterHandoffSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    chapter: z.number().int().positive(),
+    sourceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    summary: z.string().min(1),
+    resolved: z.array(z.string().min(1)),
+    unresolved: z.array(z.string().min(1)),
+    characterCarry: z.array(
+      z
+        .object({
+          characterId: z.string().min(1),
+          state: z.string().min(1)
+        })
+        .strict()
+    ),
+    emotionalCarry: z.string().min(1),
+    nextConstraints: z.array(z.string().min(1))
+  })
+  .strict();
 
 export const chapterContextManifestSchema = z
   .object({
@@ -599,6 +813,36 @@ export const qualityReportSchema = z
   })
   .strict();
 
+export const checkpointSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    generatedAt: z.string().datetime(),
+    label: z.string().min(1),
+    lastCommittedChapter: z.number().int().positive(),
+    stateFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    active: z
+      .object({
+        facts: z.array(z.string().min(1)),
+        timeline: z.array(z.string().min(1)),
+        threads: z.array(z.string().min(1)),
+        resources: z.array(z.string().min(1)),
+        relationships: z.array(z.string().min(1)),
+        characters: z.array(z.string().min(1)),
+        storyCards: z.array(z.string().min(1))
+      })
+      .strict(),
+    qualityDebt: z.array(z.string().min(1)),
+    sources: z.array(
+      z
+        .object({
+          path: z.string().min(1),
+          fingerprint: z.string().regex(/^[a-f0-9]{64}$/)
+        })
+        .strict()
+    )
+  })
+  .strict();
+
 const milestoneSourceSchema = z
   .object({
     path: z.string().min(1),
@@ -696,10 +940,142 @@ export const commercialMilestoneReviewSchema = z
     }
   });
 
+export const storyMilestoneTypeSchema = z.enum(["short-complete", "volume"]);
+
+const storyMilestoneChapterSchema = z
+  .object({
+    chapter: z.number().int().positive(),
+    title: z.string().min(1),
+    chineseCharacters: z.number().int().nonnegative(),
+    emotionalTarget: z.string().min(1),
+    sceneCount: z.number().int().positive(),
+    reviewRound: z.number().int().min(1).max(2),
+    sources: z.array(milestoneSourceSchema)
+  })
+  .strict();
+
+export const storyMilestoneReportSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    milestone: storyMilestoneTypeSchema,
+    workForm: workFormSchema,
+    generatedAt: z.string().datetime(),
+    bundleFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    throughChapter: z.number().int().positive(),
+    totalChineseCharacters: z.number().int().nonnegative(),
+    ok: z.boolean(),
+    blockingIssues: z.array(z.string().min(1)),
+    chapters: z.array(storyMilestoneChapterSchema).min(1),
+    sources: z.array(milestoneSourceSchema)
+  })
+  .strict();
+
+const storyReviewDimensionIdSchema = z.enum([
+  "openingPull",
+  "compression",
+  "causality",
+  "emotionalEscalation",
+  "reversal",
+  "endingPayoff",
+  "platformFit",
+  "promiseDelivery",
+  "escalation",
+  "characterArcs",
+  "subplotControl",
+  "continuityHealth",
+  "climaxPayoff",
+  "nextVolumePull"
+]);
+
+export const storyMilestoneReviewSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    milestone: storyMilestoneTypeSchema,
+    bundleFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    verdict: z.enum(["pass", "revise", "reposition"]),
+    dimensions: z
+      .array(
+        z
+          .object({
+            id: storyReviewDimensionIdSchema,
+            score: z.number().int().min(1).max(5),
+            evidence: z.array(z.string().min(1)).min(1),
+            nextAction: z.string().min(1)
+          })
+          .strict()
+      )
+      .min(1),
+    blockingIssues: z.array(z.string().min(1)),
+    readerTest: z
+      .object({
+        hypothesis: z.string().min(1),
+        targetReader: z.string().min(1),
+        successSignal: z.string().min(1)
+      })
+      .strict()
+  })
+  .strict()
+  .superRefine((review, context) => {
+    const required = review.milestone === "short-complete"
+      ? [
+          "openingPull",
+          "compression",
+          "causality",
+          "emotionalEscalation",
+          "reversal",
+          "endingPayoff",
+          "platformFit"
+        ]
+      : [
+          "promiseDelivery",
+          "escalation",
+          "characterArcs",
+          "subplotControl",
+          "continuityHealth",
+          "climaxPayoff",
+          "nextVolumePull"
+        ];
+    const ids = review.dimensions.map((dimension) => dimension.id);
+    const missing = required.filter((id) => !ids.includes(id as typeof ids[number]));
+    if (new Set(ids).size !== ids.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["dimensions"],
+        message: "Milestone review dimensions must be unique."
+      });
+    }
+    if (missing.length > 0 || ids.some((id) => !required.includes(id))) {
+      context.addIssue({
+        code: "custom",
+        path: ["dimensions"],
+        message: `Expected exactly these ${review.milestone} dimensions: ${required.join(", ")}`
+      });
+    }
+    if (review.verdict === "pass") {
+      if (review.blockingIssues.length > 0 || review.dimensions.some((dimension) => dimension.score < 3)) {
+        context.addIssue({
+          code: "custom",
+          path: ["verdict"],
+          message: "A passing milestone review requires no blockers and every dimension >= 3."
+        });
+      }
+    } else if (review.blockingIssues.length === 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["blockingIssues"],
+        message: "A non-passing milestone review must identify a blocker."
+      });
+    }
+  });
+
 export type NovelState = z.infer<typeof novelStateSchema>;
 export type BookPhase = z.infer<typeof bookPhaseSchema>;
 export type ChapterStatus = z.infer<typeof chapterStatusSchema>;
 export type ChapterContract = z.infer<typeof chapterContractSchema>;
+export type ChapterHandoff = z.infer<typeof chapterHandoffSchema>;
+export type CharacterProfile = z.infer<typeof characterProfileSchema>;
+export type StyleProfile = z.infer<typeof styleProfileSchema>;
+export type StyleExamples = z.infer<typeof styleExamplesSchema>;
 export type ContinuityDomain = z.infer<typeof continuityDomainSchema>;
 export type ContinuityStore = z.infer<typeof continuityStoreSchema>;
 export type ContinuityDelta = z.infer<typeof continuityDeltaSchema>;
@@ -711,6 +1087,7 @@ export type MarketScan = z.infer<typeof marketScanSchema>;
 export type TopicCandidates = z.infer<typeof topicCandidatesSchema>;
 export type TopicDecision = z.infer<typeof topicDecisionSchema>;
 export type TopicSelectionReport = z.infer<typeof topicSelectionReportSchema>;
+export type StoryMilestoneType = z.infer<typeof storyMilestoneTypeSchema>;
 
 export function chapterLengthPolicyIssues(
   contract: ChapterContract,

@@ -11,9 +11,9 @@
 
 它不是一个“输入题目、一次生成整本小说”的文本生成器，而是一套把 **市场选题、作品设定、逐章创作、质量复核、角色状态、剧情状态和最终导出** 串联起来的生产系统。
 
-Codex 负责理解、策划、写作、审稿和局部修复；`novelctl` 负责确定性的状态检查、阶段推进、连续性提交、故障恢复和导出。所有关键内容都保存在本地 Markdown/YAML 文件中，作者可以阅读、修改、版本管理，也可以随时停止后继续。
+Codex 负责理解、策划、写作、审稿和局部修复；`novelctl` 负责确定性的状态检查、阶段推进、连续性提交、故障恢复、检索索引、检查点和导出。所有关键内容都保存在本地 Markdown/YAML 文件中，作者可以阅读、修改、版本管理，也可以随时停止后继续。
 
-> 当前版本：`0.1.0`，处于可运行的工程验证阶段。项目尚未接入番茄小说或知乎盐选的自动发布接口，也不承诺平台流量、签约结果或作品收入。
+> 当前版本：`0.2.0`，处于可运行的工程验证阶段。项目尚未接入番茄小说或知乎盐选的自动发布接口，也不承诺平台流量、签约结果或作品收入。
 
 ## 为什么要做这个项目
 
@@ -81,6 +81,12 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 
 这些数据只在章节正文通过审查并被作者接受后提交。计划中的事件、审稿建议和被废弃的草稿不会自动变成“既定事实”。
 
+稳定身份与动态状态分开保存：
+
+- `planning/characters/<角色ID>.yaml` 保存动机、道德底线、决策习惯、说话节奏和 OOC 风险；
+- `continuity/characters.yaml` 只保存生死、位置、伤势、目标和知识等会随剧情变化的状态；
+- 每章根据明确的参与角色选择性加载档案，不会把所有角色资料都塞入上下文。
+
 ### 4. 防止角色错乱和“死而复生”
 
 在生成下一章上下文前，系统会读取角色生命状态和本章出场合同：
@@ -98,14 +104,19 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 每次写作只组装当前章节真正需要的内容：
 
 - 当前章节合同；
+- 场景列表、情绪目标和每场价值变化；
 - 上一章交接信息；
 - 当前卷计划窗口；
 - 本章参与角色；
 - 相关事实、资源、关系和未解决剧情线；
 - 必要的世界规则；
+- 本章参与角色的稳定语言与行为档案；
+- 与场景类型匹配且已声明授权来源的微型风格样例；
 - 明确记录的未知项与省略项。
 
 这样可以减少长篇创作中的无关信息干扰，也让“为什么本章知道这些信息”可以被检查。
+
+系统还提供可删除、可重建的 SQLite 全文检索索引。索引只负责寻找较早的交接、连续性条目和角色档案；每条结果都要重新校验源文件指纹，索引无权修改剧情状态。
 
 ### 6. 可恢复的状态机
 
@@ -202,6 +213,8 @@ node plugins/codex-novel/dist/novelctl.cjs status examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs validate examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs topics examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs cards examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs index examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs search examples/commercial-demo --query "青盐 夜航簿"
 node plugins/codex-novel/dist/novelctl.cjs milestone examples/commercial-demo --type opening-three
 ```
 
@@ -289,7 +302,7 @@ Codex 与作者共同确认：
 每章严格按以下顺序进行：
 
 ```text
-章节合同
+章节合同与场景细纲
   → 有界上下文
   → 草稿
   → 机械质量检查
@@ -297,11 +310,14 @@ Codex 与作者共同确认：
   → 局部修复
   → 最终正文
   → 连续性变化
+  → 结构化章节交接
   → 作者接受
   → 连续性提交
 ```
 
 系统默认最多进行两轮审查和修复；仍有阻断问题时，应暂停并交由作者决定，而不是无限自动重写。
+
+章节审查必须分别给出人物声音、信息边界和场景价值变化的正文证据。通过审查后，`handoff.yaml` 会记录已解决事项、未解决事项、角色承接状态、情绪承接和下一章约束，并绑定最终正文指纹。
 
 ### 阶段四：里程碑复核
 
@@ -326,6 +342,14 @@ node plugins/codex-novel/dist/novelctl.cjs milestone novels/my-story --type open
 
 短篇不强制套用“前三章”标准，而是在全文完成后检查开篇吸引力、压缩程度、因果链、情绪升级、反转和结尾兑现。
 
+```bash
+# 短篇完整验收
+node plugins/codex-novel/dist/novelctl.cjs milestone novels/my-story --type short-complete
+
+# 长篇卷级验收，并生成卷末检查点
+node plugins/codex-novel/dist/novelctl.cjs milestone novels/my-story --type volume
+```
+
 ## `novelctl` 命令
 
 所有命令都使用以下形式：
@@ -347,6 +371,9 @@ node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
 | `advance` | 推进当前章节状态 |
 | `next` | 在上一章提交后创建下一章 |
 | `milestone` | 生成指定的里程碑报告 |
+| `checkpoint` | 手动生成带源文件指纹的连续性检查点 |
+| `index` | 重建可删除的 SQLite 全文检索索引 |
+| `search` | 从索引中查找仍与权威源文件一致的候选资料 |
 | `invalidate` | 在上游决策变化时显式作废相关产物 |
 | `export` | 按章节顺序导出已提交正文 |
 | `recover` | 恢复被中断的连续性事务 |
@@ -364,7 +391,7 @@ node plugins/codex-novel/dist/novelctl.cjs --help
 node plugins/codex-novel/dist/novelctl.cjs status novels/my-story --json
 
 # 编译当前章节上下文，限制最大字符数
-node plugins/codex-novel/dist/novelctl.cjs context novels/my-story --max-chars 12000
+node plugins/codex-novel/dist/novelctl.cjs context novels/my-story --max-chars 20000
 
 # 分别检查草稿与最终正文
 node plugins/codex-novel/dist/novelctl.cjs quality novels/my-story --source draft
@@ -388,6 +415,11 @@ node plugins/codex-novel/dist/novelctl.cjs invalidate novels/my-story \
 - 读者定位、作品简介、世界规则、人物和卷计划；
 - 三章合同、上下文、草稿、审稿、最终正文和连续性变化；
 - 动态角色卡与剧情卡；
+- 独立角色语言/行为档案；
+- 场景级细纲与章节情绪目标；
+- 绑定终稿的结构化章节交接；
+- 有授权来源的场景风格样例；
+- 可重建的全文检索索引；
 - 事实、时间线、资源、关系和未解决剧情线；
 - 前三章机械指标与内部商业复核；
 - 为第四章准备好的合同和上下文来源清单。
@@ -441,6 +473,10 @@ npm test
 - 非法复活状态拒绝；
 - 连续性事务中断恢复；
 - 前三章里程碑；
+- 两轮审稿预算和三项显式审查；
+- 检索结果失效过滤；
+- 自动/手动检查点；
+- 长篇卷级与短篇整体验收分流；
 - 章节产物、指纹和连续性提交链。
 
 ## 当前限制与后续方向
@@ -449,10 +485,10 @@ npm test
 
 - 导入已有长篇稿件；
 - 旧工作区的自动结构迁移；
-- 面向百万字作品的检索索引；
+- 面向百万字作品的语义向量检索与分布式索引；
 - EPUB、DOCX 和平台投稿包；
 - 番茄小说、知乎盐选的自动发布；
-- 场景网格、人物弧线和子情节节拍表；
+- 跨卷人物弧线和子情节节拍总表；
 - 作者可见的命名版本与一键恢复界面；
 - 连载库存和更新节奏看板；
 - 基于真实发布数据的匿名复盘；

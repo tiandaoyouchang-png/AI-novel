@@ -21,6 +21,7 @@ import {
   type ContinuityStore,
   type NovelState
 } from "./schema.js";
+import { generateCheckpoint } from "./checkpoint.js";
 
 const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   facts: "facts.yaml",
@@ -280,6 +281,13 @@ export async function commitContinuityDelta(
     });
   } catch {
     // Event logs are diagnostic and must never invalidate the commit.
+  }
+  if (chapter % after.continuity.checkpointInterval === 0) {
+    try {
+      await generateCheckpoint(workspace, `chapter-${chapter}`);
+    } catch {
+      // Checkpoints are derived recovery aids and must not invalidate committed continuity.
+    }
   }
   return after;
 }

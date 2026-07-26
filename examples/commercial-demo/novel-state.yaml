@@ -9,6 +9,7 @@ workflow:
   phase: production
   currentChapter: 4
   chapterStatus: not_started
+  reviewRound: 0
   delegatedThroughChapter: null
   blockingReason: null
   updatedAt: 2026-07-26T09:56:41.787Z
@@ -19,7 +20,7 @@ artifacts:
     acceptedAt: 2026-07-26T09:56:41.675Z
   foundation:
     status: accepted
-    fingerprint: 681162c78c6c107d4507ae4233b5e5488d0100699ec491fba3e8b95e4226455a
+    fingerprint: f3f6825399c7974593180b54711abee67b4b9bab69d73b57a5c6ee553e8591e3
     acceptedAt: 2026-07-26T09:56:41.735Z
   currentVolumePlan:
     status: accepted

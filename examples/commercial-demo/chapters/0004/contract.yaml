@@ -1,4 +1,4 @@
-schemaVersion: 1
+schemaVersion: 2
 chapter: 4
 title: 请君重做假账
 goal: 沈砚必须在县衙监视下重做一份能通过钦差初验、又暗藏可被外部核验破绽的总账。
@@ -47,6 +47,28 @@ readerPromise: 读者将看到沈砚如何在敌人规定的账目里制造一�
 keyTurn: 沈砚故意不在数字本身做假，而是把经手顺序变成沈禾熟悉的药方剂量。
 netChange: 主角从发现证据升级为主动设计可分发的证据协议，同时让妹妹正式进入行动线。
 endingPull: 代笔书吏写完最后一行后，用沈父才会使用的方式敲了三下砚台。
+emotionalTarget: 沈砚从在监视下被迫造假，转为主动设计只有盟友能够复核的证据协议。
+sceneBeats:
+  - id: scene-controlled-ledger
+    type: investigation
+    location: 临河县衙账房
+    participants:
+      - 沈砚
+      - 周嵩
+    goal: 在周嵩规定的口径里建立一条外部可核验路径。
+    conflict: 书吏逐笔监看，右手伤势和人质关系限制了明显暗号。
+    valueShift: 被迫重做假账转为把经手顺序编码成证据。
+    emotionalChange: 受控压抑转为隐蔽主动。
+  - id: scene-medicine-decoding
+    type: reveal
+    location: 回春铺
+    participants:
+      - 顾青昭
+      - 沈禾
+    goal: 让沈禾识别袋号被转译成的药方剂量。
+    conflict: 顾青昭不能公开动用御史渠道，沈禾尚不知全部风险。
+    valueShift: 只有沈砚理解的暗线转为盟友可独立复核的协议。
+    emotionalChange: 被保护在外转为主动进入行动线。
 targetLength:
   min: 1800
   target: 2200

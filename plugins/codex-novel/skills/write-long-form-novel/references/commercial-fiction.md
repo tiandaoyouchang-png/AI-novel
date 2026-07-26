@@ -18,7 +18,7 @@ Treat platform and form as separate decisions.
 
 For `long-serial`, optimize for a sustainable action loop, recurring chapter reward, escalation capacity, backlog health, and a next-chapter question. Use the opening-three milestone after the first three committed chapters.
 
-For `short-complete`, optimize for an immediate lead, compressed causality, a small cast, rising emotional pressure, a decisive reversal, and a complete ending payoff. Chapters may function as sections, but each still uses the same contract, review, and continuity transaction. Do not run the opening-three milestone unless the short work genuinely uses three opening chapters; use a whole-story review before `completed`.
+For `short-complete`, optimize for an immediate lead, compressed causality, a small cast, rising emotional pressure, a decisive reversal, and a complete ending payoff. Chapters may function as sections, but each still uses the same contract, review, handoff, and continuity transaction. Run `milestone --type short-complete` before `completed`; do not force the opening-three milestone onto a short work.
 
 For `fanqie`, write toward the chosen long or short channel and define a recommendation/reader-retention test. For `zhihu-salt`, write toward the chosen long or short submission route and define a lead-to-finish or paid-continuation test. Verify current platform rules before publication; the workflow does not treat a product profile as a permanent rule.
 
@@ -34,6 +34,7 @@ Define commercial quality as a repeatable reader experience, not as trend imitat
 - recognizable voice without copying another author's expression.
 
 Do not expand worldbuilding until the reader promise and story engine are clear.
+Express style through `planning/style-profile.yaml` and licensed scene examples. Never turn a named author's distinctive expression into a configurable imitation target.
 
 ## Opening contract
 
@@ -71,6 +72,8 @@ Every chapter must earn its place. Require:
 
 Reject chapters that only relocate characters, repeat known information, summarize emotions, or postpone all consequences.
 
+Every schema-v2 scene beat must achieve its declared value shift and contribute to the chapter emotional target. Review these explicitly instead of treating the scene list as a loose brainstorming note.
+
 ## Scene and prose standards
 
 - Enter scenes near pressure and leave after the value shift.
@@ -92,6 +95,7 @@ Give each volume:
 - a consequence that opens the next stage.
 
 Plan the current volume firmly and distant volumes lightly. Replan when the engine changes; do not force chapters to obey stale outlines.
+At a volume boundary, run `novelctl milestone --type volume`; it generates form-specific review dimensions and a named continuity checkpoint.
 
 ## Review priorities
 

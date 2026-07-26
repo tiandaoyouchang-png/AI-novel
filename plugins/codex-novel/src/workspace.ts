@@ -14,6 +14,7 @@ import {
 } from "./io.js";
 import {
   chapterContractSchema,
+  chapterHandoffSchema,
   chapterLengthPolicyIssues,
   chapterReviewSchema,
   continuityDeltaSchema,
@@ -32,6 +33,7 @@ import {
 import { validateCurrentChapterContext } from "./context.js";
 import { readCurrentQualityReport } from "./quality.js";
 import { validateTopicSelection } from "./topics.js";
+import { loadCharacterProfiles, validateCreativeProfiles } from "./profiles.js";
 
 const PHASE_TRANSITIONS: Record<BookPhase, readonly BookPhase[]> = {
   preview: ["brief_approved"],
@@ -131,6 +133,40 @@ const INITIAL_FILES: Record<string, string> = {
     "maxParagraphLength: 500",
     ""
   ].join("\n"),
+  "planning/style-profile.yaml": [
+    "schemaVersion: 1",
+    "pov: third-limited",
+    "tense: past",
+    "pacing: balanced",
+    "dialogueDensity: medium",
+    "sentenceRhythm: 压力场景使用较短句，安静场景允许适度展开",
+    "descriptionPreferences:",
+    "  - 优先使用具体动作、感官证据和角色选择",
+    "bannedPatterns:",
+    "  - 大段解释角色已经通过行动表达的情绪",
+    "sceneGuidance:",
+    "  dialogue:",
+    "    - 每轮对话都应改变信息、关系或行动选择",
+    "  action:",
+    "    - 动作必须受空间、能力和代价约束",
+    "  investigation:",
+    "    - 线索必须可回看且不能依赖作者临时补充",
+    "  intimacy:",
+    "    - 亲密变化通过具体选择体现",
+    "  reveal:",
+    "    - 揭示必须重排既有证据而非凭空新增答案",
+    "  transition:",
+    "    - 只保留推动时间、位置或压力变化的内容",
+    "  other:",
+    "    - 场景必须产生明确价值变化",
+    ""
+  ].join("\n"),
+  "planning/style-examples.yaml": [
+    "schemaVersion: 1",
+    "# Only user-owned, explicitly authorized, or public-domain examples are allowed.",
+    "examples: []",
+    ""
+  ].join("\n"),
   "continuity/facts.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/timeline.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/threads.yaml": "schemaVersion: 1\nentries: []\n",
@@ -181,8 +217,11 @@ async function artifactFingerprint(workspace: string, artifact: ArtifactKey): Pr
   const foundationFiles = [
     "planning/story-bible.md",
     "planning/world-rules.yaml",
-    "planning/characters/character-roster.md"
+    "planning/characters/character-roster.md",
+    "planning/style-profile.yaml"
   ];
+  const profiles = await loadCharacterProfiles(workspace);
+  foundationFiles.push(...profiles.map(({ path: relative }) => relative));
   const combined = (
     await Promise.all(foundationFiles.map((relative) => fs.readFile(path.join(workspace, relative), "utf8")))
   ).join("\n---\n");
@@ -292,6 +331,7 @@ export async function initializeWorkspace(
       phase: "preview",
       currentChapter: 1,
       chapterStatus: "not_started",
+      reviewRound: 0,
       delegatedThroughChapter: null,
       blockingReason: null,
       updatedAt: createdAt
@@ -352,8 +392,11 @@ export async function transitionPhase(workspace: string, to: BookPhase): Promise
     await requireUsableFiles(workspace, [
       "planning/story-bible.md",
       "planning/world-rules.yaml",
-      "planning/characters/character-roster.md"
+      "planning/characters/character-roster.md",
+      "planning/style-profile.yaml",
+      "planning/style-examples.yaml"
     ]);
+    await validateCreativeProfiles(workspace);
   } else if (to === "production") {
     await requireUsableFiles(workspace, ["planning/volumes/current-volume.md"]);
   } else if (to === "completed" && before.workflow.chapterStatus !== "continuity_committed") {
@@ -452,6 +495,13 @@ export async function advanceChapter(
   if (!CHAPTER_TRANSITIONS[before.workflow.chapterStatus].includes(to)) {
     throw new Error(`Invalid chapter transition: ${before.workflow.chapterStatus} -> ${to}`);
   }
+  if (
+    before.workflow.chapterStatus === "reviewed" &&
+    to === "drafted" &&
+    before.workflow.reviewRound >= 2
+  ) {
+    throw new Error("The two-round repair budget is exhausted. Stop for author direction.");
+  }
 
   const chapter = chapterDirectory(before);
   const requiredByStatus: Partial<Record<ChapterStatus, readonly string[]>> = {
@@ -463,7 +513,10 @@ export async function advanceChapter(
     drafted: [`chapters/${chapter}/draft.md`],
     reviewed: [`chapters/${chapter}/review.yaml`, `chapters/${chapter}/quality-draft.json`],
     accepted: [`chapters/${chapter}/final.md`, `chapters/${chapter}/quality-final.json`],
-    continuity_committed: [`chapters/${chapter}/delta.yaml`]
+    continuity_committed: [
+      `chapters/${chapter}/delta.yaml`,
+      `chapters/${chapter}/handoff.yaml`
+    ]
   };
   await requireUsableFiles(workspace, requiredByStatus[to] ?? []);
   if (to === "planned") {
@@ -491,6 +544,11 @@ export async function advanceChapter(
     if (review.sourceFingerprint !== quality.sourceFingerprint) {
       throw new Error("Review fingerprint does not match the current draft.");
     }
+    if (review.reviewRound !== before.workflow.reviewRound + 1) {
+      throw new Error(
+        `Review round must advance from ${before.workflow.reviewRound} to ${before.workflow.reviewRound + 1}.`
+      );
+    }
   }
   if (to === "accepted") {
     const quality = await readCurrentQualityReport(workspace, "final");
@@ -501,15 +559,38 @@ export async function advanceChapter(
     if (review.verdict !== "pass") {
       throw new Error("Chapter cannot be accepted until review verdict is pass.");
     }
+    if (review.reviewRound !== before.workflow.reviewRound) {
+      throw new Error("Accepted review round does not match chapter state.");
+    }
     if (review.sourceFingerprint !== quality.sourceFingerprint) {
       throw new Error(
         "Accepted prose differs from the reviewed draft. Return to drafted, review the exact candidate, then accept."
       );
     }
   }
+  if (to === "continuity_committed") {
+    const handoff = chapterHandoffSchema.parse(
+      parse(await fs.readFile(path.join(workspace, "chapters", chapter, "handoff.yaml"), "utf8"))
+    );
+    const finalFingerprint = await fingerprintFile(
+      path.join(workspace, "chapters", chapter, "final.md")
+    );
+    if (handoff.chapter !== before.workflow.currentChapter) {
+      throw new Error("Chapter handoff does not match the current chapter.");
+    }
+    if (handoff.sourceFingerprint !== finalFingerprint) {
+      throw new Error("Chapter handoff fingerprint does not match accepted final prose.");
+    }
+  }
 
   const after: NovelState = structuredClone(before);
   after.workflow.chapterStatus = to;
+  if (to === "reviewed") {
+    const review = chapterReviewSchema.parse(
+      parse(await fs.readFile(path.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+    );
+    after.workflow.reviewRound = review.reviewRound;
+  }
   after.workflow.updatedAt = now();
   after.workflow.blockingReason = null;
   if (to === "continuity_committed") {
@@ -532,6 +613,7 @@ export async function startNextChapter(workspace: string): Promise<NovelState> {
   const after: NovelState = structuredClone(before);
   after.workflow.currentChapter += 1;
   after.workflow.chapterStatus = "not_started";
+  after.workflow.reviewRound = 0;
   after.workflow.updatedAt = now();
   const runId = await createTransitionSnapshot(workspace, before, after);
   await writeState(workspace, after);
@@ -586,6 +668,9 @@ export async function validateWorkspace(workspace: string): Promise<NovelState> 
       `Accepted artifacts changed after approval: ${stale.join(", ")}. Run invalidate before continuing.`
     );
   }
+  if (state.artifacts.foundation.status === "accepted") {
+    await validateCreativeProfiles(workspace);
+  }
   const requiredDirectories = WORKSPACE_DIRECTORIES.filter((relative) => relative !== "runtime/runs");
   const missingDirectories: string[] = [];
   for (const relative of requiredDirectories) {
@@ -620,6 +705,9 @@ export async function validateCommittedChapterArtifacts(
       const delta = continuityDeltaSchema.parse(
         parse(await fs.readFile(path.join(chapterRoot, "delta.yaml"), "utf8"))
       );
+      const handoff = chapterHandoffSchema.parse(
+        parse(await fs.readFile(path.join(chapterRoot, "handoff.yaml"), "utf8"))
+      );
       const finalFingerprint = await fingerprintFile(path.join(chapterRoot, "final.md"));
 
       if (contract.chapter !== chapter) issues.push(`chapter ${chapter}: contract number mismatch`);
@@ -635,6 +723,9 @@ export async function validateCommittedChapterArtifacts(
       }
       if (delta.chapter !== chapter || delta.sourceFingerprint !== finalFingerprint) {
         issues.push(`chapter ${chapter}: continuity delta is stale`);
+      }
+      if (handoff.chapter !== chapter || handoff.sourceFingerprint !== finalFingerprint) {
+        issues.push(`chapter ${chapter}: handoff is stale`);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -653,6 +744,7 @@ export function formatStatus(state: NovelState): string {
     `- phase: ${state.workflow.phase}`,
     `- current chapter: ${state.workflow.currentChapter}`,
     `- chapter status: ${state.workflow.chapterStatus}`,
+    `- review round: ${state.workflow.reviewRound}/2`,
     `- last committed chapter: ${state.continuity.lastCommittedChapter}`,
     `- brief: ${state.artifacts.brief.status}`,
     `- foundation: ${state.artifacts.foundation.status}`,

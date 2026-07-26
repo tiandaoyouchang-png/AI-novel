@@ -10,11 +10,17 @@ import {
   getContinuityCards,
   recoverContinuityTransaction
 } from "../src/continuity.js";
-import { fingerprintFile, readState } from "../src/io.js";
+import { fingerprintFile, readState, writeState } from "../src/io.js";
 import {
   generateOpeningMilestone,
+  generateStoryMilestone,
   validateCommercialMilestoneReview
 } from "../src/milestone.js";
+import { generateCheckpoint } from "../src/checkpoint.js";
+import {
+  queryRetrievalIndex,
+  rebuildRetrievalIndex
+} from "../src/retrieval.js";
 import { generateTopicSelectionReport } from "../src/topics.js";
 import { runQualityCheck } from "../src/quality.js";
 import {
@@ -53,11 +59,70 @@ async function enterProduction(workspace: string): Promise<void> {
     "planning/characters/character-roster.md",
     "# Character Roster\nActive protagonist and antagonist."
   );
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/characters/char-lin-yan.yaml",
+    characterProfileYaml()
+  );
   await transitionPhase(workspace, "foundation_approved");
   await writeAcceptedArtifact(
     workspace,
     "planning/volumes/current-volume.md",
     "# Current Volume\nPromise, escalation, midpoint, and payoff."
+  );
+  await transitionPhase(workspace, "production");
+}
+
+async function enterShortProduction(workspace: string): Promise<void> {
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/novel-brief.md",
+    "# Novel Brief\nA compact complete story with a decisive emotional payoff."
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/market-position.yaml",
+    marketPositionYaml()
+      .replace("targetPlatform: fanqie", "targetPlatform: zhihu-salt")
+      .replace("workForm: long-serial", "workForm: short-complete")
+  );
+  await writeTopicDiscovery(workspace);
+  const candidatesPath = path.join(workspace, "discovery/topic-candidates.yaml");
+  const candidates = await fs.readFile(candidatesPath, "utf8");
+  await fs.writeFile(
+    candidatesPath,
+    candidates
+      .replace("targetPlatform: fanqie", "targetPlatform: zhihu-salt")
+      .replace("workForm: long-serial", "workForm: short-complete"),
+    "utf8"
+  );
+  await generateTopicSelectionReport(workspace, new Date().toISOString().slice(0, 10));
+  await transitionPhase(workspace, "brief_approved");
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/story-bible.md",
+    "# Story Bible\nCompact causal chain and final reversal."
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/world-rules.yaml",
+    "schemaVersion: 1\nrules:\n  - id: world-001"
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/characters/character-roster.md",
+    "# Character Roster\nActive protagonist and antagonist."
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/characters/char-lin-yan.yaml",
+    characterProfileYaml()
+  );
+  await transitionPhase(workspace, "foundation_approved");
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/volumes/current-volume.md",
+    "# Whole Story Plan\nOpening, escalation, reversal, and ending payoff."
   );
   await transitionPhase(workspace, "production");
 }
@@ -232,9 +297,31 @@ function marketPositionYaml(): string {
   ].join("\n");
 }
 
-function contractYaml(chapter: number): string {
+function characterProfileYaml(): string {
   return [
     "schemaVersion: 1",
+    "id: char-lin-yan",
+    "name: 林砚",
+    "role: 主角与盐仓账房",
+    "coreMotivation: 用账术查清父亲旧案并保护家人",
+    "moralBoundary: 不以无辜者的性命交换证据",
+    "decisionPattern: 先核对可验证细节，再承担一次主动风险",
+    "voice:",
+    "  rhythm: 短句为主，压力下省略主语",
+    "  diction: 使用账目、重量和货路相关的具体词",
+    "  habits:",
+    "    - 回答前先确认对方真正掌握的证据",
+    "  avoids:",
+    "    - 不发表脱离处境的长篇演说",
+    "oocRisks:",
+    "  - 无证据时突然相信权力人物",
+    "relationshipVoices: []"
+  ].join("\n");
+}
+
+function contractYaml(chapter: number): string {
+  return [
+    "schemaVersion: 2",
     `chapter: ${chapter}`,
     `title: 第${chapter}章`,
     "goal: 主角必须在封锁前取得账册",
@@ -261,6 +348,17 @@ function contractYaml(chapter: number): string {
     "keyTurn: 账册已经被人换过",
     "netChange: 主角得到半条真线索并暴露行踪",
     "endingPull: 门外响起熟人的声音",
+    "emotionalTarget: 从被迫冒险转为主动保留证据",
+    "sceneBeats:",
+    "  - id: scene-warehouse-entry",
+    "    type: investigation",
+    "    location: 盐仓",
+    "    participants:",
+    "      - 林砚",
+    "    goal: 在封锁前找到真实账册",
+    "    conflict: 巡夜使正在逼近且账册已经被替换",
+    "    valueShift: 没有证据的怀疑转为持有半条真线索",
+    "    emotionalChange: 侥幸转为警觉",
     "targetLength:",
     "  min: 20",
     "  target: 100",
@@ -282,6 +380,71 @@ const chapterProse = [
   "门外脚步停住。一个他绝不该在这里听见的声音，隔着木门喊出了他的乳名。"
 ].join("\n");
 
+function passingReviewYaml(fingerprint: string, reviewRound = 1): string {
+  return [
+    "schemaVersion: 2",
+    `reviewRound: ${reviewRound}`,
+    `sourceFingerprint: ${fingerprint}`,
+    "verdict: pass",
+    "checks:",
+    "  characterVoice:",
+    "    status: pass",
+    "    evidence: 林砚始终以账目和现场细节做判断",
+    "  informationBoundaries:",
+    "    status: pass",
+    "    evidence: 正文没有提前揭示幕后主使",
+    "  sceneValueChanges:",
+    "    status: pass",
+    "    evidence: 场景从怀疑推进到取得半条真线索",
+    "blockingIssues: []",
+    "warnings: []"
+  ].join("\n");
+}
+
+function repairReviewYaml(fingerprint: string, reviewRound: number): string {
+  return [
+    "schemaVersion: 2",
+    `reviewRound: ${reviewRound}`,
+    `sourceFingerprint: ${fingerprint}`,
+    "verdict: repair",
+    "checks:",
+    "  characterVoice:",
+    "    status: fail",
+    "    evidence: 主角出现了一句脱离账房身份的空泛演说",
+    "  informationBoundaries:",
+    "    status: pass",
+    "    evidence: 幕后主使仍未提前揭晓",
+    "  sceneValueChanges:",
+    "    status: pass",
+    "    evidence: 场景完成了从怀疑到取得线索的变化",
+    "blockingIssues:",
+    "  - id: issue-voice",
+    "    category: character",
+    "    evidence: 草稿末段出现与角色档案冲突的长篇演说",
+    "    repair: 删除演说并改为一次可验证的账目选择",
+    "warnings: []"
+  ].join("\n");
+}
+
+function handoffYaml(chapter: number, fingerprint: string): string {
+  return [
+    "schemaVersion: 1",
+    `chapter: ${chapter}`,
+    `sourceFingerprint: "${fingerprint}"`,
+    `summary: 第${chapter}章确认账册被替换，主角取得半条线索并暴露行踪`,
+    "resolved:",
+    "  - 确认盐仓账册不是原件",
+    "unresolved:",
+    "  - 替换账册的人仍未确认",
+    "characterCarry:",
+    "  - characterId: char-lin-yan",
+    "    state: 已取得半枚暗印，行踪暴露",
+    "emotionalCarry: 警觉压过侥幸，下一步必须主动验证线索",
+    "nextConstraints:",
+    "  - 不能提前揭晓幕后主使"
+  ].join("\n");
+}
+
 async function commitTestChapter(workspace: string, chapter: number): Promise<void> {
   const directory = String(chapter).padStart(4, "0");
   await writeAcceptedArtifact(workspace, `chapters/${directory}/contract.yaml`, contractYaml(chapter));
@@ -296,13 +459,7 @@ async function commitTestChapter(workspace: string, chapter: number): Promise<vo
   await writeAcceptedArtifact(
     workspace,
     `chapters/${directory}/review.yaml`,
-    [
-      "schemaVersion: 1",
-      `sourceFingerprint: ${draftFingerprint}`,
-      "verdict: pass",
-      "blockingIssues: []",
-      "warnings: []"
-    ].join("\n")
+    passingReviewYaml(draftFingerprint)
   );
   await advanceChapter(workspace, "reviewed");
   await fs.writeFile(path.join(workspace, `chapters/${directory}/final.md`), `${chapterProse}\n`, "utf8");
@@ -323,6 +480,11 @@ async function commitTestChapter(workspace: string, chapter: number): Promise<vo
       `      statement: 第${chapter}章已经形成可验证变化`,
       `    evidence: 第${chapter}章终稿`
     ].join("\n")
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    `chapters/${directory}/handoff.yaml`,
+    handoffYaml(chapter, draftFingerprint)
   );
   await advanceChapter(workspace, "continuity_committed");
 }
@@ -500,7 +662,7 @@ test("mechanical quality gate blocks banned words before model review", async (t
   await writeAcceptedArtifact(
     workspace,
     "chapters/0001/review.yaml",
-    `schemaVersion: 1\nsourceFingerprint: ${"0".repeat(64)}\nverdict: pass\nblockingIssues: []\nwarnings: []`
+    passingReviewYaml("0".repeat(64))
   );
   await assert.rejects(() => advanceChapter(workspace, "reviewed"), /quality gate/);
   assert.equal((await readState(workspace)).workflow.chapterStatus, "drafted");
@@ -532,10 +694,10 @@ test("blocks dead characters onstage and permits explicitly non-present appearan
     [
       "schemaVersion: 1",
       "entries:",
-      "  - id: char-han-jiu",
+      "  - id: char-lin-yan",
       "    status: active",
       "    value:",
-      "      name: 韩九",
+      "      name: 林砚",
       "      lifeStatus: dead",
       "      currentLocation: 临河县义仓遗址",
       "      currentGoal: 已无现场行动目标",
@@ -551,7 +713,7 @@ test("blocks dead characters onstage and permits explicitly non-present appearan
   const cards = await getContinuityCards(workspace);
   assert.equal(cards.characters[0]?.value.lifeStatus, "dead");
   const contractPath = path.join(workspace, "chapters/0001/contract.yaml");
-  const deadOnstage = contractYaml(1).replace("  - 林砚", "  - 韩九");
+  const deadOnstage = contractYaml(1);
   await writeAcceptedArtifact(workspace, "chapters/0001/contract.yaml", deadOnstage);
   await assert.rejects(
     () => compileChapterContext(workspace),
@@ -562,12 +724,12 @@ test("blocks dead characters onstage and permits explicitly non-present appearan
     contractPath,
     deadOnstage.replace(
       "locations:",
-      "nonPresentParticipants:\n  - 韩九\nlocations:"
+      "nonPresentParticipants:\n  - 林砚\nlocations:"
     ),
     "utf8"
   );
   const context = await compileChapterContext(workspace);
-  assert.match(await fs.readFile(context.output, "utf8"), /char-han-jiu/);
+  assert.match(await fs.readFile(context.output, "utf8"), /char-lin-yan/);
 });
 
 test("rejects a normal continuity delta that revives a dead character", async (t) => {
@@ -761,7 +923,7 @@ test("chapter transitions require artifacts and only commit accepted continuity"
   await writeAcceptedArtifact(
     workspace,
     "chapters/0001/review.yaml",
-    `schemaVersion: 1\nsourceFingerprint: ${draftFingerprint}\nverdict: pass\nblockingIssues: []\nwarnings: []`
+    passingReviewYaml(draftFingerprint)
   );
   await advanceChapter(workspace, "reviewed");
   await fs.writeFile(
@@ -778,6 +940,11 @@ test("chapter transitions require artifacts and only commit accepted continuity"
   assert.equal((await readState(workspace)).continuity.lastCommittedChapter, 0);
 
   const finalFingerprint = await fingerprintFile(path.join(workspace, "chapters/0001/final.md"));
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/handoff.yaml",
+    handoffYaml(1, finalFingerprint)
+  );
   await writeAcceptedArtifact(
     workspace,
     "chapters/0001/delta.yaml",
@@ -846,4 +1013,172 @@ test("chapter transitions require artifacts and only commit accepted continuity"
   const exported = await exportNovel(workspace, "md");
   assert.deepEqual(exported.chapters, [1]);
   assert.match(await fs.readFile(exported.output, "utf8"), /盐仓/);
+});
+
+test("context injects scene beats, selected character profiles, safe style examples, and handoff", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "上下文流水线测试" });
+  await enterProduction(workspace);
+  await commitTestChapter(workspace, 1);
+  await startNextChapter(workspace);
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/style-examples.yaml",
+    [
+      "schemaVersion: 1",
+      "examples:",
+      "  - id: owned-investigation",
+      "    title: 原创查证样例",
+      "    sceneTypes: [investigation]",
+      "    rights: user-owned",
+      "    source: 测试作者原创",
+      "    excerpt: 林砚没有先猜答案。他把三张重量记录按时辰排开，先圈出唯一无法由雨水解释的差额。",
+      "    guidance: 先给可观察证据，再给角色结论"
+    ].join("\n")
+  );
+  await rebuildRetrievalIndex(workspace);
+  await writeAcceptedArtifact(workspace, "chapters/0002/contract.yaml", contractYaml(2));
+  const compiled = await compileChapterContext(workspace, 20_000);
+  const context = await fs.readFile(compiled.output, "utf8");
+  assert.match(context, /## Scene Plan/);
+  assert.match(context, /value shift:/);
+  assert.match(context, /## Character Profiles/);
+  assert.match(context, /短句为主，压力下省略主语/);
+  assert.match(context, /## Authorized Style Examples/);
+  assert.match(context, /原创查证样例/);
+  assert.match(context, /## Previous Chapter Handoff/);
+  assert.match(context, /确认账册被替换/);
+});
+
+test("review gate enforces explicit checks and a two-round repair budget", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "两轮审稿测试" });
+  await enterProduction(workspace);
+  await writeAcceptedArtifact(workspace, "chapters/0001/contract.yaml", contractYaml(1));
+  await compileChapterContext(workspace);
+  await advanceChapter(workspace, "planned");
+  await fs.writeFile(path.join(workspace, "chapters/0001/draft.md"), `${chapterProse}\n`, "utf8");
+  await advanceChapter(workspace, "drafted");
+  await runQualityCheck(workspace, "draft");
+  const fingerprint = await fingerprintFile(path.join(workspace, "chapters/0001/draft.md"));
+
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/review.yaml",
+    repairReviewYaml(fingerprint, 1)
+  );
+  await advanceChapter(workspace, "reviewed");
+  await advanceChapter(workspace, "drafted");
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/review.yaml",
+    repairReviewYaml(fingerprint, 2)
+  );
+  const second = await advanceChapter(workspace, "reviewed");
+  assert.equal(second.workflow.reviewRound, 2);
+  await assert.rejects(
+    () => advanceChapter(workspace, "drafted"),
+    /two-round repair budget is exhausted/
+  );
+});
+
+test("continuity commit rejects a stale structured handoff", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "交接指纹测试" });
+  await enterProduction(workspace);
+  await writeAcceptedArtifact(workspace, "chapters/0001/contract.yaml", contractYaml(1));
+  await compileChapterContext(workspace);
+  await advanceChapter(workspace, "planned");
+  await fs.writeFile(path.join(workspace, "chapters/0001/draft.md"), `${chapterProse}\n`, "utf8");
+  await advanceChapter(workspace, "drafted");
+  await runQualityCheck(workspace, "draft");
+  const fingerprint = await fingerprintFile(path.join(workspace, "chapters/0001/draft.md"));
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/review.yaml",
+    passingReviewYaml(fingerprint)
+  );
+  await advanceChapter(workspace, "reviewed");
+  await fs.writeFile(path.join(workspace, "chapters/0001/final.md"), `${chapterProse}\n`, "utf8");
+  await runQualityCheck(workspace, "final");
+  await advanceChapter(workspace, "accepted");
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/delta.yaml",
+    [
+      "schemaVersion: 1",
+      "chapter: 1",
+      `sourceFingerprint: ${fingerprint}`,
+      "changes: []"
+    ].join("\n")
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/handoff.yaml",
+    handoffYaml(1, "0".repeat(64))
+  );
+  await assert.rejects(
+    () => advanceChapter(workspace, "continuity_committed"),
+    /handoff fingerprint does not match/
+  );
+  assert.equal((await readState(workspace)).continuity.lastCommittedChapter, 0);
+});
+
+test("retrieval index returns current sources and drops stale candidates", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "检索索引测试" });
+  await enterProduction(workspace);
+  await commitTestChapter(workspace, 1);
+  const rebuilt = await rebuildRetrievalIndex(workspace);
+  assert.ok(rebuilt.documents > 0);
+  const current = await queryRetrievalIndex(workspace, ["账册"], 20);
+  assert.ok(current.some((candidate) => candidate.id === "handoff:1"));
+  await fs.appendFile(
+    path.join(workspace, "chapters/0001/handoff.yaml"),
+    "\n# stale after indexing\n"
+  );
+  const staleFiltered = await queryRetrievalIndex(workspace, ["账册"], 20);
+  assert.equal(staleFiltered.some((candidate) => candidate.id === "handoff:1"), false);
+});
+
+test("checkpoints and milestone rules separate long serials from completed shorts", async (t) => {
+  const longFixture = await temporaryWorkspace();
+  t.after(() => fs.rm(longFixture.parent, { recursive: true, force: true }));
+  await initializeWorkspace(longFixture.workspace, { title: "卷级检查测试" });
+  await enterProduction(longFixture.workspace);
+  const longState = await readState(longFixture.workspace);
+  longState.continuity.checkpointInterval = 1;
+  await writeState(longFixture.workspace, longState);
+  await commitTestChapter(longFixture.workspace, 1);
+  await fs.stat(
+    path.join(longFixture.workspace, "continuity/checkpoints/chapter-1.yaml")
+  );
+  const volume = await generateStoryMilestone(longFixture.workspace, "volume");
+  assert.equal(volume.report.ok, true);
+  assert.equal(volume.report.workForm, "long-serial");
+  assert.ok(volume.checkpointPath);
+  await assert.rejects(
+    () => generateStoryMilestone(longFixture.workspace, "short-complete"),
+    /only valid for short-complete/
+  );
+
+  const shortFixture = await temporaryWorkspace();
+  t.after(() => fs.rm(shortFixture.parent, { recursive: true, force: true }));
+  await initializeWorkspace(shortFixture.workspace, { title: "短篇验收测试" });
+  await enterShortProduction(shortFixture.workspace);
+  await commitTestChapter(shortFixture.workspace, 1);
+  const short = await generateStoryMilestone(shortFixture.workspace, "short-complete");
+  assert.equal(short.report.ok, true);
+  assert.equal(short.report.workForm, "short-complete");
+  assert.equal(short.report.chapters.length, 1);
+  await assert.rejects(
+    () => generateStoryMilestone(shortFixture.workspace, "volume"),
+    /only valid for long-serial/
+  );
+  const manual = await generateCheckpoint(shortFixture.workspace, "short-complete-final");
+  assert.equal(manual.checkpoint.lastCommittedChapter, 1);
 });

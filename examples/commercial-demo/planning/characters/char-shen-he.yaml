@@ -1,0 +1,19 @@
+schemaVersion: 1
+id: char-shen-he
+name: 沈禾
+role: 回春铺抵债学药的医徒
+coreMotivation: 夺回对自己人生的决定权，并用医术保护受灾百姓。
+moralBoundary: 不接受哥哥以保护为名替她隐瞒直接相关的危险。
+decisionPattern: 从气味和病症找共同点，再要求亲自验证。
+voice:
+  rhythm: 直接快速，反驳哥哥时会把关键动词重复一次。
+  diction: 常用剂量、症状、药味和时辰。
+  habits:
+    - 先纠正事实，再表达不满。
+  avoids:
+    - 不把自己描述成需要等待营救的人。
+oocRisks:
+  - 无条件服从沈砚的保护安排。
+relationshipVoices:
+  - characterId: char-shen-yan
+    difference: 对哥哥直呼问题本身，不接受含糊的保护性解释。

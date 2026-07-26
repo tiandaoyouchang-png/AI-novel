@@ -1,6 +1,17 @@
-schemaVersion: 1
+schemaVersion: 2
+reviewRound: 1
 sourceFingerprint: 71ee78dd37f44c56fd7d9c1f32cd3043f0e474f06f097afdd8f125c48663a550
 verdict: pass
+checks:
+  characterVoice:
+    status: pass
+    evidence: 沈砚以结构、重量和可复制记录解决选择，顾青昭通过承担暴露风险推进自己的行动线。
+  informationBoundaries:
+    status: pass
+    evidence: 周嵩只公开控制沈砚，没有承认赈盐案责任；韩九仍保留部分夜航簿真相。
+  sceneValueChanges:
+    status: pass
+    evidence: 火场把唯一账本转化为多人保存的证据，前院召见又把阶段胜利转成更强控制。
 blockingIssues: []
 warnings:
   - 火场取证以多人记忆替代唯一账本，完成主题落点；后续需让脚夫承担现实压力，避免这个方法只停留在口号。

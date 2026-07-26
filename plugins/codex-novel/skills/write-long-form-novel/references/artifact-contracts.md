@@ -54,11 +54,17 @@ Before approval, include:
 
 `world-rules.yaml` stores stable rule IDs, constraints, costs, and forbidden crossings.
 
-`characters/character-roster.md` indexes active characters. Put detailed recurring-character profiles in separate files and read only participating profiles per chapter.
+`characters/character-roster.md` indexes active characters. Put every recurring character in a schema-v1 `characters/<character-id>.yaml` profile with stable ID, name, role, core motivation, moral boundary, decision pattern, voice rules, OOC risks, and relationship-specific voice differences. Read only participating profiles per chapter. Keep changing life, injury, location, goal, and knowledge state in `continuity/characters.yaml`, not the stable profile.
+
+`style-profile.yaml` defines abstract POV, tense, pacing, dialogue density, sentence rhythm, description preferences, banned patterns, and scene-type guidance. It must describe craft constraints rather than imitate a named author.
+
+`style-examples.yaml` is an optional library of scene-tagged micro-examples. Every entry must declare `user-owned`, `authorized`, or `public-domain` rights and a source. Unlicensed excerpts are invalid.
 
 ### Volume planning
 
 `volumes/current-volume.md` defines the volume promise, escalation ladder, midpoint shift, climax, payoff, and transition into the next volume. Plan the current volume more firmly than distant volumes.
+
+For `short-complete`, use this file as the whole-story plan: opening pressure, causal escalation, reversal, ending payoff, and compression decisions.
 
 ## Artifact states
 

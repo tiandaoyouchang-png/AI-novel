@@ -10,14 +10,20 @@ import {
 } from "./io.js";
 import {
   chapterContractSchema,
+  chapterHandoffSchema,
   chapterLengthPolicyIssues,
   chapterReviewSchema,
   commercialMilestoneReviewSchema,
   continuityDeltaSchema,
   openingMilestoneReportSchema,
   marketPositionSchema,
-  qualityReportSchema
+  qualityReportSchema,
+  storyMilestoneReportSchema,
+  storyMilestoneReviewSchema,
+  type StoryMilestoneType
 } from "./schema.js";
+import { generateCheckpoint } from "./checkpoint.js";
+import { loadCharacterProfiles } from "./profiles.js";
 
 const REPORT_DIRECTORY = "reports/opening-three";
 const CONTINUITY_FILES = [
@@ -99,6 +105,8 @@ export async function generateOpeningMilestone(
   }
 
   const blockingIssues: string[] = [];
+  const characterProfilePaths = (await loadCharacterProfiles(workspace))
+    .map(({ path: relative }) => relative);
   const globalSourcePaths = [
     "author-intent.md",
     "discovery/market-scan.yaml",
@@ -110,6 +118,9 @@ export async function generateOpeningMilestone(
     "planning/story-bible.md",
     "planning/characters/character-roster.md",
     "planning/volumes/current-volume.md",
+    "planning/style-profile.yaml",
+    "planning/style-examples.yaml",
+    ...characterProfilePaths,
     ...CONTINUITY_FILES
   ];
   const globalSources = await Promise.all(
@@ -139,7 +150,8 @@ export async function generateOpeningMilestone(
       final: `${chapterRoot}/final.md`,
       review: `${chapterRoot}/review.yaml`,
       quality: `${chapterRoot}/quality-final.json`,
-      delta: `${chapterRoot}/delta.yaml`
+      delta: `${chapterRoot}/delta.yaml`,
+      handoff: `${chapterRoot}/handoff.yaml`
     };
     const chapterSources = await Promise.all(
       Object.values(paths).map((relative) => source(workspace, relative))
@@ -155,6 +167,9 @@ export async function generateOpeningMilestone(
     );
     const delta = continuityDeltaSchema.parse(
       parse(await fs.readFile(path.join(workspace, paths.delta), "utf8"))
+    );
+    const handoff = chapterHandoffSchema.parse(
+      parse(await fs.readFile(path.join(workspace, paths.handoff), "utf8"))
     );
     const finalFingerprint = chapterSources.find((item) => item.path === paths.final)?.fingerprint;
     if (!finalFingerprint) throw new Error(`Unable to fingerprint ${paths.final}.`);
@@ -176,6 +191,9 @@ export async function generateOpeningMilestone(
     }
     if (delta.chapter !== chapter || delta.sourceFingerprint !== finalFingerprint) {
       blockingIssues.push(`Chapter ${chapter} continuity delta is not bound to accepted prose.`);
+    }
+    if (handoff.chapter !== chapter || handoff.sourceFingerprint !== finalFingerprint) {
+      blockingIssues.push(`Chapter ${chapter} handoff is not bound to accepted prose.`);
     }
 
     chapters.push({
@@ -233,4 +251,241 @@ export async function generateOpeningMilestone(
   }
 
   return { report, reportPath, templatePath, reviewStatus, reviewVerdict };
+}
+
+function storyReviewDimensions(type: StoryMilestoneType): string[] {
+  return type === "short-complete"
+    ? [
+        "openingPull",
+        "compression",
+        "causality",
+        "emotionalEscalation",
+        "reversal",
+        "endingPayoff",
+        "platformFit"
+      ]
+    : [
+        "promiseDelivery",
+        "escalation",
+        "characterArcs",
+        "subplotControl",
+        "continuityHealth",
+        "climaxPayoff",
+        "nextVolumePull"
+      ];
+}
+
+function storyReviewTemplate(
+  type: StoryMilestoneType,
+  bundleFingerprint: string
+): unknown {
+  return {
+    schemaVersion: 1,
+    milestone: type,
+    bundleFingerprint,
+    verdict: "revise",
+    dimensions: storyReviewDimensions(type).map((id) => ({
+      id,
+      score: 1,
+      evidence: ["TODO: cite accepted prose, handoff, or continuity evidence."],
+      nextAction: "TODO: state one bounded revision or reader-validation action."
+    })),
+    blockingIssues: ["TODO: replace with the highest-leverage reader risk."],
+    readerTest: {
+      hypothesis: "TODO: state the intended reader response.",
+      targetReader: "TODO: state a narrow target reader segment.",
+      successSignal: "TODO: state an observable success signal."
+    }
+  };
+}
+
+export async function validateStoryMilestoneReview(
+  workspace: string,
+  type: StoryMilestoneType,
+  expectedBundleFingerprint: string
+): Promise<ReturnType<typeof storyMilestoneReviewSchema.parse>> {
+  const reviewPath = path.join(workspace, "reports", type, "review.yaml");
+  const review = storyMilestoneReviewSchema.parse(
+    parse(await fs.readFile(reviewPath, "utf8"))
+  );
+  if (review.milestone !== type) {
+    throw new Error(`Milestone review type does not match ${type}.`);
+  }
+  if (review.bundleFingerprint !== expectedBundleFingerprint) {
+    throw new Error("Milestone review is stale. Regenerate and review the current accepted bundle.");
+  }
+  return review;
+}
+
+export async function generateStoryMilestone(
+  workspace: string,
+  type: StoryMilestoneType
+): Promise<{
+  report: ReturnType<typeof storyMilestoneReportSchema.parse>;
+  reportPath: string;
+  templatePath: string;
+  reviewStatus: "missing" | "valid" | "stale-or-invalid";
+  reviewVerdict: "pass" | "revise" | "reposition" | null;
+  checkpointPath: string | null;
+}> {
+  const state = await readState(workspace);
+  const position = marketPositionSchema.parse(
+    parse(await fs.readFile(path.join(workspace, "planning/market-position.yaml"), "utf8"))
+  );
+  if (state.continuity.lastCommittedChapter === 0) {
+    throw new Error(`${type} milestone requires at least one continuity-committed chapter.`);
+  }
+  if (type === "short-complete" && position.workForm !== "short-complete") {
+    throw new Error("The short-complete milestone is only valid for short-complete projects.");
+  }
+  if (type === "volume" && position.workForm !== "long-serial") {
+    throw new Error("The volume milestone is only valid for long-serial projects.");
+  }
+
+  const blockingIssues: string[] = [];
+  const chapters: Array<{
+    chapter: number;
+    title: string;
+    chineseCharacters: number;
+    emotionalTarget: string;
+    sceneCount: number;
+    reviewRound: number;
+    sources: Array<{ path: string; fingerprint: string }>;
+  }> = [];
+
+  for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
+    const directory = String(chapter).padStart(4, "0");
+    const root = `chapters/${directory}`;
+    const paths = [
+      `${root}/contract.yaml`,
+      `${root}/final.md`,
+      `${root}/review.yaml`,
+      `${root}/quality-final.json`,
+      `${root}/delta.yaml`,
+      `${root}/handoff.yaml`
+    ];
+    const chapterSources = await Promise.all(
+      paths.map((relative) => source(workspace, relative))
+    );
+    const contract = chapterContractSchema.parse(
+      parse(await fs.readFile(path.join(workspace, paths[0]!), "utf8"))
+    );
+    const review = chapterReviewSchema.parse(
+      parse(await fs.readFile(path.join(workspace, paths[2]!), "utf8"))
+    );
+    const quality = qualityReportSchema.parse(
+      JSON.parse(await fs.readFile(path.join(workspace, paths[3]!), "utf8"))
+    );
+    const delta = continuityDeltaSchema.parse(
+      parse(await fs.readFile(path.join(workspace, paths[4]!), "utf8"))
+    );
+    const handoff = chapterHandoffSchema.parse(
+      parse(await fs.readFile(path.join(workspace, paths[5]!), "utf8"))
+    );
+    const finalFingerprint = chapterSources[1]?.fingerprint;
+    if (!finalFingerprint) throw new Error(`Unable to fingerprint ${paths[1]}.`);
+    if (contract.chapter !== chapter) blockingIssues.push(`Chapter ${chapter}: contract number mismatch.`);
+    if (review.verdict !== "pass" || review.sourceFingerprint !== finalFingerprint) {
+      blockingIssues.push(`Chapter ${chapter}: review is not passing or is stale.`);
+    }
+    if (!quality.ok || quality.sourceFingerprint !== finalFingerprint) {
+      blockingIssues.push(`Chapter ${chapter}: final quality report is not passing or is stale.`);
+    }
+    if (delta.chapter !== chapter || delta.sourceFingerprint !== finalFingerprint) {
+      blockingIssues.push(`Chapter ${chapter}: continuity delta is stale.`);
+    }
+    if (handoff.chapter !== chapter || handoff.sourceFingerprint !== finalFingerprint) {
+      blockingIssues.push(`Chapter ${chapter}: handoff is stale.`);
+    }
+    chapters.push({
+      chapter,
+      title: contract.title,
+      chineseCharacters: quality.metrics.chineseCharacters,
+      emotionalTarget: contract.emotionalTarget,
+      sceneCount: contract.sceneBeats.length,
+      reviewRound: review.reviewRound,
+      sources: chapterSources
+    });
+  }
+
+  const globalPaths = [
+    "planning/market-position.yaml",
+    "planning/story-bible.md",
+    "planning/volumes/current-volume.md",
+    "planning/style-profile.yaml",
+    "planning/style-examples.yaml",
+    ...(await loadCharacterProfiles(workspace)).map(({ path: relative }) => relative),
+    ...CONTINUITY_FILES
+  ];
+  const globalSources = await Promise.all(
+    globalPaths.map((relative) => source(workspace, relative))
+  );
+  const allSources = [...globalSources, ...chapters.flatMap((chapter) => chapter.sources)];
+  const bundleFingerprint = sha256Text(
+    allSources
+      .map((item) => `${item.path}:${item.fingerprint}`)
+      .sort()
+      .join("\n")
+  );
+  const report = storyMilestoneReportSchema.parse({
+    schemaVersion: 1,
+    milestone: type,
+    workForm: position.workForm,
+    generatedAt: new Date().toISOString(),
+    bundleFingerprint,
+    throughChapter: state.continuity.lastCommittedChapter,
+    totalChineseCharacters: chapters.reduce(
+      (total, chapter) => total + chapter.chineseCharacters,
+      0
+    ),
+    ok: blockingIssues.length === 0,
+    blockingIssues,
+    chapters,
+    sources: globalSources
+  });
+
+  const reportRoot = path.join(workspace, "reports", type);
+  await fs.mkdir(reportRoot, { recursive: true });
+  const reportPath = path.join(reportRoot, "metrics.json");
+  const templatePath = path.join(reportRoot, "review-template.yaml");
+  await atomicWriteText(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  await atomicWriteText(
+    templatePath,
+    stringify(storyReviewTemplate(type, bundleFingerprint), { lineWidth: 0 })
+  );
+
+  let reviewStatus: "missing" | "valid" | "stale-or-invalid" = "missing";
+  let reviewVerdict: "pass" | "revise" | "reposition" | null = null;
+  const reviewPath = path.join(reportRoot, "review.yaml");
+  if (await pathExists(reviewPath)) {
+    try {
+      const review = await validateStoryMilestoneReview(
+        workspace,
+        type,
+        bundleFingerprint
+      );
+      reviewStatus = "valid";
+      reviewVerdict = review.verdict;
+    } catch {
+      reviewStatus = "stale-or-invalid";
+    }
+  }
+
+  let checkpointPath: string | null = null;
+  if (type === "volume") {
+    checkpointPath = (
+      await generateCheckpoint(
+        workspace,
+        `volume-through-${state.continuity.lastCommittedChapter}`
+      )
+    ).output;
+  }
+  return {
+    report,
+    reportPath,
+    templatePath,
+    reviewStatus,
+    reviewVerdict,
+    checkpointPath
+  };
 }

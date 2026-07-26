@@ -11,6 +11,7 @@ import {
 import {
   chapterContractSchema,
   chapterContextManifestSchema,
+  chapterHandoffSchema,
   characterCardValueSchema,
   continuityStoreSchema,
   topicCandidatesSchema,
@@ -18,6 +19,15 @@ import {
   type ContinuityDomain,
   type ContinuityStore
 } from "./schema.js";
+import {
+  readStyleExamples,
+  readStyleProfile,
+  selectCharacterProfiles
+} from "./profiles.js";
+import {
+  queryRetrievalIndex,
+  readRetrievalCandidate
+} from "./retrieval.js";
 
 const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   facts: "facts.yaml",
@@ -28,11 +38,6 @@ const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   characters: "characters.yaml",
   storyCards: "story-cards.yaml"
 };
-
-function takeTail(content: string, maxChars: number): string {
-  const trimmed = content.trim();
-  return trimmed.length <= maxChars ? trimmed : `[truncated]\n${trimmed.slice(-maxChars)}`;
-}
 
 function takePrefix(content: string, maxChars: number): string {
   const trimmed = content.trim();
@@ -69,7 +74,7 @@ function matchesContext(
 
 export async function compileChapterContext(
   workspace: string,
-  maxChars = 12_000
+  maxChars = 20_000
 ): Promise<{ output: string; manifest: string; selectedEntries: number; truncated: boolean }> {
   if (maxChars < 4_000 || maxChars > 50_000) {
     throw new Error("Context maxChars must be between 4000 and 50000.");
@@ -109,6 +114,13 @@ export async function compileChapterContext(
   if (!selectedTopic) {
     throw new Error(`Selected topic does not exist: ${topicDecision.selectedId}.`);
   }
+  const characterProfiles = await selectCharacterProfiles(workspace, contract.participants);
+  const styleProfile = await readStyleProfile(workspace);
+  const styleExamples = await readStyleExamples(workspace);
+  const sceneTypes = new Set(contract.sceneBeats.map((scene) => scene.type));
+  const selectedStyleExamples = styleExamples.examples
+    .filter((example) => example.sceneTypes.some((sceneType) => sceneTypes.has(sceneType)))
+    .slice(0, 2);
 
   const terms = [
     ...contract.participants,
@@ -116,6 +128,13 @@ export async function compileChapterContext(
     ...contract.keywords,
     ...contract.protectedFacts
   ];
+  const retrievalCandidates = await queryRetrievalIndex(workspace, terms, 6);
+  const retrievedHistory = await Promise.all(
+    retrievalCandidates.map(async (candidate) => ({
+      ...candidate,
+      content: await readRetrievalCandidate(workspace, candidate)
+    }))
+  );
   const explicitByDomain: Record<ContinuityDomain, Set<string>> = {
     facts: new Set(contract.protectedFacts),
     timeline: new Set(),
@@ -180,14 +199,22 @@ export async function compileChapterContext(
     "planning/world-rules.yaml",
     "planning/characters/character-roster.md",
     "planning/volumes/current-volume.md",
+    "planning/style-profile.yaml",
+    "planning/style-examples.yaml",
+    ...characterProfiles.map(({ path: relative }) => relative),
     ...Object.values(DOMAIN_FILES).map((file) => `continuity/${file}`),
     `chapters/${chapterDirectory}/contract.yaml`
   ];
+  sourceFiles.push(...retrievalCandidates.map((candidate) => candidate.path));
   if (chapter > 1 && state.continuity.lastCommittedChapter >= chapter - 1) {
-    sourceFiles.push(`chapters/${String(chapter - 1).padStart(4, "0")}/final.md`);
+    const previous = String(chapter - 1).padStart(4, "0");
+    sourceFiles.push(
+      `chapters/${previous}/final.md`,
+      `chapters/${previous}/handoff.yaml`
+    );
   }
   const sources = await Promise.all(
-    sourceFiles.map(async (relative) => ({
+    [...new Set(sourceFiles)].map(async (relative) => ({
       path: relative,
       fingerprint: await fingerprintFile(path.join(workspace, relative))
     }))
@@ -205,10 +232,74 @@ export async function compileChapterContext(
     `- key turn: ${contract.keyTurn}`,
     `- net change: ${contract.netChange}`,
     `- ending pull: ${contract.endingPull}`,
+    `- emotional target: ${contract.emotionalTarget}`,
     `- required events: ${contract.requiredEvents.join("; ") || "none"}`,
     `- protected facts: ${contract.protectedFacts.join("; ") || "none"}`,
     `- prohibited crossings: ${contract.prohibitedCrossings.join("; ") || "none"}`,
     "",
+    "## Scene Plan",
+    ""
+  ];
+  for (const scene of contract.sceneBeats) {
+    sections.push(
+      `### ${scene.id} [${scene.type}]`,
+      "",
+      `- location: ${scene.location}`,
+      `- participants: ${scene.participants.join(", ")}`,
+      `- goal: ${scene.goal}`,
+      `- conflict: ${scene.conflict}`,
+      `- value shift: ${scene.valueShift}`,
+      `- emotional change: ${scene.emotionalChange}`,
+      ""
+    );
+  }
+  sections.push("## Character Profiles", "");
+  for (const { profile } of characterProfiles) {
+    sections.push(
+      `### ${profile.name} (${profile.id})`,
+      "",
+      `- role: ${profile.role}`,
+      `- core motivation: ${profile.coreMotivation}`,
+      `- moral boundary: ${profile.moralBoundary}`,
+      `- decision pattern: ${profile.decisionPattern}`,
+      `- voice rhythm: ${profile.voice.rhythm}`,
+      `- diction: ${profile.voice.diction}`,
+      `- habits: ${profile.voice.habits.join("; ") || "none"}`,
+      `- avoids: ${profile.voice.avoids.join("; ") || "none"}`,
+      `- OOC risks: ${profile.oocRisks.join("; ")}`,
+      ""
+    );
+  }
+  sections.push(
+    "## Style Profile",
+    "",
+    `- POV: ${styleProfile.pov}`,
+    `- tense: ${styleProfile.tense}`,
+    `- pacing: ${styleProfile.pacing}`,
+    `- dialogue density: ${styleProfile.dialogueDensity}`,
+    `- sentence rhythm: ${styleProfile.sentenceRhythm}`,
+    `- description preferences: ${styleProfile.descriptionPreferences.join("; ")}`,
+    `- banned patterns: ${styleProfile.bannedPatterns.join("; ") || "none"}`,
+    `- scene guidance: ${[...sceneTypes]
+      .flatMap((sceneType) => styleProfile.sceneGuidance[sceneType] ?? [])
+      .join("; ") || "none"}`,
+    ""
+  );
+  if (selectedStyleExamples.length > 0) {
+    sections.push("## Authorized Style Examples", "");
+    for (const example of selectedStyleExamples) {
+      sections.push(
+        `### ${example.title} (${example.rights})`,
+        "",
+        `- source: ${example.source}`,
+        `- guidance: ${example.guidance}`,
+        "",
+        example.excerpt,
+        ""
+      );
+    }
+  }
+  sections.push(
     "## Selected Topic",
     "",
     `- working title: ${selectedTopic.workingTitle}`,
@@ -238,7 +329,7 @@ export async function compileChapterContext(
     "",
     "## Relevant Continuity",
     ""
-  ];
+  );
 
   if (selected.length === 0) {
     sections.push("- No matching active continuity entries. Treat this as an explicit gap.");
@@ -250,14 +341,47 @@ export async function compileChapterContext(
       );
     }
   }
+  if (retrievedHistory.length > 0) {
+    sections.push("", "## Retrieved History Candidates", "");
+    for (const candidate of retrievedHistory) {
+      sections.push(
+        `- [${candidate.kind}/${candidate.id}] ` +
+        takePrefix(candidate.content, 700).replace(/\n+/g, " ")
+      );
+    }
+  }
 
   if (chapter > 1 && state.continuity.lastCommittedChapter >= chapter - 1) {
     const previous = String(chapter - 1).padStart(4, "0");
+    const handoff = chapterHandoffSchema.parse(
+      parse(
+        await fs.readFile(
+          path.join(workspace, "chapters", previous, "handoff.yaml"),
+          "utf8"
+        )
+      )
+    );
+    const previousFinalFingerprint = await fingerprintFile(
+      path.join(workspace, "chapters", previous, "final.md")
+    );
+    if (
+      handoff.chapter !== chapter - 1 ||
+      handoff.sourceFingerprint !== previousFinalFingerprint
+    ) {
+      throw new Error("Previous chapter handoff is stale. Rebuild it from accepted prose.");
+    }
     sections.push(
       "",
       "## Previous Chapter Handoff",
       "",
-      takeTail(await fs.readFile(path.join(workspace, "chapters", previous, "final.md"), "utf8"), 1_800)
+      `- summary: ${handoff.summary}`,
+      `- resolved: ${handoff.resolved.join("; ") || "none"}`,
+      `- unresolved: ${handoff.unresolved.join("; ") || "none"}`,
+      `- emotional carry: ${handoff.emotionalCarry}`,
+      `- next constraints: ${handoff.nextConstraints.join("; ") || "none"}`,
+      `- character carry: ${handoff.characterCarry
+        .map((item) => `${item.characterId}: ${item.state}`)
+        .join("; ") || "none"}`
     );
   }
 
@@ -267,7 +391,7 @@ export async function compileChapterContext(
     "",
     "## Deliberate Omissions",
     "",
-    "- Full prior chapters except the immediate handoff.",
+    "- Full prior chapters; the exact structured handoff is used instead.",
     "- Raw market research; only the approved topic decision enters prose context.",
     "- Continuity entries unrelated to current participants, locations, IDs, or keywords.",
     "- Drafts, rejected reviews, and speculative future events.",

@@ -5,8 +5,17 @@ import { readState } from "./io.js";
 import { compileChapterContext } from "./context.js";
 import { getContinuityCards, recoverContinuityTransaction } from "./continuity.js";
 import { runQualityCheck } from "./quality.js";
-import { generateOpeningMilestone } from "./milestone.js";
+import {
+  generateOpeningMilestone,
+  generateStoryMilestone
+} from "./milestone.js";
 import { generateTopicSelectionReport } from "./topics.js";
+import { generateCheckpoint } from "./checkpoint.js";
+import {
+  queryRetrievalIndex,
+  readRetrievalCandidate,
+  rebuildRetrievalIndex
+} from "./retrieval.js";
 import {
   advanceChapter,
   exportNovel,
@@ -31,9 +40,12 @@ function usage(): string {
     "  invalidate <workspace> --artifact brief|foundation|current-volume-plan --reason <text>",
     "  topics <workspace> [--policy-date YYYY-MM-DD]",
     "  phase <workspace> --to <phase>",
-    "  context <workspace> [--max-chars 12000]",
+    "  context <workspace> [--max-chars 20000]",
     "  quality <workspace> [--source draft|final]",
-    "  milestone <workspace> [--type opening-three]",
+    "  milestone <workspace> [--type opening-three|short-complete|volume]",
+    "  checkpoint <workspace> [--label text]",
+    "  index <workspace>",
+    "  search <workspace> --query <text> [--limit 8]",
     "  advance <workspace> --to <chapter-status>",
     "  next <workspace>",
     "  export <workspace> [--format md|txt]",
@@ -189,7 +201,7 @@ async function main(): Promise<void> {
 
   if (command === "context") {
     const maxCharsOption = option(args, "--max-chars");
-    const maxChars = maxCharsOption ? Number(maxCharsOption) : 12_000;
+    const maxChars = maxCharsOption ? Number(maxCharsOption) : 20_000;
     if (!Number.isInteger(maxChars)) throw new Error("context --max-chars must be an integer.");
     const result = await compileChapterContext(workspace, maxChars);
     console.log(json ? JSON.stringify(result, null, 2) : `Compiled context to ${result.output}`);
@@ -209,10 +221,12 @@ async function main(): Promise<void> {
 
   if (command === "milestone") {
     const type = option(args, "--type") ?? "opening-three";
-    if (type !== "opening-three") {
-      throw new Error("milestone --type currently supports only opening-three.");
+    if (type !== "opening-three" && type !== "short-complete" && type !== "volume") {
+      throw new Error("milestone --type must be opening-three, short-complete, or volume.");
     }
-    const result = await generateOpeningMilestone(workspace);
+    const result = type === "opening-three"
+      ? await generateOpeningMilestone(workspace)
+      : await generateStoryMilestone(workspace, type);
     if (json) {
       console.log(JSON.stringify(result, null, 2));
     } else {
@@ -221,11 +235,62 @@ async function main(): Promise<void> {
         ? result.reviewVerdict
         : result.reviewStatus;
       console.log(
-        `Opening milestone mechanical checks ${mechanical}; commercial review ${review}.\n` +
+        `${type} milestone mechanical checks ${mechanical}; commercial review ${review}.\n` +
         `Metrics: ${result.reportPath}\nReview template: ${result.templatePath}`
       );
     }
     if (!result.report.ok) process.exitCode = 2;
+    return;
+  }
+
+  if (command === "checkpoint") {
+    const result = await generateCheckpoint(workspace, option(args, "--label"));
+    console.log(
+      json
+        ? JSON.stringify(result, null, 2)
+        : `Created checkpoint for chapter ${result.checkpoint.lastCommittedChapter}: ${result.output}`
+    );
+    return;
+  }
+
+  if (command === "index") {
+    const result = await rebuildRetrievalIndex(workspace);
+    console.log(
+      json
+        ? JSON.stringify(result, null, 2)
+        : `Rebuilt retrieval index with ${result.documents} document(s): ${result.output}`
+    );
+    return;
+  }
+
+  if (command === "search") {
+    const query = option(args, "--query");
+    if (!query) throw new Error("search requires --query.");
+    const limitOption = option(args, "--limit");
+    const limit = limitOption ? Number(limitOption) : 8;
+    if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
+      throw new Error("search --limit must be an integer between 1 and 50.");
+    }
+    const candidates = await queryRetrievalIndex(
+      workspace,
+      query.split(/\s+/).filter(Boolean),
+      limit
+    );
+    const results = await Promise.all(
+      candidates.map(async (candidate) => ({
+        ...candidate,
+        content: await readRetrievalCandidate(workspace, candidate)
+      }))
+    );
+    console.log(
+      json
+        ? JSON.stringify(results, null, 2)
+        : results.length === 0
+          ? "No current indexed sources matched."
+          : results
+            .map((item) => `- ${item.kind}/${item.id} (${item.path})`)
+            .join("\n")
+    );
     return;
   }
 

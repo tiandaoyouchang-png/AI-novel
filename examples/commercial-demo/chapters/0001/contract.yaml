@@ -1,4 +1,4 @@
-schemaVersion: 1
+schemaVersion: 2
 chapter: 1
 title: 义仓里的青盐
 goal: 沈砚必须在天亮封仓前确认义仓盐袋为何比官账轻，并决定是否保留证据。
@@ -38,6 +38,18 @@ readerPromise: 读者将看到沈砚如何从重量与封口的矛盾中找出�
 keyTurn: 沈砚发现异常不是仓吏偷斤短两，而是有人用南盐外皮包进禁运青盐。
 netChange: 沈砚从可能的旁观者变成私藏证据的涉案者。
 endingPull: 仓外熟悉的咳嗽停住，有人准确叫出沈砚的小名。
+emotionalTarget: 沈砚从害怕旧错暴露，转为主动承担私藏证据的风险。
+sceneBeats:
+  - id: scene-weigh-and-reveal
+    type: investigation
+    location: 临河县义仓
+    participants:
+      - 沈砚
+      - 韩九
+    goal: 在封仓前确认盐袋重量和封口的矛盾。
+    conflict: 韩九在外巡夜，沈砚也可能因旧假账被追责。
+    valueShift: 可疑短斤从普通侵吞转为禁盐调包证据。
+    emotionalChange: 侥幸旁观转为主动涉险。
 targetLength:
   min: 900
   target: 1400

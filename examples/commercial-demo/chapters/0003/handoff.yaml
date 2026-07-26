@@ -1,0 +1,24 @@
+schemaVersion: 1
+chapter: 3
+sourceFingerprint: 71ee78dd37f44c56fd7d9c1f32cd3043f0e474f06f097afdd8f125c48663a550
+summary: 沈砚放弃唯一总账，救出韩九并让袋号证据由多人保存；韩九交出沈父夜航簿残页，周嵩则以重做总账为名公开控制沈砚。
+resolved:
+  - 韩九在火场中存活并交出指向城外安民营的反向货路残页。
+  - 唯一账本被毁后，袋号、时辰和经手者已由多人分别保存。
+unresolved:
+  - 反向货路、纵火安排与周嵩之间的完整因果链仍未证实。
+  - 沈父残页为何落在韩九手中仍未说明。
+characterCarry:
+  - characterId: char-shen-yan
+    state: 右掌烫伤、后背擦伤，持有残页并进入周嵩直接控制范围。
+  - characterId: char-gu-qingzhao
+    state: 为阻止封门公开承担风险，与沈砚的合作获得一项行动证据。
+  - characterId: char-han-jiu
+    state: 咳喘严重，已交出一页残纸但保留完整真相。
+  - characterId: char-zhou-song
+    state: 以清名和公开赏识包装对沈砚的强制征用。
+emotionalCarry: 救人和分散证据带来短暂主动权，但县令的公开召见把冲突推进到无法退出的近身控制。
+nextConstraints:
+  - 沈砚的右手伤势必须影响写账行动。
+  - 周嵩不能看不出普通数字暗号。
+  - 顾青昭必须在县衙外拥有独立选择。

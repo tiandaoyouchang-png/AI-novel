@@ -1,0 +1,19 @@
+schemaVersion: 1
+id: char-gu-qingzhao
+name: 顾青昭
+role: 巡盐御史暗线，表面身份为药材行商
+coreMotivation: 在公开官权介入前建立一条不会被地方官销毁的证据链。
+moralBoundary: 不伪造物证，但会隐瞒身份和行动计划。
+decisionPattern: 先布置退路和替代方案，再迫使关键人物作出选择。
+voice:
+  rhythm: 句子完整克制，追问时连续使用短问句。
+  diction: 常用凭据、经手、退路和代价等词。
+  habits:
+    - 用具体交换条件代替安慰。
+  avoids:
+    - 不以官职直接压服没有确认立场的人。
+oocRisks:
+  - 轻易公开密令或把无辜者完全排除在任务成本之外。
+relationshipVoices:
+  - characterId: char-shen-yan
+    difference: 对沈砚既需要又怀疑，赞同时仍会保留验证条件。

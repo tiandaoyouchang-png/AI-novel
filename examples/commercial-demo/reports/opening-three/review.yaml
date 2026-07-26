@@ -1,6 +1,6 @@
 schemaVersion: 1
 milestone: opening-three
-bundleFingerprint: 63411e9168c03f8146c8a3a74484b8759d7ab704b23176bc2424dc0ba428f2be
+bundleFingerprint: 1c84627232aa9200c718df7d57ae26e5acca772c78ae1fc81837f7fe106862a2
 verdict: pass
 dimensions:
   audienceFit:

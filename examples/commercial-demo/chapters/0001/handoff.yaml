@@ -1,0 +1,17 @@
+schemaVersion: 1
+chapter: 1
+sourceFingerprint: d6edaa64bad656f84f784d34444e297903f3cebd05da552beefe1e40cf42907d
+summary: 沈砚从盐袋重量、封口和袋底青盐确认赈盐被调包，私藏一粒青盐并抄走袋号，正式成为涉案者。
+resolved:
+  - 义仓短斤不是普通侵吞，而是南盐外皮包入禁运青盐。
+unresolved:
+  - 谁安排调包以及韩九为何准确守在仓外仍未确认。
+characterCarry:
+  - characterId: char-shen-yan
+    state: 持有青盐样本和异常袋号，承担盗盐与旧假账同时暴露的风险。
+  - characterId: char-han-jiu
+    state: 已认出沈砚并暴露与沈父的旧关系，但立场仍不明确。
+emotionalCarry: 沈砚已经无法继续假装旁观，警觉和负罪感转成主动取证压力。
+nextConstraints:
+  - 不能提前确认韩九完全可信。
+  - 必须为青盐样本增加独立于沈砚证词的第二类物证。

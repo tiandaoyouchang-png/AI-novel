@@ -1,0 +1,27 @@
+schemaVersion: 1
+pov: third-limited
+tense: past
+pacing: compressed
+dialogueDensity: medium
+sentenceRhythm: 压力场景使用短句推进，证据推理允许一到两句较长的因果链。
+descriptionPreferences:
+  - 用重量、气味、触感和物件位置承载线索。
+  - 用角色选择和付出的代价表达情绪。
+bannedPatterns:
+  - 不用抽象总结替代已经发生的行动。
+  - 不连续堆叠相同结构的比喻。
+sceneGuidance:
+  dialogue:
+    - 每轮对话至少改变一次信息差、关系或行动选择。
+  action:
+    - 动作必须受伤势、空间与既有资源约束。
+  investigation:
+    - 关键结论必须能回指正文中已经出现的物证。
+  intimacy:
+    - 亲密关系通过承担风险和保留选择权推进。
+  reveal:
+    - 揭示应重排旧证据，不能凭空引入答案。
+  transition:
+    - 过场只保留新的压力、时间或位置变化。
+  other:
+    - 每个场景必须产生可陈述的价值变化。

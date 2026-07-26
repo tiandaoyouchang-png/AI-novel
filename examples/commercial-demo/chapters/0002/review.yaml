@@ -1,6 +1,17 @@
-schemaVersion: 1
+schemaVersion: 2
+reviewRound: 1
 sourceFingerprint: ee12f73fd632c6ba99d5d0518646fd6a51f32c5bb2aa966c411a987c295bfad9
 verdict: pass
+checks:
+  characterVoice:
+    status: pass
+    evidence: 顾青昭以交换条件和不完整密令建立合作，沈砚仍坚持核验火漆与时间差。
+  informationBoundaries:
+    status: pass
+    evidence: 顾青昭的真实权限和无字凹痕来源仍被保留，没有泄露后续答案。
+  sceneValueChanges:
+    status: pass
+    evidence: 两个场景分别完成低信任联盟和第二件物证，结尾再把压力升级为火灾。
 blockingIssues: []
 warnings:
   - 顾青昭的身份信息保持了不完整性；后续必须通过她独立承担风险证明其行动线，而非只靠口头自证。

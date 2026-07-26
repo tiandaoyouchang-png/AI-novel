@@ -1,4 +1,4 @@
-schemaVersion: 1
+schemaVersion: 2
 chapter: 3
 title: 火里留哪一本账
 goal: 沈砚必须在义仓坍塌前救出韩九，并保住足以让调包案继续被查的证据。
@@ -49,6 +49,31 @@ readerPromise: 读者将看到主角把救人与取证从二选一改造成可�
 keyTurn: 沈砚放弃抢救唯一总账，改为让多个普通人分别记住袋号、时辰与经手者。
 netChange: 沈砚救出韩九、获得父亲旧账线索，也正式进入县令视野，已无法退回普通账房生活。
 endingPull: 周嵩在众人面前称赞沈砚懂账，请他天亮后进县衙“重做一本烧掉的账”。
+emotionalTarget: 沈砚从执着保住唯一账本，转为选择救人并让证据由多人共同保存。
+sceneBeats:
+  - id: scene-fire-choice
+    type: action
+    location: 临河县义仓
+    participants:
+      - 沈砚
+      - 顾青昭
+      - 韩九
+    goal: 在仓梁坍塌前救出韩九并保留可查证据。
+    conflict: 人、账册和样本无法同时带走，沈砚右手会受伤。
+    valueShift: 唯一账本即将焚毁转为多人持有可复核信息。
+    emotionalChange: 控制证据的焦灼转为承担共同保存的风险。
+  - id: scene-magistrate-invitation
+    type: dialogue
+    location: 义仓前院
+    participants:
+      - 沈砚
+      - 顾青昭
+      - 韩九
+      - 周嵩
+    goal: 判断周嵩公开召见的真实意图。
+    conflict: 周嵩以赞许包装控制，现场无人能公开拒绝。
+    valueShift: 沈砚仍可退回普通账房转为正式进入县令视野。
+    emotionalChange: 火场后的短暂庆幸转为更强压力。
 targetLength:
   min: 1000
   target: 1500
