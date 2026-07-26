@@ -1,0 +1,35 @@
+schemaVersion: 1
+entries:
+  - id: rel-shen-gu
+    status: active
+    value:
+      parties:
+        - 沈砚
+        - 顾青昭
+      state: 顾青昭公开阻止封门并协助分散证据，双方合作从互持把柄升级为共同暴露。
+      trust: guarded
+    sourceChapter: 3
+    evidence: 顾青昭以雄黄阻拦衙役，并让脚夫分别记住异常袋号。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: rel-shen-han
+    status: active
+    value:
+      parties:
+        - 沈砚
+        - 韩九
+      state: 沈砚选择放弃诱饵总账救出韩九，韩九回报一页沈父夜航记录；完整真相仍被保留。
+      trust: fragile-alliance
+    sourceChapter: 3
+    evidence: 火场救人与旧纸交付。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: rel-shen-zhou
+    status: active
+    value:
+      parties:
+        - 沈砚
+        - 周嵩
+      state: 周嵩公开称赞并召沈砚重做焚毁总账，表面征用、实质控制。
+      trust: adversarial-courtesy
+    sourceChapter: 3
+    evidence: 周嵩在衙役和脚夫面前邀请沈砚回县衙做账。
+    updatedAt: 2026-07-26T08:29:12.746Z

@@ -1,0 +1,4 @@
+node_modules/
+.test-dist/
+dist/*
+!dist/novelctl.cjs

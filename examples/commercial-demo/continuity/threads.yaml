@@ -1,0 +1,38 @@
+schemaVersion: 1
+entries:
+  - id: thread-father-ledger
+    status: active
+    value:
+      question: 沈父为何记录赈字船反向货路，完整夜航簿其余部分在哪里？
+      status: partially_answered
+      urgency: high
+    sourceChapter: 3
+    evidence: 韩九只交出一页旧纸，没有交代完整簿册下落。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: thread-green-salt
+    status: active
+    value:
+      question: 好盐是否先被运往城外安民营，再由反向货船将青盐和劣盐补回官仓？
+      status: narrowed
+      urgency: high
+    sourceChapter: 3
+    evidence: 沈父残页与官账记录的货流方向相反。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: thread-sealless-mark
+    status: active
+    value:
+      question: 转运司火漆背面的无字细齿凹痕代表哪一级经手组织？
+      status: open
+      urgency: medium
+    sourceChapter: 2
+    evidence: 两人在验盐亭观察到无法对应公开官印文字的暗记。
+    updatedAt: 2026-07-26T08:25:58.178Z
+  - id: thread-warehouse-fire
+    status: active
+    value:
+      question: 谁布置了空袋、梁油和诱饵总账，试图制造盗账替罪羊？
+      status: open
+      urgency: high
+    sourceChapter: 3
+    evidence: 韩九获救且总账焚毁，但纵火者身份未被确认。
+    updatedAt: 2026-07-26T08:29:12.746Z

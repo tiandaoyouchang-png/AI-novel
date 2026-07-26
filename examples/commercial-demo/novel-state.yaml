@@ -1,0 +1,30 @@
+schemaVersion: 2
+novel:
+  id: 盐火照夜-938e5de4
+  title: 盐火照夜
+  language: zh-CN
+  audienceChannel: 番茄小说男频长篇
+  publicationFormat: 章节制连续更新小说
+workflow:
+  phase: production
+  currentChapter: 4
+  chapterStatus: not_started
+  delegatedThroughChapter: null
+  blockingReason: null
+  updatedAt: 2026-07-26T09:56:41.787Z
+artifacts:
+  brief:
+    status: accepted
+    fingerprint: e20b671a357ba699c445f6149eeabd068e38c4ce321b2784f6b5145ce0384f5d
+    acceptedAt: 2026-07-26T09:56:41.675Z
+  foundation:
+    status: accepted
+    fingerprint: 681162c78c6c107d4507ae4233b5e5488d0100699ec491fba3e8b95e4226455a
+    acceptedAt: 2026-07-26T09:56:41.735Z
+  currentVolumePlan:
+    status: accepted
+    fingerprint: 13d062d5401af0d9786c115035c780707eda26c6ddaf951cc3e6e11e55965638
+    acceptedAt: 2026-07-26T09:56:41.787Z
+continuity:
+  lastCommittedChapter: 3
+  checkpointInterval: 10

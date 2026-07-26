@@ -1,0 +1,70 @@
+schemaVersion: 1
+asOf: 2026-07-26
+targetMarket: 中国大陆番茄小说与知乎盐选的中文商业故事
+targetPlatforms:
+  - fanqie
+  - zhihu-salt
+targetForms:
+  - long-serial
+  - short-complete
+sources:
+  - id: cadpa-2024-development
+    title: 2024年度中国网络文学发展报告
+    url: https://www.cadpa.org.cn/3277/202507/41753.html
+    publisher: 中国音像与数字出版协会
+    publishedAt: 2025-07-17
+    accessedAt: 2026-07-26
+    type: industry-report
+    appliesTo: [fanqie, zhihu-salt]
+    appliesToForms: [long-serial, short-complete]
+    signal: 悬疑推理仍是最受用户欢迎题材，历史军事关注度稳步提升；用户规模增长快于作品和作者供给。
+    evidence: 报告基于35家主要网络文学企业同口径数据、3.7万用户调研和重点企业访谈，显示2024年用户规模6.38亿，悬疑推理热度持续走强，历史军事具备开发潜力。
+    confidence: high
+  - id: cssn-2025-development
+    title: 2025中国网络文学发展研究报告
+    url: https://www.cssn.cn/skgz/bwyc/202604/t20260420_5981165.shtml
+    publisher: 中国社会科学网
+    publishedAt: 2026-04-20
+    accessedAt: 2026-07-26
+    type: industry-report
+    appliesTo: [fanqie, zhihu-salt]
+    appliesToForms: [long-serial, short-complete]
+    signal: 类型细分、专业职业经验、传统文化融合和多平台长篇需求共同增长。
+    evidence: 报告显示历史、科幻、奇幻、现实等核心品类作品增长，平台题材进一步细分；创作者将账务、科研、基层职业等真实知识转化为差异化叙事资源。
+    confidence: high
+  - id: cwa-2024-bluebook
+    title: 2024中国网络文学蓝皮书
+    url: https://image.chinawriter.com.cn/n1/2025/0630/c404023-40511500.html
+    publisher: 中国作家协会网络文学中心
+    publishedAt: 2025-06-30
+    accessedAt: 2026-07-26
+    type: industry-report
+    appliesTo: [fanqie, zhihu-salt]
+    appliesToForms: [long-serial, short-complete]
+    signal: 精品化、现实小切口、历史与幻想融合、中短篇增长和IP改编需求同步存在。
+    evidence: 蓝皮书记录现实、科幻、历史、幻想多类型精品增长，并强调基层人物视角、职业细节、传统文化元素和悬疑结构的价值。
+    confidence: high
+  - id: fanqie-recommendation-2026
+    title: 推荐验证期规则全指南
+    url: https://fanqienovel.com/writer/zone/article/7659317147297923134
+    publisher: 番茄小说网
+    publishedAt: 2026-07-08
+    accessedAt: 2026-07-26
+    type: platform-data
+    appliesTo: [fanqie]
+    appliesToForms: [long-serial]
+    signal: 番茄长篇作品进入推荐验证流程，选题和开篇需要为实际推荐测试准备可观察的读者反馈。
+    evidence: 番茄作家专区将推荐验证期规则列为2026年7月官方创作指南，并同步维护长篇发文、签约和推荐规则。
+    confidence: high
+  - id: salt-story-2026
+    title: 打破叙事固化 走出创新之路——盐言故事近期网文新探
+    url: https://wyb.chinawriter.com.cn/attachment/202603/16/bde40308-ae12-419c-9f05-6c86e69fc095.pdf
+    publisher: 文艺报
+    publishedAt: 2026-03-16
+    accessedAt: 2026-07-26
+    type: industry-report
+    appliesTo: [zhihu-salt]
+    appliesToForms: [long-serial, short-complete]
+    signal: 盐言故事以短篇幅、快节奏、强情感为核心，同时通过长篇计划、类型融合和短剧漫剧开发扩展内容形态。
+    evidence: 文章梳理盐言故事的女性情感、现实悬疑、幻想和男频短篇探索，并强调反同质化、现实议题、情绪回应与IP改编。
+    confidence: high

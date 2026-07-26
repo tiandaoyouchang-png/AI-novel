@@ -1,0 +1,97 @@
+schemaVersion: 1
+chapter: 1
+sourceFingerprint: d6edaa64bad656f84f784d34444e297903f3cebd05da552beefe1e40cf42907d
+changes:
+  - domain: facts
+    operation: upsert
+    id: fact-warehouse-adulterated-salt
+    value:
+      statement: 临河县义仓地字十九袋中混有北泽青盐和带硝涩味的劣盐。
+      certainty: observed
+    evidence: 沈砚从鼠洞处取样并通过颜色、气味和舌尖涩麻初验。
+  - domain: facts
+    operation: upsert
+    id: fact-ledger-handwriting-new
+    value:
+      statement: 地字十九袋号表面做旧，但数字九使用县衙书吏今年才改的短钩写法。
+      certainty: observed
+    evidence: 沈砚近距离查看袋角墨号。
+  - domain: resources
+    operation: upsert
+    id: res-blue-salt-grain
+    value:
+      owner: 沈砚
+      item: 一粒北泽青盐样本
+      location: 沈砚袖口暗缝
+      risk: 被搜出可按盗取官盐治罪
+    evidence: 沈砚将青盐夹进袖口暗缝。
+  - domain: threads
+    operation: upsert
+    id: thread-green-salt
+    value:
+      question: 禁运北泽盐如何进入临河县赈盐仓，真正的南场官盐又去了哪里？
+      status: open
+      urgency: high
+    evidence: 地字十九袋内出现混合青盐和劣盐。
+  - domain: threads
+    operation: upsert
+    id: thread-father-ledger
+    value:
+      question: 沈父最后一本夜航簿是否在韩九手中？
+      status: open
+      urgency: medium
+    evidence: 沈砚在门内直接询问，韩九的咳嗽随即停止。
+  - domain: relationships
+    operation: upsert
+    id: rel-shen-han
+    value:
+      parties:
+        - 沈砚
+        - 韩九
+      state: 旧恩与现实胁迫并存，韩九疑似在保护沈砚，也可能在诱他入局。
+      trust: uncertain
+    evidence: 韩九以旧称警告沈砚，并挡住耳房差役的视线。
+  - domain: timeline
+    operation: upsert
+    id: time-chapter-001-warehouse
+    value:
+      when: 钦差验仓前一夜
+      event: 沈砚在临河县义仓发现调包赈盐并私藏样本。
+    evidence: 第一章全章。
+  - domain: characters
+    operation: upsert
+    id: char-shen-yan
+    value:
+      name: 沈砚
+      lifeStatus: alive
+      currentLocation: 临河县义仓内
+      currentGoal: 带走青盐样本并查清赈盐调包
+      knowledgeIds: [fact-warehouse-adulterated-salt, fact-ledger-handwriting-new]
+      hiddenKnowledgeIds: []
+      condition: [右手旧茧完整, 身份尚未暴露]
+    evidence: 沈砚在仓内完成取样并藏起青盐。
+  - domain: characters
+    operation: upsert
+    id: char-han-jiu
+    value:
+      name: 韩九
+      lifeStatus: alive
+      currentLocation: 临河县义仓门外
+      currentGoal: 在县丞胁迫下暗中保护沈砚
+      knowledgeIds: [thread-father-ledger]
+      hiddenKnowledgeIds: [fact-father-reverse-route]
+      condition: [咳嗽带铜哨音, 孙子徭役名册受制]
+    evidence: 韩九在仓外警告沈砚并挡住差役视线。
+  - domain: storyCards
+    operation: upsert
+    id: card-main-green-salt
+    value:
+      type: main-plot
+      status: active
+      summary: 沈砚追查赈盐调包与反向货路。
+      currentBeat: 取得第一粒青盐和异常袋号。
+      nextPressure: 必须在封仓前证明调包时间并安全离开。
+      characterIds: [char-shen-yan, char-han-jiu]
+      threadIds: [thread-green-salt, thread-father-ledger]
+      payoffDebt: 解释禁运青盐来源并揭示正常官盐去向。
+    evidence: 第一章终稿完成异常盐样本与袋号的首次交付。

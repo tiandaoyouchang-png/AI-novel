@@ -1,0 +1,55 @@
+schemaVersion: 1
+chapter: 3
+title: 火里留哪一本账
+goal: 沈砚必须在义仓坍塌前救出韩九，并保住足以让调包案继续被查的证据。
+resistance: 火势从盐垛底部蔓延，官差只顾搬走总账，顾青昭要求优先保全物证，沈砚无法同时带走韩九、账册和全部样本。
+requiredEvents:
+  - 沈砚利用盐垛重量与仓梁结构判断一条短暂安全路线。
+  - 顾青昭独立承担暴露风险，阻止差役封死仓门。
+  - 沈砚选择先救韩九，并用可复制的袋号和巡夜记录替代唯一账本。
+  - 韩九交出沈父夜航簿的一页，指向赈盐被转去城外难民营的反向货路。
+  - 县令周嵩以协助查账为名当众召见沈砚。
+protectedFacts:
+  - 火漆碎片仍由沈砚持有。
+  - 顾青昭与沈砚只是低信任合作。
+  - 韩九帮助过沈砚但仍可能隐瞒事实。
+prohibitedCrossings:
+  - 不能让火灾一次性销毁所有可查痕迹。
+  - 不能让周嵩公开承认参与赈盐案。
+  - 不能让沈砚靠巧合毫发无伤地救人。
+participants:
+  - 沈砚
+  - 顾青昭
+  - 韩九
+  - 周嵩
+locations:
+  - 临河县义仓
+  - 义仓前院
+threadIds:
+  - thread-green-salt
+  - thread-father-ledger
+  - thread-warehouse-fire
+  - thread-sealless-mark
+resourceIds:
+  - res-half-sealing-wax
+  - res-father-ledger-page
+relationshipIds:
+  - rel-shen-han
+  - rel-shen-gu
+  - rel-shen-zhou
+worldRuleIds:
+  - salt-trace-five
+  - official-seal-liability
+keywords:
+  - 火场
+  - 夜航簿
+  - 巡夜簿
+  - 袋号
+readerPromise: 读者将看到主角把救人与取证从二选一改造成可承担代价的第三条路。
+keyTurn: 沈砚放弃抢救唯一总账，改为让多个普通人分别记住袋号、时辰与经手者。
+netChange: 沈砚救出韩九、获得父亲旧账线索，也正式进入县令视野，已无法退回普通账房生活。
+endingPull: 周嵩在众人面前称赞沈砚懂账，请他天亮后进县衙“重做一本烧掉的账”。
+targetLength:
+  min: 1000
+  target: 1500
+  max: 2400

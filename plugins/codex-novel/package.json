@@ -1,0 +1,27 @@
+{
+  "name": "@ai-novel/codex-novel",
+  "version": "0.1.0",
+  "description": "Codex-native market selection, writing, and continuity for long and short fiction.",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "novelctl": "./dist/novelctl.cjs"
+  },
+  "scripts": {
+    "build": "npm run typecheck && esbuild src/cli.ts --bundle --platform=node --format=cjs --target=node22 --outfile=dist/novelctl.cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && esbuild test/workspace.test.ts --bundle --platform=node --format=cjs --target=node22 --outfile=.test-dist/workspace.test.cjs && node --test .test-dist/*.test.cjs"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "esbuild": "^0.25.9",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,119 @@
+schemaVersion: 1
+chapter: 2
+sourceFingerprint: ee12f73fd632c6ba99d5d0518646fd6a51f32c5bb2aa966c411a987c295bfad9
+changes:
+  - domain: facts
+    operation: upsert
+    id: fact-seal-replaced-rain-night
+    value:
+      statement: 义仓封条所用朱蜡在雨夜刚被替换，蜡面存在先压印后贴回造成的逆向卷边。
+      certainty: observed
+    evidence: 沈砚与顾青昭在验盐亭检查仍有柔性的内深外浅蜡屑。
+  - domain: facts
+    operation: upsert
+    id: fact-han-created-patrol-gap
+    value:
+      statement: 韩九故意将东南角梆子提前一刻钟，为沈砚离开义仓制造空当。
+      certainty: observed
+    evidence: 沈砚辨认出童年躲避官差时使用的手势，并听见提前的梆声。
+  - domain: resources
+    operation: upsert
+    id: res-half-sealing-wax
+    value:
+      owner: 沈砚
+      item: 四分之一枚转运司火漆
+      marks: 正面水纹模糊，背面有无字细齿凹痕
+      risk: 被搜出可按盗印收押
+    evidence: 顾青昭将取得的半枚蜡片再次掰开，把较小一块交给沈砚。
+  - domain: threads
+    operation: upsert
+    id: thread-sealless-mark
+    value:
+      question: 转运司火漆背面的无字细齿凹痕代表哪一级经手组织？
+      status: open
+      urgency: medium
+    evidence: 两人在验盐亭观察到无法对应公开官印文字的暗记。
+  - domain: threads
+    operation: upsert
+    id: thread-warehouse-fire
+    value:
+      question: 谁从最潮湿的盐垛底部纵火，韩九能否活着带出证词？
+      status: open
+      urgency: immediate
+    evidence: 义仓底部起火，仓内传出韩九带咳喘的呼救。
+  - domain: relationships
+    operation: upsert
+    id: rel-shen-gu
+    value:
+      parties:
+        - 沈砚
+        - 顾青昭
+      state: 双方以假账草稿、青盐和火漆互相制衡，形成临时合作。
+      trust: low
+    evidence: 两人谈判后分持物证，顾青昭只交出较小的火漆碎片。
+  - domain: relationships
+    operation: upsert
+    id: rel-shen-han
+    value:
+      parties:
+        - 沈砚
+        - 韩九
+      state: 韩九已用可追责的巡夜时间差帮助沈砚，但是否隐瞒沈父夜航簿仍未知。
+      trust: guarded
+    evidence: 韩九提前东南角梆声，并被留在起火的义仓内。
+  - domain: timeline
+    operation: upsert
+    id: time-chapter-002-seal-and-fire
+    value:
+      when: 钦差验仓前一夜，沈砚离仓后
+      event: 沈砚与顾青昭取得火漆证据并建立合作，义仓随即起火。
+    evidence: 第二章全章。
+  - domain: characters
+    operation: upsert
+    id: char-shen-yan
+    value:
+      name: 沈砚
+      lifeStatus: alive
+      currentLocation: 废弃验盐亭
+      currentGoal: 保住青盐与火漆证据并判断顾青昭是否可信
+      knowledgeIds: [fact-warehouse-adulterated-salt, fact-seal-replaced-rain-night]
+      hiddenKnowledgeIds: []
+      condition: [持有高风险物证, 补假账把柄被顾青昭掌握]
+    evidence: 沈砚离仓后在验盐亭检查火漆。
+  - domain: characters
+    operation: upsert
+    id: char-gu-qingzhao
+    value:
+      name: 顾青昭
+      lifeStatus: alive
+      currentLocation: 废弃验盐亭
+      currentGoal: 借沈砚的账术查清转运司暗记
+      knowledgeIds: [fact-seal-replaced-rain-night]
+      hiddenKnowledgeIds: [thread-sealless-mark]
+      condition: [暗线身份未公开, 与沈砚低信任合作]
+    evidence: 顾青昭展示把柄并与沈砚分持火漆。
+  - domain: characters
+    operation: upsert
+    id: char-han-jiu
+    value:
+      name: 韩九
+      lifeStatus: alive
+      currentLocation: 起火的临河县义仓内
+      currentGoal: 让沈砚逃离并保住沈父夜航簿线索
+      knowledgeIds: [fact-han-created-patrol-gap]
+      hiddenKnowledgeIds: [fact-father-reverse-route]
+      condition: [被困火场, 咳喘加重]
+    evidence: 韩九制造巡夜空当后从仓内呼救。
+  - domain: storyCards
+    operation: upsert
+    id: card-main-green-salt
+    value:
+      type: main-plot
+      status: active
+      summary: 沈砚追查赈盐调包与反向货路。
+      currentBeat: 火漆证明封条在雨夜被替换，义仓随后起火。
+      nextPressure: 在救人、保账和保物证之间作出不可逆选择。
+      characterIds: [char-shen-yan, char-gu-qingzhao, char-han-jiu]
+      threadIds: [thread-green-salt, thread-sealless-mark, thread-warehouse-fire]
+      payoffDebt: 解释纵火者为何选择潮湿盐垛，并兑现韩九生死结果。
+    evidence: 第二章终稿增加封印证据并把火场选择推到下一章。

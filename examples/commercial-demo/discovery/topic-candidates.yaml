@@ -1,0 +1,115 @@
+schemaVersion: 1
+candidates:
+  - id: salt-ledger-mystery
+    workingTitle: 盐火照夜
+    targetPlatform: fanqie
+    workForm: long-serial
+    genre: 架空历史悬疑
+    targetReader: 喜欢历史悬疑、官场博弈和小人物专业破局的中文男频读者
+    channel: 番茄小说男频长篇
+    platformRationale: 免费阅读与推荐验证适合用连续案件、章节证据回报和稳定追读钩子逐步检验读者留存。
+    formRationale: 官盐五痕可以扩展为县、府、转运司和边盐多层案件，适合长篇连载升级。
+    readerNeed: 在高压权力结构中看到小人物用可学习、可验证的专业能力取得阶段胜利。
+    emotionalReward: 每章解开一处货流或账目矛盾，同时让主角的筹码、盟友和风险同步升级。
+    coreFantasy: 一个被官场轻视的账房，用所有人都以为枯燥的账、印、货路和人情债撬开系统性赈盐大案。
+    storyEngine: 接触异常记录，现场核验五类痕迹，用交易换线索，在公开规则中设局，获得筹码并暴露更高层对手。
+    differentiator: 把历史悬疑建立在官盐重量、封印、税票、脚程和经手人五痕互证上，而不是依赖现代刑侦知识或超自然能力。
+    openingHook: 暴雨夜，账房在封存义仓发现一袋来自禁运盐场的青盐，仓外传来亡父旧识的咳嗽。
+    comparableAppeals:
+      - 历史悬疑的证据回看感
+      - 小人物专业升级的掌控感
+      - 官场规则内博弈的压迫感
+    evidenceIds:
+      - cadpa-2024-development
+      - cssn-2025-development
+      - cwa-2024-bluebook
+      - fanqie-recommendation-2026
+    saturationRisks:
+      - 历史探案容易退化成换皮现代刑侦
+      - 贪腐官场和赈灾案属于高频母题
+    originalityBoundaries:
+      - 只借鉴读者满足类型，不复制任何现有作品的案件、角色关系、组织或表达
+      - 核心证据必须由本书官盐五痕规则和人物既有选择生成
+      - 胜利必须付出身份、关系、资源或道德代价
+    scores:
+      demand: 5
+      competitionWhitespace: 4
+      channelFit: 5
+      authorFit: 4
+      serialSustainability: 5
+      differentiation: 5
+      evidenceQuality: 5
+  - id: opera-apocalypse
+    workingTitle: 戏台熄灯以后
+    targetPlatform: fanqie
+    workForm: long-serial
+    genre: 都市幻想与末世群像
+    targetReader: 喜欢都市玄幻、末世危机和传统文化新表达的年轻男频读者
+    channel: 番茄小说男频长篇
+    platformRationale: 灾区任务和团队升级可形成高频章节回报，适合在推荐验证中观察设定理解与追读。
+    formRationale: 不同剧目、行当和灾区可以形成连续任务，但必须持续兑现文化机制而非只堆视觉奇观。
+    readerNeed: 在文明崩塌压力下获得热血团队成长和传统技艺重新产生现实价值的满足。
+    emotionalReward: 每场演出解锁一种救援规则，也揭开剧团成员对灾难真相的不同责任。
+    coreFantasy: 末日中只有被观众真正记住的传统角色能短暂获得力量，一个濒临解散的县剧团成为城市救援队。
+    storyEngine: 接受灾区任务，选择剧目与角色，争取观众共同记忆，付出身体和关系代价，带回新的文明碎片。
+    differentiator: 把传统戏曲的程式、角色行当和观演关系转化为有限制的灾难救援机制。
+    openingHook: 最后一场散伙演出结束时，全城停电，台下死去三天的老观众却同时鼓掌。
+    comparableAppeals:
+      - 末世高压升级
+      - 传统文化视觉奇观
+      - 群像团队羁绊
+    evidenceIds:
+      - cssn-2025-development
+      - cwa-2024-bluebook
+      - fanqie-recommendation-2026
+    saturationRisks:
+      - 都市末世和传统文化融合正在变得拥挤
+      - 能力体系容易只剩视觉标签
+    originalityBoundaries:
+      - 不借用既有戏神、神格或末世副本体系
+      - 每种能力必须来自具体戏曲程式及其现实限制
+    scores:
+      demand: 4
+      competitionWhitespace: 3
+      channelFit: 4
+      authorFit: 3
+      serialSustainability: 5
+      differentiation: 4
+      evidenceQuality: 4
+  - id: silver-folk-healing
+    workingTitle: 爷爷的失物招领处
+    targetPlatform: zhihu-salt
+    workForm: short-complete
+    genre: 民俗悬疑与银发治愈
+    targetReader: 喜欢民俗志怪、代际关系和温暖悬疑的泛女性读者
+    channel: 知乎盐选故事
+    platformRationale: 现实议题、强情感、民俗悬疑和关系反转与盐言故事的短篇内容特征更匹配。
+    formRationale: 以一件失物和一次旧事故完成因果闭环，避免单元连续扩张稀释核心情感。
+    readerNeed: 在代际隔阂和衰老焦虑中获得被理解、被记住以及旧经验重新有用的安慰。
+    emotionalReward: 每件失物解决一个现实关系缺口，也拼回老人正在失去的一段记忆。
+    coreFantasy: 患有早期认知障碍的退休修表匠能从旧物残留的时间误差里听见失主最想忘掉的一分钟。
+    storyEngine: 接收失物，核验社区记忆，修复物件与关系，付出一段自己的记忆，逼近一次被集体掩盖的旧事故。
+    differentiator: 把银发主角的认知衰退同时作为情感代价、叙事限制和不可靠证据来源。
+    openingHook: 老人收到一块每天慢一分钟的手表，可失主坚持自己已经死了二十年。
+    comparableAppeals:
+      - 民俗悬疑
+      - 单元治愈
+      - 银发与代际共情
+    evidenceIds:
+      - cssn-2025-development
+      - cwa-2024-bluebook
+      - salt-story-2026
+    saturationRisks:
+      - 治愈单元容易缺少长篇推动力
+      - 认知障碍可能被工具化消费
+    originalityBoundaries:
+      - 不把疾病浪漫化为万能超能力
+      - 每个单元必须尊重老年主体性并保留现实照护成本
+    scores:
+      demand: 4
+      competitionWhitespace: 5
+      channelFit: 5
+      authorFit: 3
+      serialSustainability: 3
+      differentiation: 5
+      evidenceQuality: 4

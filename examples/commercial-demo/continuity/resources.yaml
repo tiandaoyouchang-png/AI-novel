@@ -1,0 +1,32 @@
+schemaVersion: 1
+entries:
+  - id: res-blue-salt-grain
+    status: active
+    value:
+      owner: 沈砚
+      item: 一粒北泽青盐样本
+      location: 沈砚袖口暗缝
+      risk: 被搜出可按盗取官盐治罪
+    sourceChapter: 1
+    evidence: 沈砚将青盐夹进袖口暗缝。
+    updatedAt: 2026-07-26T08:23:26.175Z
+  - id: res-father-ledger-page
+    status: active
+    value:
+      owner: 沈砚
+      item: 沈父夜航簿残页
+      content: 赈字船三艘的反向货路与异常水脚
+      risk: 可证明走货异常，也会暴露沈父参与旧案
+    sourceChapter: 3
+    evidence: 韩九从棉袄夹层取出旧纸，沈砚将其攥在左掌。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: res-half-sealing-wax
+    status: active
+    value:
+      owner: 沈砚
+      item: 四分之一枚转运司火漆
+      marks: 正面水纹模糊，背面有无字细齿凹痕
+      risk: 被搜出可按盗印收押
+    sourceChapter: 2
+    evidence: 顾青昭将取得的半枚蜡片再次掰开，把较小一块交给沈砚。
+    updatedAt: 2026-07-26T08:25:58.178Z

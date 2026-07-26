@@ -1,0 +1,6 @@
+schemaVersion: 1
+bannedWords: []
+maxRepeatedPhraseOccurrences: 5
+repeatedPhraseLength: 8
+minParagraphs: 5
+maxParagraphLength: 600

@@ -1,0 +1,67 @@
+schemaVersion: 1
+entries:
+  - id: char-shen-father
+    status: active
+    value:
+      name: 沈父
+      lifeStatus: dead
+      currentLocation: 临河县沈氏祖坟
+      currentGoal: 无现场行动目标
+      knowledgeIds: []
+      hiddenKnowledgeIds: []
+      condition: [故事开始前已确认死亡, 只能通过残页回忆或他人叙述出现]
+    sourceChapter: 0
+    evidence: 已接受的角色背景与故事圣经确认沈父在开篇前死亡。
+    updatedAt: 2026-07-26T09:58:00.000Z
+  - id: char-gu-qingzhao
+    status: active
+    value:
+      name: 顾青昭
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 保护分散证据并查明县令与转运司的连接
+      knowledgeIds: [fact-evidence-distributed, fact-father-reverse-route]
+      hiddenKnowledgeIds: [thread-sealless-mark]
+      condition: [暗线身份风险上升, 与沈砚共同暴露]
+    sourceChapter: 3
+    evidence: 顾青昭公开阻止封门并记下全部异常袋号。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: char-han-jiu
+    status: active
+    value:
+      name: 韩九
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 活下来并决定是否交出完整夜航簿
+      knowledgeIds: [fact-father-reverse-route]
+      hiddenKnowledgeIds: [thread-father-ledger]
+      condition: [已脱离火场, 咳喘严重, 完整真相仍隐瞒]
+    sourceChapter: 3
+    evidence: 沈砚把韩九拖出火场，韩九交出一页残纸。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: char-shen-yan
+    status: active
+    value:
+      name: 沈砚
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 在县令控制下重做假账并暗查反向货路
+      knowledgeIds: [fact-father-reverse-route, fact-evidence-distributed, fact-shen-right-hand-burn]
+      hiddenKnowledgeIds: []
+      condition: [右掌烫伤起泡, 后背擦伤, 已进入县令视野]
+    sourceChapter: 3
+    evidence: 沈砚救出韩九、取得残页并被周嵩当众召见。
+    updatedAt: 2026-07-26T08:29:12.746Z
+  - id: char-zhou-song
+    status: active
+    value:
+      name: 周嵩
+      lifeStatus: alive
+      currentLocation: 临河县义仓前院
+      currentGoal: 以重做总账为名控制沈砚和幸存证据
+      knowledgeIds: [fact-evidence-distributed]
+      hiddenKnowledgeIds: []
+      condition: [公开维持清名, 幕后责任未证实]
+    sourceChapter: 3
+    evidence: 周嵩当众召沈砚进入县衙重做焚毁总账。
+    updatedAt: 2026-07-26T08:29:12.746Z

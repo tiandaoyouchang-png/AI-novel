@@ -7,3 +7,8 @@
 # OS / Editor
 .DS_Store
 Thumbs.db
+
+# Local novel workspaces and generated indexes
+/novels/
+**/derived/*.sqlite
+**/derived/*.sqlite3

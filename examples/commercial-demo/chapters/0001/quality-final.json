@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "chapter": 1,
+  "source": "final",
+  "sourceFingerprint": "d6edaa64bad656f84f784d34444e297903f3cebd05da552beefe1e40cf42907d",
+  "ok": true,
+  "blockingIssues": [],
+  "warnings": [],
+  "metrics": {
+    "chineseCharacters": 992,
+    "latinWords": 0,
+    "paragraphs": 24,
+    "longestParagraph": 98,
+    "duplicateParagraphs": 0,
+    "repeatedPhrases": 0
+  }
+}

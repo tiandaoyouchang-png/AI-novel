@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Fiction Studio"
+  short_description: "Research and write market-backed long or short fiction"
+  default_prompt: "Use $write-long-form-novel to compare market-backed topics for Fanqie or Zhihu Salt and turn the approved idea into a resumable fiction workspace."
