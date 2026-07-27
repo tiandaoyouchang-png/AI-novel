@@ -1,0 +1,63 @@
+schemaVersion: 1
+arcs:
+  - id: card-main-green-salt
+    type: main-plot
+    title: 夜航簿与盐仓黑账
+    status: active
+    introducedIn:
+      volume: 1
+      chapter: 1
+    promises:
+      - 查明夜航簿记录的走私网络
+      - 解释沈父失踪与盐仓黑账的关系
+    dependencies:
+      - thread-father-ledger
+      - thread-night-shipping
+    payoffTarget:
+      volume: 3
+      chapter: null
+      description: 让沈砚公开父亲留下的分布式证据并迫使幕后主使现身
+    lastAdvancedChapter: 3
+    maxIdleChapters: 5
+    dormantReason: null
+    volumeBeats:
+      - volume: 1
+        objective: 证明夜航簿不是孤立假账并找到第一条活证据
+        status: active
+        payoffDebt: 交代青盐记号与夜航船次的对应关系
+      - volume: 2
+        objective: 追查盐仓、漕运和地方官署之间的利益链
+        status: planned
+        payoffDebt: 揭示父亲为何主动切断与沈砚的联系
+      - volume: 3
+        objective: 将分散证据转化为普通人可共同保存的公开账
+        status: planned
+        payoffDebt: 兑现父亲失踪、黑账主使和沈砚责任选择
+  - id: card-arc-shen-agency
+    type: character-arc
+    title: 沈砚从被迫补账到主动存证
+    status: active
+    introducedIn:
+      volume: 1
+      chapter: 1
+    promises:
+      - 沈砚必须正面承担三年前补假账的责任
+      - 他要从保护唯一账本转向保护共同作证的人
+    dependencies:
+      - card-main-green-salt
+    payoffTarget:
+      volume: 2
+      chapter: null
+      description: 沈砚在妹妹安全与公开证据之间作出不可撤回的主动选择
+    lastAdvancedChapter: 3
+    maxIdleChapters: 4
+    dormantReason: null
+    volumeBeats:
+      - volume: 1
+        objective: 放弃依赖唯一总账，开始分散证据
+        status: active
+        payoffDebt: 让选择带来具体人际和安全代价
+      - volume: 2
+        objective: 主动组织证人并承担过去行为的后果
+        status: planned
+        payoffDebt: 不能把三年前补假账只当作外部把柄

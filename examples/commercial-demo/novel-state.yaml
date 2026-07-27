@@ -16,7 +16,7 @@ workflow:
 artifacts:
   brief:
     status: accepted
-    fingerprint: e20b671a357ba699c445f6149eeabd068e38c4ce321b2784f6b5145ce0384f5d
+    fingerprint: bc9d325a25baa7fb3c240f8ce0c02db9d17fcfc98c914b21a14dec094f93315a
     acceptedAt: 2026-07-26T09:56:41.675Z
   foundation:
     status: accepted

@@ -1,6 +1,6 @@
 {
   "name": "@ai-novel/codex-novel",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Codex-native scene planning, selective context, review, retrieval, and continuity for long and short fiction.",
   "private": true,
   "type": "module",
@@ -13,6 +13,7 @@
     "test": "npm run build && esbuild test/workspace.test.ts --bundle --platform=node --format=cjs --target=node22 --outfile=.test-dist/workspace.test.cjs && node --test .test-dist/*.test.cjs"
   },
   "dependencies": {
+    "jszip": "^3.10.1",
     "yaml": "^2.8.1",
     "zod": "^4.1.5"
   },

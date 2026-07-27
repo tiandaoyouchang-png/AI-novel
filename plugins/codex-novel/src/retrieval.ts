@@ -11,6 +11,20 @@ import {
 import { loadCharacterProfiles } from "./profiles.js";
 
 const INDEX_PATH = "derived/retrieval.sqlite";
+
+async function loadNodeSqlite(): Promise<typeof import("node:sqlite")> {
+  const original = process.emitWarning.bind(process);
+  process.emitWarning = ((warning: string | Error, ...args: unknown[]) => {
+    const message = warning instanceof Error ? warning.message : String(warning);
+    if (message === "SQLite is an experimental feature and might change at any time") return;
+    return original(warning, ...(args as [string?]));
+  }) as typeof process.emitWarning;
+  try {
+    return await import("node:sqlite");
+  } finally {
+    process.emitWarning = original as typeof process.emitWarning;
+  }
+}
 const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   facts: "facts.yaml",
   timeline: "timeline.yaml",
@@ -112,7 +126,7 @@ export async function rebuildRetrievalIndex(
   const output = path.join(workspace, INDEX_PATH);
   await fs.mkdir(path.dirname(output), { recursive: true });
   const temporary = `${output}.${randomUUID()}.tmp`;
-  const { DatabaseSync } = await import("node:sqlite");
+  const { DatabaseSync } = await loadNodeSqlite();
   const database = new DatabaseSync(temporary);
   try {
     database.exec(
@@ -157,7 +171,7 @@ export async function queryRetrievalIndex(
   const query = ftsQuery(terms);
   if (!query) return [];
 
-  const { DatabaseSync } = await import("node:sqlite");
+  const { DatabaseSync } = await loadNodeSqlite();
   const database = new DatabaseSync(output, { readOnly: true });
   let raw: Array<Record<string, unknown>>;
   try {

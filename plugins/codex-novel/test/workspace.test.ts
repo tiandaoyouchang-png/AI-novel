@@ -4,13 +4,14 @@ import * as os from "node:os";
 import * as path from "node:path";
 import test from "node:test";
 import { parse } from "yaml";
+import JSZip from "jszip";
 import { compileChapterContext } from "../src/context.js";
 import {
   commitContinuityDelta,
   getContinuityCards,
   recoverContinuityTransaction
 } from "../src/continuity.js";
-import { fingerprintFile, readState, writeState } from "../src/io.js";
+import { fingerprintFile, pathExists, readState, writeState } from "../src/io.js";
 import {
   generateOpeningMilestone,
   generateStoryMilestone,
@@ -23,6 +24,16 @@ import {
 } from "../src/retrieval.js";
 import { generateTopicSelectionReport } from "../src/topics.js";
 import { runQualityCheck } from "../src/quality.js";
+import { inspectArcGrid, validateHookExperiments } from "../src/planning.js";
+import { createRevision, listRevisions, restoreRevision } from "../src/revisions.js";
+import {
+  generateLearningReport,
+  importPublicationMetrics,
+  inspectCadence,
+  updatePublishedThrough
+} from "../src/production.js";
+import { exportDocument, importManuscript } from "../src/documents.js";
+import { friendlyError, guideWorkspace, runDoctor } from "../src/diagnostics.js";
 import {
   advanceChapter,
   exportNovel,
@@ -70,6 +81,7 @@ async function enterProduction(workspace: string): Promise<void> {
     "planning/volumes/current-volume.md",
     "# Current Volume\nPromise, escalation, midpoint, and payoff."
   );
+  await writeAcceptedArtifact(workspace, "planning/arc-grid.yaml", arcGridYaml());
   await transitionPhase(workspace, "production");
 }
 
@@ -225,7 +237,81 @@ async function writeTopicDiscovery(workspace: string): Promise<void> {
       "  - 破局必须来自可验证账目与货路证据"
     ].join("\n")
   );
+  await writeAcceptedArtifact(
+    workspace,
+    "discovery/hook-experiments.yaml",
+    hookExperimentsYaml()
+  );
   await generateTopicSelectionReport(workspace, today);
+}
+
+function hookExperimentsYaml(): string {
+  const sampleA = "雨夜里，林砚收到一封写着自己死亡日期的信。他起初以为是恶作剧，直到信中准确写出街角即将发生的车祸，以及只有失踪父亲才知道的旧账册暗号。信纸末尾还沾着未干的盐霜，和父亲消失那晚留在门槛上的一模一样。";
+  const sampleB = "审讯室的灯第三次熄灭时，桌上的死者照片突然多了一行字：下一位是林砚。他没有报警，因为照片背后盖着父亲失踪前使用的私章，而门外正有人用父亲的声音叫他回家。他摸向唯一出口，却发现门锁早已从外面焊死。";
+  return [
+    "schemaVersion: 1",
+    "selectedHookId: hook-a",
+    "candidates:",
+    "  - id: hook-a",
+    "    title: 死亡来信",
+    "    hypothesis: 预告死亡并连接父亲失踪案能形成明确的继续阅读问题",
+    `    openingSample: "${sampleA}"`,
+    "    targetEmotion: 紧张和求证欲",
+    "    readerQuestion: 父亲是否还活着以及来信者是谁",
+    "    risks:",
+    "      - 死亡预告可能显得套路化",
+    "  - id: hook-b",
+    "    title: 死者照片",
+    "    hypothesis: 封闭审讯场景和异常证据能快速建立悬疑",
+    `    openingSample: "${sampleB}"`,
+    "    targetEmotion: 恐惧和怀疑",
+    "    readerQuestion: 门外的人为什么知道父亲的声音",
+    "    risks:",
+    "      - 超自然感可能偏离写实定位",
+    "testProtocol:",
+    "  blindLabels: true",
+    "  targetReaders: 喜欢历史悬疑和小人物升级的男频读者",
+    "  minimumSampleSize: 3",
+    "  questions:",
+    "    - 读完后是否愿意继续阅读下一章",
+    "    - 最想立刻知道的问题是什么",
+    "  successSignals:",
+    "    - 至少三分之二读者选择继续阅读且能复述核心悬念",
+    "rejected:",
+    "  - id: hook-b",
+    "    reason: 超自然暗示过强，与当前写实调查定位不一致",
+    "notes:",
+    "  - 尚未获得真实读者数据，当前选择属于作者决策"
+  ].join("\n");
+}
+
+function arcGridYaml(): string {
+  return [
+    "schemaVersion: 1",
+    "arcs:",
+    "  - id: arc-main-ledger",
+    "    type: main-plot",
+    "    title: 失踪账册主线",
+    "    status: active",
+    "    introducedIn:",
+    "      volume: 1",
+    "      chapter: 1",
+    "    promises:",
+    "      - 查明父亲失踪与账册之间的关系",
+    "    dependencies: []",
+    "    payoffTarget:",
+    "      volume: 3",
+    "      chapter: null",
+    "      description: 揭示父亲保存账册的真实目的",
+    "    lastAdvancedChapter: 0",
+    "    maxIdleChapters: 8",
+    "    dormantReason: null",
+    "    volumeBeats:",
+    "      - volume: 1",
+    "        objective: 证明账册确实存在",
+    "        status: active",
+    "        payoffDebt: 交代第一位保管人的下落"
+  ].join("\n");
 }
 
 function topicCandidateLines(
@@ -1047,6 +1133,9 @@ test("context injects scene beats, selected character profiles, safe style examp
   assert.match(context, /短句为主，压力下省略主语/);
   assert.match(context, /## Authorized Style Examples/);
   assert.match(context, /原创查证样例/);
+  assert.match(context, /## Accepted Opening Hook/);
+  assert.match(context, /## Relevant Cross-Volume Arcs/);
+  assert.match(context, /失踪账册主线/);
   assert.match(context, /## Previous Chapter Handoff/);
   assert.match(context, /确认账册被替换/);
 });
@@ -1181,4 +1270,136 @@ test("checkpoints and milestone rules separate long serials from completed short
   );
   const manual = await generateCheckpoint(shortFixture.workspace, "short-complete-final");
   assert.equal(manual.checkpoint.lastCommittedChapter, 1);
+});
+
+test("hook experiments are required and preserve rejected alternatives", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "钩子实验测试" });
+  await writeAcceptedArtifact(workspace, "planning/market-position.yaml", marketPositionYaml());
+  await writeTopicDiscovery(workspace);
+  const experiments = await validateHookExperiments(workspace);
+  assert.equal(experiments.candidates.length, 2);
+  assert.equal(experiments.selectedHookId, "hook-a");
+  assert.deepEqual(experiments.rejected.map((candidate) => candidate.id), ["hook-b"]);
+  await fs.writeFile(
+    path.join(workspace, "discovery/hook-experiments.yaml"),
+    hookExperimentsYaml().replace("rejected:\n  - id: hook-b", "rejected:\n  - id: hook-a"),
+    "utf8"
+  );
+  await assert.rejects(() => validateHookExperiments(workspace), /Selected hook cannot also be rejected/);
+});
+
+test("cross-volume arc grid reports idle active arcs", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "跨卷网格测试" });
+  await enterProduction(workspace);
+  const state = await readState(workspace);
+  state.workflow.currentChapter = 13;
+  state.workflow.chapterStatus = "not_started";
+  state.continuity.lastCommittedChapter = 12;
+  await writeState(workspace, state);
+  const { report } = await inspectArcGrid(workspace);
+  assert.equal(report.totalArcs, 1);
+  assert.equal(report.idleArcs.length, 1);
+  assert.ok(report.warnings.some((warning) => /连续 12 章未推进/.test(warning)));
+});
+
+test("named revisions restore authoritative files and keep a safety snapshot", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "修订历史测试" });
+  const intentPath = path.join(workspace, "author-intent.md");
+  await fs.writeFile(intentPath, "# Author Intent\n\n第一版方向。\n", "utf8");
+  const first = await createRevision(workspace, "第一版方向");
+  await fs.writeFile(intentPath, "# Author Intent\n\n第二版方向。\n", "utf8");
+  const temporaryPlan = path.join(workspace, "planning", "temporary-note.md");
+  await fs.writeFile(temporaryPlan, "# Temporary\n\n只属于第二版。\n", "utf8");
+  const second = await createRevision(workspace, "第二版方向");
+  assert.ok(second.diffSummary.changed.includes("author-intent.md"));
+  assert.ok(second.diffSummary.added.includes("planning/temporary-note.md"));
+  const restored = await restoreRevision(workspace, first.id);
+  assert.match(await fs.readFile(intentPath, "utf8"), /第一版方向/);
+  assert.equal(await pathExists(temporaryPlan), false);
+  assert.equal(restored.restored.id, first.id);
+  const revisions = await listRevisions(workspace);
+  assert.equal(revisions.length, 3);
+  assert.match(revisions.at(-1)?.name ?? "", /恢复前自动备份/);
+});
+
+test("serial cadence and local metrics remain author-controlled", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "连载数据测试" });
+  await enterProduction(workspace);
+  await commitTestChapter(workspace, 1);
+  const cadence = await inspectCadence(workspace);
+  assert.equal(cadence.readyInventory, 1);
+  assert.equal(cadence.health, "red");
+  const published = await updatePublishedThrough(workspace, 1);
+  assert.equal(published.readyInventory, 0);
+
+  const metricsCsv = path.join(parent, "metrics.csv");
+  await fs.writeFile(
+    metricsCsv,
+    [
+      "chapter,observedAt,impressions,readers,completionRate,continuationRate,follows,comments",
+      "1,2026-07-27,1000,600,0.7,0.55,40,12"
+    ].join("\n"),
+    "utf8"
+  );
+  const imported = await importPublicationMetrics(workspace, metricsCsv);
+  assert.equal(imported.imported, 1);
+  const learning = await generateLearningReport(workspace);
+  assert.equal(learning.report.conclusionStatus, "needs-author-review");
+  assert.equal((learning.report.averages as { continuationRate: number }).continuationRate, 0.55);
+});
+
+test("manuscript import is quarantined and committed prose exports to DOCX and EPUB", async (t) => {
+  const importFixture = await temporaryWorkspace();
+  t.after(() => fs.rm(importFixture.parent, { recursive: true, force: true }));
+  const source = path.join(importFixture.parent, "old.md");
+  await fs.writeFile(
+    source,
+    "# 第一章 雨夜\n\n这是第一章正文。\n\n# 第二章 来信\n\n这是第二章正文。\n",
+    "utf8"
+  );
+  const imported = await importManuscript(importFixture.workspace, source, "旧稿导入");
+  assert.equal(imported.chapters, 2);
+  assert.equal((await readState(importFixture.workspace)).workflow.phase, "preview");
+  assert.equal(
+    await pathExists(path.join(importFixture.workspace, "chapters/0001/final.md")),
+    false
+  );
+
+  const exportFixture = await temporaryWorkspace();
+  t.after(() => fs.rm(exportFixture.parent, { recursive: true, force: true }));
+  await initializeWorkspace(exportFixture.workspace, { title: "多格式导出" });
+  await enterProduction(exportFixture.workspace);
+  await commitTestChapter(exportFixture.workspace, 1);
+  const docx = await exportDocument(exportFixture.workspace, "docx");
+  const epub = await exportDocument(exportFixture.workspace, "epub");
+  assert.ok((await fs.stat(docx.output)).size > 100);
+  assert.ok((await fs.stat(epub.output)).size > 100);
+  const docxZip = await JSZip.loadAsync(await fs.readFile(docx.output));
+  assert.ok(docxZip.file("word/document.xml"));
+  const epubZip = await JSZip.loadAsync(await fs.readFile(epub.output));
+  assert.equal(await epubZip.file("mimetype")?.async("string"), "application/epub+zip");
+  assert.ok(epubZip.file("OEBPS/content.opf"));
+});
+
+test("doctor and guide provide a safe next action", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "引导测试" });
+  const doctor = await runDoctor(workspace);
+  assert.equal(doctor.ok, true);
+  const guide = await guideWorkspace(workspace);
+  assert.equal(guide.nextAction, "完成选题与开篇钩子实验");
+  assert.match(guide.prompt, /不要直接写正文/);
+  assert.match(
+    friendlyError(JSON.stringify([{ path: ["candidates", 0, "title"], message: "Too small" }])),
+    /candidates.0.title/
+  );
 });

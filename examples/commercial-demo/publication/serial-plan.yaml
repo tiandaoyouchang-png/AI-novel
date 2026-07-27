@@ -1,0 +1,5 @@
+schemaVersion: 1
+updatesPerWeek: 7
+targetBufferDays: 7
+publishedThroughChapter: 0
+blockedDays: []

@@ -20,10 +20,11 @@ When a workspace exists:
 1. Run `node <plugin-root>/dist/novelctl.cjs status <workspace>`.
 2. Read `novel-state.yaml`.
 3. Run `node <plugin-root>/dist/novelctl.cjs cards <workspace>` when the request involves character state, death, secrets, subplots, or current plot position.
-4. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
-5. Read only the accepted artifacts needed for the current step.
-6. Preserve user-edited prose and accepted decisions unless replacement is explicit.
-7. Recommend one recoverable next action.
+4. Run `node <plugin-root>/dist/novelctl.cjs arcs <workspace>` for a long serial before planning a volume or when a plot line may have gone idle.
+5. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
+6. Read only the accepted artifacts needed for the current step.
+7. Preserve user-edited prose and accepted decisions unless replacement is explicit.
+8. Recommend one recoverable next action. Use `guide <workspace>` when the author needs a plain-language prompt.
 
 When no workspace exists, remain in preview conversation until the user asks to create durable files. Then run:
 
@@ -53,10 +54,13 @@ For a new commercial project, do not silently turn the first idea into the book:
 1. Research current market demand with dated, attributable evidence. Prefer official industry, platform, and reader-research sources; use search trends and competitor products only as supporting evidence.
 2. Write `discovery/market-scan.yaml`, then compare three to eight candidates in `discovery/topic-candidates.yaml`.
 3. Record the selected candidate, rejected alternatives, trade-off, originality protections, and reader-test hypothesis in `discovery/topic-decision.yaml`.
-4. Run `node <plugin-root>/dist/novelctl.cjs topics <workspace>`.
-5. Resolve every blocker before requesting brief approval. The selected topic's platform, form, target reader, and channel must match `planning/market-position.yaml` exactly.
+4. For the selected topic, create two or three substantially different anonymous opening samples in `discovery/hook-experiments.yaml`. Define the target emotion, reader question, risks, blinded questions, minimum sample, and observable success signals. Record why every unselected hook was rejected.
+5. Run `node <plugin-root>/dist/novelctl.cjs topics <workspace>` and `hooks <workspace>`.
+6. Resolve every blocker before requesting brief approval. The selected topic's platform, form, target reader, and channel must match `planning/market-position.yaml` exactly.
 
 Treat broad genre popularity as a search direction, not proof that one premise has demand. Do not copy a competitor's plot, character system, organization, setting expression, or distinctive language. Keep raw market research out of chapter prose context; include only the accepted topic decision and its protected originality boundaries.
+
+Do not present an AI review as a real reader blind test. When no target readers have participated, record the hook choice as an author decision or internal prediction.
 
 Read [topic-selection.md](references/topic-selection.md) before creating or changing discovery artifacts.
 
@@ -78,6 +82,8 @@ Do not treat chat-only previews as accepted files. When an accepted upstream dec
 
 Before foundation approval, create one structured `planning/characters/<character-id>.yaml` profile for every recurring character and complete `planning/style-profile.yaml`. Character profiles hold stable motivation, moral boundaries, decision patterns, voice rules, and OOC risks; `continuity/characters.yaml` holds only changing state. `planning/style-examples.yaml` may contain only user-owned, explicitly authorized, or public-domain excerpts. Never configure imitation of a named author's distinctive expression.
 
+Before moving a `long-serial` project into production, complete `planning/arc-grid.yaml`. Give each main plot, subplot, mystery, relationship line, and recurring character arc a stable ID, volume beats, promises, dependencies, payoff target, last advanced chapter, and maximum idle chapters. The arc grid plans the future; `continuity/story-cards.yaml` remains authoritative for what has actually happened. Never overwrite committed continuity with a plan. A `short-complete` project may keep the grid empty or use a small scene-payoff map.
+
 If an accepted brief, foundation, or volume plan was edited, run:
 
 ```bash
@@ -85,6 +91,14 @@ node <plugin-root>/dist/novelctl.cjs invalidate <workspace> --artifact <brief|fo
 ```
 
 Re-approve the affected chain before producing more prose.
+
+Before a substantial author-directed prose or planning revision, create a named restore point:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs revision create <workspace> --name "<purpose>"
+```
+
+Use `revision list` to inspect history. Use `revision restore --id <id>` only when the author asks to restore; it creates a safety revision first and invalidates the disposable retrieval index. Do not manually edit state to simulate a rollback.
 
 ## Produce one chapter safely
 
@@ -135,6 +149,8 @@ node <plugin-root>/dist/novelctl.cjs milestone <workspace> --type volume
 
 The volume milestone also writes a named continuity checkpoint. The CLI automatically writes interval checkpoints after the configured number of committed chapters.
 
+For a long serial, inspect release inventory with `cadence <workspace>`. Only continuity-committed, unpublished chapters count as ready inventory. Update `--published-through` from confirmed publication records; never infer publication from draft completion. Short completed fiction does not use the serial buffer calculation.
+
 ## Preserve bounded context
 
 Prefer the smallest context package that preserves causality:
@@ -159,9 +175,19 @@ node <plugin-root>/dist/novelctl.cjs index <workspace>
 
 The index can identify older handoffs, profiles, continuity entries, and authorized examples. A stale source fingerprint removes that result; the index never writes authoritative continuity.
 
-## Export accepted prose
+## Import, learn, and export
 
-Run `node <plugin-root>/dist/novelctl.cjs export <workspace> --format md` or `--format txt`. Export only continuity-committed chapters in numeric order. Never include plans, reviews, or rejected drafts.
+To bring an existing Markdown or text manuscript into a new workspace, run:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs import <workspace> --source <manuscript.md|txt> --title "<title>"
+```
+
+Imported sections stay under `imports/` with status `awaiting-continuity-extraction`. They are not accepted canon. Extract characters, aliases, life states, timeline, relationships, resources, and unresolved clues; mark uncertain facts for author confirmation before entering the normal approval chain.
+
+Publication metrics are local and opt-in. Import an author-provided CSV with `metrics import`, then run `learn`. The generated report is a review base, not an automatic market verdict. Never upload metrics or silently modify the accepted brief from observed data.
+
+Run `node <plugin-root>/dist/novelctl.cjs export <workspace> --format md|txt|docx|epub`. Export only continuity-committed chapters in numeric order. Never include plans, reviews, imported quarantine files, or rejected drafts.
 
 ## Finish clearly
 

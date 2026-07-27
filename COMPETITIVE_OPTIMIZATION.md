@@ -22,7 +22,7 @@ Channel implication: model platform and form separately. This implementation sup
 
 ## Ten optimization points
 
-Status note for `0.2.0`: points 1–4 and 7 are implemented. Point 6 now has schema-bound chapter scene beats, emotional targets, value changes, dynamic plot/character cards, and volume checkpoints; a cross-volume visual beat matrix remains future work.
+Status note for `0.3.0`: points 1–10 now have tested command-line implementations. Reader tests and publication metrics remain author-supplied and local; the system never labels an AI judgment as market proof or silently rewrites canon from metrics.
 
 | # | Gap | Competitor or market evidence | Optimization | Priority | Verification |
 |---|---|---|---|---|---|
@@ -30,18 +30,18 @@ Status note for `0.2.0`: points 1–4 and 7 are implemented. Point 6 now has sch
 | 2 | No candidate portfolio or explicit trade-off | AI tools brainstorm, but a single generated idea hides alternatives | Require at least three candidates scored on demand, whitespace, channel fit, author fit, sustainability, differentiation, and evidence quality | P0 | Deterministic ranking and score explanation |
 | 3 | Market positioning begins after the topic is already chosen | Current `market-position.yaml` cannot explain why this topic beat alternatives | Bind the selected topic and source fingerprints into the accepted brief | P0 | Editing discovery evidence makes the brief stale |
 | 4 | Trend copying and saturation risk are not gated | Broad demand signals do not prove whitespace; culturally distinctive work has stronger IP/export potential | Add originality boundary, saturation risk, prohibited imitation, and two-source support for the selected candidate | P0 | Candidate fails when differentiation or evidence quality is below threshold |
-| 5 | No opening-hook experiment before committing a book | Novelcrafter/Sudowrite support brainstorming and review, but the current workflow accepts one hook | Generate 2–3 hook hypotheses and define a blind-test signal before foundation approval | P1 | One hook selected with rejected alternatives and test result |
-| 6 | No cross-volume subplot/character-arc grid | Dabble exposes parallel plot lines against scenes | Chapter scene beats and dynamic story cards are implemented; add a cross-volume matrix with main plot, subplot, character arc, payoff, and debt columns | P1 | Current scene value changes validate; future matrix reports idle plot lines across a rolling window |
+| 5 | Opening-hook experiment | Novelcrafter/Sudowrite support brainstorming and review | Generate 2–3 hook hypotheses, blind-test signals, a selection, and rejection records before brief approval | Implemented | One hook selected; every alternative has a rejection reason; fake reader evidence is prohibited |
+| 6 | Cross-volume subplot/character-arc grid | Dabble exposes parallel plot lines against scenes | Add a cross-volume matrix with main plot, subplot, character arc, payoff, dependency, and idle-limit fields | Implemented | Active plot lines beyond their idle limit are reported without overwriting dynamic continuity |
 | 7 | Context selection lacked dynamic character/plot state and explicit secret visibility | Sudowrite saliency supports card/trait visibility to prevent premature disclosure | Dynamic character/story cards, death-state blocking, knowledge separation, hidden-ID redaction; add chapter-number reveal policy next | P1 | Dead onstage participants are blocked; hidden IDs are redacted and cross-references validated |
-| 8 | Revision history is diagnostic, not author-facing | Novelcrafter exposes field and scene revision restoration | Add named prose revisions, diff summaries, and safe restore without editing authoritative state by hand | P2 | Restore round-trip test preserves review invalidation |
-| 9 | No serial-production cadence or backlog health | Dabble tracks writing goals; Yuewen exposes publishing and performance data | Add chapter backlog, cadence target, buffer, and blocked-day status | P2 | Report flags an empty buffer or missed cadence without weakening quality gates |
-| 10 | No post-publication learning loop | Yuewen exposes reader profiles, subscriptions, rewards, and revenue | Add anonymized chapter metrics, hypothesis review, and market-position revision workflow | P2 | Metrics update a new decision record; they never rewrite canon automatically |
+| 8 | Author-facing revision history | Novelcrafter exposes field and scene revision restoration | Add named prose revisions, diff summaries, pre-restore backup, and safe restore | Implemented | Restore round-trip preserves a safety snapshot and invalidates disposable retrieval |
+| 9 | Serial-production cadence and backlog health | Dabble tracks writing goals; Yuewen exposes publishing and performance data | Derive ready inventory and buffer health from committed versus confirmed-published chapters | Implemented | Drafts never count as stock; short-complete projects are excluded |
+| 10 | Post-publication learning loop | Yuewen exposes reader profiles, subscriptions, rewards, and revenue | Import local author-provided chapter metrics and generate a hypothesis-review record | Implemented | Reports require author review and never rewrite canon automatically |
 
 ## Delivery order
 
-1. Implement points 1–4 as the topic-selection gate before brief approval.
-2. Point 7 is implemented; add point 5 before scaling blind reader tests.
-3. Extend the implemented chapter scene beats into the remaining cross-volume portion of point 6 before planning multiple distant volumes.
-4. Add points 8–10 when real publication and reader data are available.
+1. Keep points 1–6 as hard planning gates before expensive long-form production.
+2. Use point 8 before substantial author revisions and point 9 throughout long serialization.
+3. Use point 10 only with author-provided publication data and an explicit sample-quality review.
+4. Add platform APIs, visual dashboards, and semantic retrieval only after real usage proves the command-line core insufficient.
 
 This order protects the expensive decision first: choosing a market-supported, original, serially sustainable book before generating large amounts of prose.
