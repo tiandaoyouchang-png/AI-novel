@@ -1,4 +1,4 @@
-schemaVersion: 2
+schemaVersion: 3
 chapter: 4
 title: 请君重做假账
 goal: 沈砚必须在县衙监视下重做一份能通过钦差初验、又暗藏可被外部核验破绽的总账。
@@ -48,6 +48,55 @@ keyTurn: 沈砚故意不在数字本身做假，而是把经手顺序变成沈�
 netChange: 主角从发现证据升级为主动设计可分发的证据协议，同时让妹妹正式进入行动线。
 endingPull: 代笔书吏写完最后一行后，用沈父才会使用的方式敲了三下砚台。
 emotionalTarget: 沈砚从在监视下被迫造假，转为主动设计只有盟友能够复核的证据协议。
+scopeLevel: county
+antagonistLayer: 1
+capabilityUses:
+  - characterId: 沈砚
+    capabilityId: evidence-protocol
+    purpose: 把异常袋号编码进经手顺序，让账外盟友能独立复核。
+    supportCharacterId: 沈禾
+  - characterId: 周嵩
+    capabilityId: county-procedure
+    purpose: 用县衙书吏、统一口径和逐笔监看限制沈砚。
+    supportCharacterId: null
+  - characterId: 顾青昭
+    capabilityId: protected-channel
+    purpose: 判断是否承担身份暴露代价，启用一次有限御史渠道。
+    supportCharacterId: null
+  - characterId: 沈禾
+    capabilityId: medicine-code
+    purpose: 独立识别药方剂量对应的异常袋号。
+    supportCharacterId: null
+investigationChain:
+  anomaly: 周嵩要求重做的赈盐损耗能够在总数上自洽，却无法解释三个异常袋号的经手顺序。
+  alternativeExplanations:
+    - 三个袋号只是火场后抄录混乱造成的偶然错序。
+    - 有人用统一损耗口径掩盖同一批盐在多个经手环节被替换。
+  eliminationTests:
+    - 比较袋号、经手顺序、脚夫记忆与药方剂量映射，检查错序是否能由单次誊抄解释。
+  result: 三个袋号的错序跨越不同经手人，不能由一次誊抄失误解释，形成可外部复核的调查方向。
+  limitation: 该编码只能证明货路需要复核，不能直接证明周嵩或任何具体经手人有罪。
+evidenceMoves:
+  - evidenceId: evidence-abnormal-bag-numbers
+    action: test
+    claimId: claim-bag-numbers-cross-location
+    expectedResult: 用沈禾独立解码与脚夫分散记忆验证袋号并非沈砚单方面编造。
+revealIds: []
+coincidences: []
+supportingCharacterAgency:
+  - characterId: 顾青昭
+    independentGoal: 保住病案调查与御史线，不让沈砚单方面决定她承担的身份风险。
+    decision: 暂不公开御史身份，只发送一条可否认的核验请求。
+  - characterId: 沈禾
+    independentGoal: 保护药铺与脚夫，不再只接受不知风险的跑腿任务。
+    decision: 先独立复核药方编码，再自行选择一名可信脚夫执行，不把完整名单交给沈砚。
+outcomeCost: 沈砚建立了可分发的证据协议，但沈禾和顾青昭因此各自暴露一条原本安全的人情线。
+failureConsequence: 即使编码被识破，县衙重做的假账仍会进入钦差初验，且被暴露的人情线不能自动恢复。
+periodChecks:
+  physical: 编码依赖账目经手顺序、纸面数字与药方剂量，不依赖照片、化验或现代通信。
+  institutional: 御史渠道只提供有限核验，不能替代县衙证据登记、证人证言与后续质证。
+  vocabulary: 使用账房、书吏、盐引、脚夫和药方等时代内词汇，不使用媒体或鉴定报告。
+  antagonistCountermove: 周嵩安排两名书吏逐笔监看，并用总数自洽的损耗口径掩护经手错序。
 sceneBeats:
   - id: scene-controlled-ledger
     type: investigation

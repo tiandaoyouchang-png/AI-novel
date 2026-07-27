@@ -15,7 +15,10 @@ import {
   characterCardValueSchema,
   continuityStoreSchema,
   arcGridSchema,
+  evidenceValueSchema,
   hookExperimentsSchema,
+  revealPolicySchema,
+  storyGuardrailsSchema,
   topicCandidatesSchema,
   topicDecisionSchema,
   type ContinuityDomain,
@@ -38,7 +41,8 @@ const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 
 function takePrefix(content: string, maxChars: number): string {
@@ -48,8 +52,24 @@ function takePrefix(content: string, maxChars: number): string {
 
 function contextValue(
   domain: ContinuityDomain,
-  value: Record<string, unknown>
+  value: Record<string, unknown>,
+  chapter: number
 ): Record<string, unknown> {
+  if (domain === "evidence") {
+    const evidence = evidenceValueSchema.parse(value);
+    if (
+      evidence.expectedRevealChapter !== null &&
+      chapter < evidence.expectedRevealChapter
+    ) {
+      return {
+        kind: evidence.kind,
+        status: evidence.status,
+        protectedMeaning: true,
+        expectedRevealChapter: evidence.expectedRevealChapter
+      };
+    }
+    return evidence;
+  }
   if (domain !== "characters") return value;
   const character = characterCardValueSchema.parse(value);
   return {
@@ -123,6 +143,12 @@ export async function compileChapterContext(
     (candidate) => candidate.id === hookExperiments.selectedHookId
   );
   if (!selectedHook) throw new Error("Selected opening hook does not exist.");
+  const guardrails = storyGuardrailsSchema.parse(
+    parse(await fs.readFile(path.join(workspace, "planning", "story-guardrails.yaml"), "utf8"))
+  );
+  const revealPolicy = revealPolicySchema.parse(
+    parse(await fs.readFile(path.join(workspace, "planning", "reveal-policy.yaml"), "utf8"))
+  );
   const characterProfiles = await selectCharacterProfiles(workspace, contract.participants);
   const styleProfile = await readStyleProfile(workspace);
   const styleExamples = await readStyleExamples(workspace);
@@ -152,7 +178,8 @@ export async function compileChapterContext(
     ].join("\n").toLocaleLowerCase();
     return normalizedTerms.some((term) => searchable.includes(term));
   });
-  const retrievalCandidates = await queryRetrievalIndex(workspace, terms, 6);
+  const retrievalCandidates = (await queryRetrievalIndex(workspace, terms, 6))
+    .filter((candidate) => candidate.kind !== "continuity-evidence");
   const retrievedHistory = await Promise.all(
     retrievalCandidates.map(async (candidate) => ({
       ...candidate,
@@ -166,7 +193,10 @@ export async function compileChapterContext(
     resources: new Set(contract.resourceIds),
     relationships: new Set(contract.relationshipIds),
     characters: new Set(contract.participants),
-    storyCards: new Set(contract.threadIds)
+    storyCards: new Set(contract.threadIds),
+    evidence: new Set(contract.schemaVersion === 3
+      ? contract.evidenceMoves.map((move) => move.evidenceId)
+      : [])
   };
 
   const selected: Array<{
@@ -221,6 +251,8 @@ export async function compileChapterContext(
     "discovery/topic-selection-report.json",
     "planning/market-position.yaml",
     "planning/story-bible.md",
+    "planning/story-guardrails.yaml",
+    "planning/reveal-policy.yaml",
     "planning/world-rules.yaml",
     "planning/characters/character-roster.md",
     "planning/volumes/current-volume.md",
@@ -278,6 +310,91 @@ export async function compileChapterContext(
       `- emotional change: ${scene.emotionalChange}`,
       ""
     );
+  }
+  sections.push(
+    "## Story Guardrails",
+    "",
+    `- core premise: ${guardrails.corePremise.oneSentence}`,
+    `- signature mechanism: ${guardrails.corePremise.signatureMechanism}`,
+    `- protected elements: ${guardrails.corePremise.protectedElements.join("; ")}`,
+    `- forbidden drift: ${guardrails.corePremise.forbiddenDrift.join("; ")}`,
+    `- maximum story scope: ${guardrails.maxScope}`,
+    `- maximum hidden antagonist layers: ${guardrails.maxHiddenAntagonistLayers}`,
+    `- prohibited shortcuts: ${guardrails.prohibitedNarrativeShortcuts.join("; ")}`,
+    `- period: ${guardrails.periodRules.era}`,
+    `- institutional constraints: ${guardrails.periodRules.institutionalConstraints.join("; ")}`,
+    `- physical constraints: ${guardrails.periodRules.physicalConstraints.join("; ")}`,
+    ""
+  );
+  if (contract.schemaVersion === 3) {
+    sections.push(
+      "## Chapter Guardrail Commitments",
+      "",
+      `- scope level: ${contract.scopeLevel}`,
+      `- antagonist layer: ${contract.antagonistLayer}/${guardrails.maxHiddenAntagonistLayers}`,
+      `- outcome cost: ${contract.outcomeCost}`,
+      `- lasting failure consequence: ${contract.failureConsequence}`,
+      `- scheduled reveals: ${contract.revealIds.join("; ") || "none"}`,
+      `- coincidences used: ${contract.coincidences.length}/${guardrails.investigationRules.coincidenceBudgetPerChapter}`,
+      "",
+      "### Capability Uses",
+      ""
+    );
+    for (const use of contract.capabilityUses) {
+      sections.push(
+        `- ${use.characterId}/${use.capabilityId}: ${use.purpose}` +
+          (use.supportCharacterId ? `; support: ${use.supportCharacterId}` : "")
+      );
+    }
+    if (contract.investigationChain) {
+      sections.push(
+        "",
+        "### Investigation Chain",
+        "",
+        `- anomaly: ${contract.investigationChain.anomaly}`,
+        `- alternative explanations: ${contract.investigationChain.alternativeExplanations.join("; ")}`,
+        `- elimination tests: ${contract.investigationChain.eliminationTests.join("; ")}`,
+        `- result: ${contract.investigationChain.result}`,
+        `- limitation: ${contract.investigationChain.limitation}`
+      );
+    }
+    sections.push("", "### Supporting Character Agency", "");
+    for (const agency of contract.supportingCharacterAgency) {
+      sections.push(
+        `- ${agency.characterId}: goal=${agency.independentGoal}; decision=${agency.decision}`
+      );
+    }
+    sections.push(
+      "",
+      "### Period and Countermove Checks",
+      "",
+      `- physical: ${contract.periodChecks.physical}`,
+      `- institutional: ${contract.periodChecks.institutional}`,
+      `- vocabulary: ${contract.periodChecks.vocabulary}`,
+      `- antagonist countermove: ${contract.periodChecks.antagonistCountermove}`,
+      ""
+    );
+  }
+  sections.push("## Reveal Schedule", "");
+  const relevantReveals = revealPolicy.reveals.filter((reveal) =>
+    reveal.status !== "cancelled" &&
+    (contract.schemaVersion === 3 && contract.revealIds.includes(reveal.id) ||
+      chapter >= reveal.targetChapter - 2 && chapter <= reveal.latestChapter)
+  );
+  if (relevantReveals.length === 0) {
+    sections.push("- No reveal is scheduled for this chapter. Do not reveal protected answers early.", "");
+  } else {
+    for (const reveal of relevantReveals) {
+      const subject = chapter < reveal.earliestChapter
+        ? "[protected until earliest chapter]"
+        : reveal.subject;
+      sections.push(
+        `- ${reveal.id}: ${subject}; window=${reveal.earliestChapter}-${reveal.latestChapter}; ` +
+          `target=${reveal.targetChapter}; status=${reveal.status}; ` +
+          `prerequisites=${reveal.prerequisiteEvidenceIds.join(", ") || "none"}`
+      );
+    }
+    sections.push("");
   }
   sections.push("## Character Profiles", "");
   for (const { profile } of characterProfiles) {
@@ -389,7 +506,7 @@ export async function compileChapterContext(
   } else {
     for (const entry of selected) {
       sections.push(
-        `- [${entry.domain}/${entry.id}] ${JSON.stringify(contextValue(entry.domain, entry.value))} ` +
+        `- [${entry.domain}/${entry.id}] ${JSON.stringify(contextValue(entry.domain, entry.value, chapter))} ` +
         `(source chapter ${entry.sourceChapter}; evidence: ${entry.evidence})`
       );
     }

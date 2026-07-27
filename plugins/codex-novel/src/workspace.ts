@@ -20,6 +20,7 @@ import {
   continuityDeltaSchema,
   marketPositionSchema,
   qualityReportSchema,
+  revealPolicySchema,
   validateState,
   type BookPhase,
   type ChapterStatus,
@@ -39,6 +40,10 @@ import {
   requireProductionArcGrid,
   validateHookExperiments
 } from "./planning.js";
+import {
+  validateChapterGuardrails,
+  validateStoryGuardrails
+} from "./guardrails.js";
 
 const PHASE_TRANSITIONS: Record<BookPhase, readonly BookPhase[]> = {
   preview: ["brief_approved"],
@@ -152,6 +157,40 @@ const INITIAL_FILES: Record<string, string> = {
     ""
   ].join("\n"),
   "planning/story-bible.md": "# Story Bible\n\n(TODO)\n",
+  "planning/story-guardrails.yaml": [
+    "# (TODO: lock the signature mechanism, scope, capabilities, evidence method, period, and costs)",
+    "schemaVersion: 1",
+    "corePremise:",
+    '  oneSentence: "(TODO)"',
+    '  signatureMechanism: "(TODO)"',
+    "  protectedElements: []",
+    "  forbiddenDrift: []",
+    "maxScope: county",
+    "maxHiddenAntagonistLayers: 1",
+    "capabilityBoundaries: []",
+    "investigationRules:",
+    "  coincidenceBudgetPerChapter: 0",
+    "  requireAlternativeExplanations: true",
+    "  evidenceMustNotNameCulprit: true",
+    "  requireVerificationLimitation: true",
+    "periodRules:",
+    '  era: "(TODO)"',
+    "  prohibitedModernTerms: []",
+    "  institutionalConstraints: []",
+    "  physicalConstraints: []",
+    "supportingCharacters: []",
+    "consequenceRules:",
+    "  failureCannotAutoReward: true",
+    "  permanentCosts: []",
+    "prohibitedNarrativeShortcuts: []",
+    ""
+  ].join("\n"),
+  "planning/reveal-policy.yaml": [
+    "# Schedule protected meanings; do not write secrets directly into pre-reveal chapter context.",
+    "schemaVersion: 1",
+    "reveals: []",
+    ""
+  ].join("\n"),
   "planning/world-rules.yaml": "schemaVersion: 1\nrules: []\n",
   "planning/characters/character-roster.md": "# Character Roster\n\n(TODO)\n",
   "planning/volumes/current-volume.md": "# Current Volume Plan\n\n(TODO)\n",
@@ -211,6 +250,7 @@ const INITIAL_FILES: Record<string, string> = {
   "continuity/relationships.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/characters.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/story-cards.yaml": "schemaVersion: 1\nentries: []\n",
+  "continuity/evidence.yaml": "schemaVersion: 1\nentries: []\n",
   "publication/serial-plan.yaml": [
     "schemaVersion: 1",
     "updatesPerWeek: 7",
@@ -262,15 +302,29 @@ async function artifactFingerprint(workspace: string, artifact: ArtifactKey): Pr
   }
   const foundationFiles = [
     "planning/story-bible.md",
+    "planning/story-guardrails.yaml",
     "planning/world-rules.yaml",
     "planning/characters/character-roster.md",
-    "planning/style-profile.yaml"
+    "planning/style-profile.yaml",
+    "planning/style-examples.yaml"
   ];
   const profiles = await loadCharacterProfiles(workspace);
   foundationFiles.push(...profiles.map(({ path: relative }) => relative));
-  const combined = (
-    await Promise.all(foundationFiles.map((relative) => fs.readFile(path.join(workspace, relative), "utf8")))
-  ).join("\n---\n");
+  const revealPolicy = revealPolicySchema.parse(
+    parse(await fs.readFile(path.join(workspace, "planning/reveal-policy.yaml"), "utf8"))
+  );
+  const stableRevealSchedule = revealPolicy.reveals.map((reveal) => ({
+    ...reveal,
+    status: reveal.status === "cancelled" ? "cancelled" : "planned",
+    revealedChapter: null,
+    delayReason: null
+  }));
+  const combined = [
+    ...await Promise.all(
+      foundationFiles.map((relative) => fs.readFile(path.join(workspace, relative), "utf8"))
+    ),
+    stringify({ schemaVersion: 1, reveals: stableRevealSchedule }, { lineWidth: 0 })
+  ].join("\n---\n");
   return sha256Text(combined);
 }
 
@@ -439,15 +493,18 @@ export async function transitionPhase(workspace: string, to: BookPhase): Promise
   } else if (to === "foundation_approved") {
     await requireUsableFiles(workspace, [
       "planning/story-bible.md",
+      "planning/story-guardrails.yaml",
       "planning/world-rules.yaml",
       "planning/characters/character-roster.md",
       "planning/style-profile.yaml",
       "planning/style-examples.yaml"
     ]);
     await validateCreativeProfiles(workspace);
+    await validateStoryGuardrails(workspace);
   } else if (to === "production") {
     await requireUsableFiles(workspace, ["planning/volumes/current-volume.md"]);
     await requireProductionArcGrid(workspace);
+    await validateStoryGuardrails(workspace);
   } else if (to === "completed" && before.workflow.chapterStatus !== "continuity_committed") {
     throw new Error("The current chapter must be continuity-committed before completing the book.");
   }
@@ -575,6 +632,12 @@ export async function advanceChapter(
     if (contract.chapter !== before.workflow.currentChapter) {
       throw new Error("Chapter contract does not match current chapter.");
     }
+    if (contract.schemaVersion !== 3) {
+      throw new Error(
+        "New chapter planning requires contract schemaVersion 3 with scope, capability, evidence, period, agency, and consequence checks."
+      );
+    }
+    await validateChapterGuardrails(workspace, contract);
     const position = marketPositionSchema.parse(
       parse(await fs.readFile(path.join(workspace, "planning/market-position.yaml"), "utf8"))
     );
@@ -590,6 +653,12 @@ export async function advanceChapter(
     const review = chapterReviewSchema.parse(
       parse(await fs.readFile(path.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
+    const contract = chapterContractSchema.parse(
+      parse(await fs.readFile(path.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+    );
+    if (contract.schemaVersion === 3 && review.schemaVersion !== 3) {
+      throw new Error("A schema-v3 chapter contract requires a schema-v3 review.");
+    }
     if (review.sourceFingerprint !== quality.sourceFingerprint) {
       throw new Error("Review fingerprint does not match the current draft.");
     }
@@ -719,6 +788,7 @@ export async function validateWorkspace(workspace: string): Promise<NovelState> 
   }
   if (state.artifacts.foundation.status === "accepted") {
     await validateCreativeProfiles(workspace);
+    await validateStoryGuardrails(workspace);
   }
   if (state.artifacts.brief.status === "accepted") {
     await validateHookExperiments(workspace);

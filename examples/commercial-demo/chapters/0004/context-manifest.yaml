@@ -1,9 +1,9 @@
 schemaVersion: 1
 chapter: 4
-generatedAt: 2026-07-27T12:46:53.594Z
+generatedAt: 2026-07-27T16:13:01.690Z
 maxChars: 20000
 truncated: false
-outputFingerprint: 993564823a45945d68af91c41102ec9abc08578ff8d5ba3c651f6d6fac0f59c2
+outputFingerprint: 600beb677d7d5bba869cd85568f104a43c4cd00369711f559297944321f5f19c
 sources:
   - path: author-intent.md
     fingerprint: 5445d836225061392cb9aa7fddf971750b30eb0e2b6ed11af317888efd60018a
@@ -21,6 +21,10 @@ sources:
     fingerprint: cb7f88cd98d4093c8c135370643369007e3441a16e408759f9fe6c9f3c8d0b9a
   - path: planning/story-bible.md
     fingerprint: 031001f8339f0ecafbf4c4b8010347ca2dd9ae5161038b13bc1f77d62a69ebc2
+  - path: planning/story-guardrails.yaml
+    fingerprint: 5d199c1bc1913e37e91bda605bdb1bb859668080a12f2152bc1f1043fef9ff0f
+  - path: planning/reveal-policy.yaml
+    fingerprint: ff5386c0c842c11b2ddc0316efbc11da2f04430823b7913d7efdbcd23734e2a8
   - path: planning/world-rules.yaml
     fingerprint: 17fddd2509ac93e642fa9d50b86f71e15a884f109c2acaf3b5c2d9bb05b8cb47
   - path: planning/characters/character-roster.md
@@ -55,8 +59,10 @@ sources:
     fingerprint: 097da709b4adc01466ccc53dc2494ad04a15eb24356374e41f3be048a96e19b7
   - path: continuity/story-cards.yaml
     fingerprint: d7220ee0fc783216928b4c9efdf3efea3f0af549a69e08a760aaf6004c4720fc
+  - path: continuity/evidence.yaml
+    fingerprint: 047368a24a9995b40323c778ce5227878a80fc7156810196b4493471072e3f7a
   - path: chapters/0004/contract.yaml
-    fingerprint: 4dbe585910af4c6f42145e8d11e5866197f8dbaf3cc3d88e8d983b2d574a81b8
+    fingerprint: 2211261051ad95963b7c3833636c568361aefc0e31c31b0d299ac8f952082537
   - path: chapters/0003/final.md
     fingerprint: 71ee78dd37f44c56fd7d9c1f32cd3043f0e474f06f097afdd8f125c48663a550
   - path: chapters/0003/handoff.yaml

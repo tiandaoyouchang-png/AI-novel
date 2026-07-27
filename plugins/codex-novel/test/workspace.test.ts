@@ -75,6 +75,8 @@ async function enterProduction(workspace: string): Promise<void> {
     "planning/characters/char-lin-yan.yaml",
     characterProfileYaml()
   );
+  await writeAcceptedArtifact(workspace, "planning/story-guardrails.yaml", storyGuardrailsYaml());
+  await writeAcceptedArtifact(workspace, "planning/reveal-policy.yaml", revealPolicyYaml());
   await transitionPhase(workspace, "foundation_approved");
   await writeAcceptedArtifact(
     workspace,
@@ -130,6 +132,8 @@ async function enterShortProduction(workspace: string): Promise<void> {
     "planning/characters/char-lin-yan.yaml",
     characterProfileYaml()
   );
+  await writeAcceptedArtifact(workspace, "planning/story-guardrails.yaml", storyGuardrailsYaml());
+  await writeAcceptedArtifact(workspace, "planning/reveal-policy.yaml", revealPolicyYaml());
   await transitionPhase(workspace, "foundation_approved");
   await writeAcceptedArtifact(
     workspace,
@@ -405,9 +409,73 @@ function characterProfileYaml(): string {
   ].join("\n");
 }
 
+function storyGuardrailsYaml(): string {
+  return [
+    "schemaVersion: 1",
+    "corePremise:",
+    "  oneSentence: 不会武功的盐仓账房用重量、账目和货路漏洞调查县域盐案",
+    "  signatureMechanism: 每次关键推进必须由账目、重量或货路核验产生",
+    "  protectedElements:",
+    "    - 主角不会武功",
+    "    - 案件以可验证的盐务细节推进",
+    "  forbiddenDrift:",
+    "    - 不升级为全国谋反或临时获得绝世武功",
+    "maxScope: county",
+    "maxHiddenAntagonistLayers: 1",
+    "capabilityBoundaries:",
+    "  - characterId: 林砚",
+    "    allowed:",
+    "      - id: ledger-audit",
+    "        description: 核对账册、重量、编号和货路记录",
+    "    prohibited:",
+    "      - 正面对抗专业杀手",
+    "      - 凭空识别毒物或施展武功",
+    "    requiresSupportFor: []",
+    "investigationRules:",
+    "  coincidenceBudgetPerChapter: 0",
+    "  requireAlternativeExplanations: true",
+    "  evidenceMustNotNameCulprit: true",
+    "  requireVerificationLimitation: true",
+    "periodRules:",
+    "  era: 架空古代县域盐政",
+    "  prohibitedModernTerms:",
+    "    - 媒体报道",
+    "    - 鉴定报告",
+    "    - 水线照片",
+    "  institutionalConstraints:",
+    "    - 账房发现的异常必须经书吏、典史或堂审程序转化为案证",
+    "  physicalConstraints:",
+    "    - 盐货重量、水线、纸张与毒性判断必须说明可观察方法及局限",
+    "supportingCharacters: []",
+    "consequenceRules:",
+    "  failureCannotAutoReward: true",
+    "  permanentCosts:",
+    "    - 证人伤亡、身份暴露或证据灭失至少保留一项不可逆后果",
+    "prohibitedNarrativeShortcuts:",
+    "  - 反派亲口说出全部计划",
+    "  - 恰好发现完整密账"
+  ].join("\n");
+}
+
+function revealPolicyYaml(): string {
+  return [
+    "schemaVersion: 1",
+    "reveals:",
+    "  - id: reveal-ledger-owner",
+    "    subject: 替换账册的实际责任人",
+    "    earliestChapter: 3",
+    "    targetChapter: 5",
+    "    latestChapter: 7",
+    "    prerequisiteEvidenceIds: []",
+    "    status: planned",
+    "    revealedChapter: null",
+    "    delayReason: null"
+  ].join("\n");
+}
+
 function contractYaml(chapter: number): string {
   return [
-    "schemaVersion: 2",
+    "schemaVersion: 3",
     `chapter: ${chapter}`,
     `title: 第${chapter}章`,
     "goal: 主角必须在封锁前取得账册",
@@ -435,6 +503,33 @@ function contractYaml(chapter: number): string {
     "netChange: 主角得到半条真线索并暴露行踪",
     "endingPull: 门外响起熟人的声音",
     "emotionalTarget: 从被迫冒险转为主动保留证据",
+    "scopeLevel: county",
+    "antagonistLayer: 1",
+    "capabilityUses:",
+    "  - characterId: 林砚",
+    "    capabilityId: ledger-audit",
+    "    purpose: 用账册纸张和编号差异判断替换痕迹",
+    "    supportCharacterId: null",
+    "investigationChain:",
+    "  anomaly: 账册纸页比昨日更白且墨味新鲜",
+    "  alternativeExplanations:",
+    "    - 旧账册受潮后由库吏正常誊抄",
+    "    - 有人替换账册以掩盖盐货差额",
+    "  eliminationTests:",
+    "    - 比较骑缝章、纸张批次和连续页码",
+    "  result: 骑缝章断裂且页码连续，支持有人替换内页",
+    "  limitation: 只能证明账册被换，不能证明替换者身份",
+    "evidenceMoves: []",
+    "revealIds: []",
+    "coincidences: []",
+    "supportingCharacterAgency: []",
+    "outcomeCost: 主角取得半条线索但暴露行踪",
+    "failureConsequence: 真实账册仍下落不明，后续无法直接定案",
+    "periodChecks:",
+    "  physical: 纸张、墨迹和骑缝章检查不依赖现代器材",
+    "  institutional: 账册异常只是调查方向，尚不能直接定罪",
+    "  vocabulary: 不使用现代媒体、照片或鉴定报告等词",
+    "  antagonistCountermove: 对方用完整页码和伪造印章制造正常誊抄假象",
     "sceneBeats:",
     "  - id: scene-warehouse-entry",
     "    type: investigation",
@@ -468,7 +563,7 @@ const chapterProse = [
 
 function passingReviewYaml(fingerprint: string, reviewRound = 1): string {
   return [
-    "schemaVersion: 2",
+    "schemaVersion: 3",
     `reviewRound: ${reviewRound}`,
     `sourceFingerprint: ${fingerprint}`,
     "verdict: pass",
@@ -482,6 +577,27 @@ function passingReviewYaml(fingerprint: string, reviewRound = 1): string {
     "  sceneValueChanges:",
     "    status: pass",
     "    evidence: 场景从怀疑推进到取得半条真线索",
+    "  corePremiseAlignment:",
+    "    status: pass",
+    "    evidence: 关键推进来自账房职业能力而非临时武力",
+    "  scopeDiscipline:",
+    "    status: pass",
+    "    evidence: 冲突保持在县域盐仓，没有升级为全国阴谋",
+    "  capabilityBoundaries:",
+    "    status: pass",
+    "    evidence: 林砚只使用已登记的账册核验能力",
+    "  evidenceChain:",
+    "    status: pass",
+    "    evidence: 异常、替代解释、验证和局限均在场景中可见",
+    "  periodAuthenticity:",
+    "    status: pass",
+    "    evidence: 物证和用语符合故事时代与县级程序",
+    "  supportingCharacterAgency:",
+    "    status: pass",
+    "    evidence: 本章无出场配角需要独立决策",
+    "  consequenceIntegrity:",
+    "    status: pass",
+    "    evidence: 暴露行踪是持续代价，失败没有自动转化为奖励",
     "blockingIssues: []",
     "warnings: []"
   ].join("\n");
@@ -489,7 +605,7 @@ function passingReviewYaml(fingerprint: string, reviewRound = 1): string {
 
 function repairReviewYaml(fingerprint: string, reviewRound: number): string {
   return [
-    "schemaVersion: 2",
+    "schemaVersion: 3",
     `reviewRound: ${reviewRound}`,
     `sourceFingerprint: ${fingerprint}`,
     "verdict: repair",
@@ -503,6 +619,27 @@ function repairReviewYaml(fingerprint: string, reviewRound: number): string {
     "  sceneValueChanges:",
     "    status: pass",
     "    evidence: 场景完成了从怀疑到取得线索的变化",
+    "  corePremiseAlignment:",
+    "    status: pass",
+    "    evidence: 调查仍由账房职业能力推进",
+    "  scopeDiscipline:",
+    "    status: pass",
+    "    evidence: 案件保持在县域盐仓",
+    "  capabilityBoundaries:",
+    "    status: pass",
+    "    evidence: 没有新增未登记能力",
+    "  evidenceChain:",
+    "    status: pass",
+    "    evidence: 线索仍有替代解释与证明局限",
+    "  periodAuthenticity:",
+    "    status: pass",
+    "    evidence: 用语与程序未越界",
+    "  supportingCharacterAgency:",
+    "    status: pass",
+    "    evidence: 本章无出场配角需要独立决策",
+    "  consequenceIntegrity:",
+    "    status: pass",
+    "    evidence: 失败后果没有变成奖励",
     "blockingIssues:",
     "  - id: issue-voice",
     "    category: character",
@@ -738,13 +875,14 @@ test("mechanical quality gate blocks banned words before model review", async (t
   );
   await fs.writeFile(
     path.join(workspace, "chapters/0001/draft.md"),
-    `${chapterProse}\n\n忽然，门外又响了一声。\n`,
+    `${chapterProse}\n\n忽然，门外又响了一声。次日的媒体报道已经传遍县城。\n`,
     "utf8"
   );
   await advanceChapter(workspace, "drafted");
   const report = await runQualityCheck(workspace, "draft");
   assert.equal(report.ok, false);
   assert.match(report.blockingIssues.join("\n"), /Banned word/);
+  assert.match(report.blockingIssues.join("\n"), /Period vocabulary violation/);
   await writeAcceptedArtifact(
     workspace,
     "chapters/0001/review.yaml",
@@ -767,6 +905,49 @@ test("chapter planning rejects a length contract outside market position", async
   await compileChapterContext(workspace);
   await assert.rejects(() => advanceChapter(workspace, "planned"), /violates market position/);
   assert.equal((await readState(workspace)).workflow.chapterStatus, "not_started");
+});
+
+test("chapter planning blocks scope escalation and undeclared protagonist abilities", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "核心设定门禁测试" });
+  await enterProduction(workspace);
+  const contractPath = path.join(workspace, "chapters/0001/contract.yaml");
+
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/contract.yaml",
+    contractYaml(1).replace("scopeLevel: county", "scopeLevel: national")
+  );
+  await compileChapterContext(workspace);
+  await assert.rejects(
+    () => advanceChapter(workspace, "planned"),
+    /scope national exceeds the approved ceiling county/
+  );
+
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/contract.yaml",
+    contractYaml(1).replace("capabilityId: ledger-audit", "capabilityId: swordsmanship")
+  );
+  await compileChapterContext(workspace);
+  await assert.rejects(
+    () => advanceChapter(workspace, "planned"),
+    /Undeclared capability swordsmanship/
+  );
+
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/contract.yaml",
+    contractYaml(1).replace("antagonistLayer: 1", "antagonistLayer: 2")
+  );
+  await compileChapterContext(workspace);
+  await assert.rejects(
+    () => advanceChapter(workspace, "planned"),
+    /Antagonist layer 2 exceeds the approved ceiling 1/
+  );
+  assert.equal((await readState(workspace)).workflow.chapterStatus, "not_started");
+  assert.ok(await pathExists(contractPath));
 });
 
 test("blocks dead characters onstage and permits explicitly non-present appearances", async (t) => {
@@ -816,6 +997,57 @@ test("blocks dead characters onstage and permits explicitly non-present appearan
   );
   const context = await compileChapterContext(workspace);
   assert.match(await fs.readFile(context.output, "utf8"), /char-lin-yan/);
+});
+
+test("context redacts protected evidence meaning before its reveal chapter", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "证据防剧透测试" });
+  await enterProduction(workspace);
+  await writeAcceptedArtifact(
+    workspace,
+    "continuity/evidence.yaml",
+    [
+      "schemaVersion: 1",
+      "entries:",
+      "  - id: evidence-protected",
+      "    status: active",
+      "    value:",
+      "      kind: foreshadowing",
+      "      status: observed",
+      "      summary: 受保护的真相是旧盐引号仍在流通",
+      "      supportsClaimIds: [claim-secret]",
+      "      contradictsClaimIds: []",
+      "      sourceIds: [chapter-zero]",
+      "      verificationMethod: 对照注销簿",
+      "      limitations: [尚未完成三方核验]",
+      "      expectedRevealChapter: 5",
+      "      revealedChapter: null",
+      "    sourceChapter: 0",
+      "    evidence: 已接受的基础伏笔",
+      `    updatedAt: ${new Date().toISOString()}`
+    ].join("\n")
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/contract.yaml",
+    contractYaml(1).replace(
+      "evidenceMoves: []",
+      [
+        "evidenceMoves:",
+        "  - evidenceId: evidence-protected",
+        "    action: test",
+        "    claimId: claim-secret",
+        "    expectedResult: 只检查伏笔物证是否仍存在，不解释其含义"
+      ].join("\n")
+    )
+  );
+  await rebuildRetrievalIndex(workspace);
+  const context = await compileChapterContext(workspace);
+  const content = await fs.readFile(context.output, "utf8");
+  assert.match(content, /protectedMeaning/);
+  assert.doesNotMatch(content, /旧盐引号仍在流通/);
+  assert.doesNotMatch(content, /对照注销簿/);
 });
 
 test("rejects a normal continuity delta that revives a dead character", async (t) => {
@@ -922,6 +1154,59 @@ test("recovers an interrupted continuity transaction from its before snapshot", 
   await assert.rejects(
     () => fs.stat(path.join(workspace, "runtime/pending-continuity.yaml")),
     /ENOENT/
+  );
+});
+
+test("continuity commit records scheduled reveals in the same recoverable transaction", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "揭秘事务测试" });
+  await writeAcceptedArtifact(
+    workspace,
+    "planning/reveal-policy.yaml",
+    revealPolicyYaml()
+      .replace("earliestChapter: 3", "earliestChapter: 1")
+      .replace("targetChapter: 5", "targetChapter: 1")
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/contract.yaml",
+    contractYaml(1).replace("revealIds: []", "revealIds:\n  - reveal-ledger-owner")
+  );
+  await writeAcceptedArtifact(workspace, "chapters/0001/final.md", chapterProse);
+  const finalFingerprint = await fingerprintFile(path.join(workspace, "chapters/0001/final.md"));
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/delta.yaml",
+    [
+      "schemaVersion: 1",
+      "chapter: 1",
+      `sourceFingerprint: ${finalFingerprint}`,
+      "changes:",
+      "  - domain: facts",
+      "    operation: upsert",
+      "    id: fact-reveal-test",
+      "    value:",
+      "      statement: 账册责任人的身份已经在正文中按计划揭示",
+      "    evidence: 第一章终稿"
+    ].join("\n")
+  );
+  const before = await readState(workspace);
+  const after = structuredClone(before);
+  after.continuity.lastCommittedChapter = 1;
+  after.workflow.chapterStatus = "continuity_committed";
+  await commitContinuityDelta(workspace, before, after);
+
+  const policy = parse(
+    await fs.readFile(path.join(workspace, "planning/reveal-policy.yaml"), "utf8")
+  );
+  assert.equal(policy.reveals[0].status, "revealed");
+  assert.equal(policy.reveals[0].revealedChapter, 1);
+  const runs = await fs.readdir(path.join(workspace, "runtime/runs"));
+  const run = runs.find((name) => name.startsWith("continuity-"));
+  assert.ok(run);
+  assert.ok(
+    await pathExists(path.join(workspace, "runtime/runs", run, "reveal-policy.before.yaml"))
   );
 });
 

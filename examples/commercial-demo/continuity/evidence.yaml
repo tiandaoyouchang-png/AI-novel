@@ -1,0 +1,64 @@
+schemaVersion: 1
+entries:
+  - id: evidence-abnormal-bag-numbers
+    status: active
+    value:
+      kind: association
+      status: corroborated
+      summary: 东字三、地字十九、玄字七三个异常袋号由不同脚夫分别记住，顾青昭能独立复述。
+      supportsClaimIds:
+        - claim-bag-numbers-cross-location
+      contradictsClaimIds:
+        - claim-single-clerical-error
+      sourceIds:
+        - chapter-0003-final
+        - witness-footmen
+      verificationMethod: 三名脚夫隔离复述后，与顾青昭记录交叉核对。
+      limitations:
+        - 只能证明三个袋号值得追查，不能证明调包者或县令责任。
+      expectedRevealChapter: null
+      revealedChapter: 3
+    sourceChapter: 3
+    evidence: 第三章火场中分散记忆并完成相互独立复述。
+    updatedAt: 2026-07-27T08:00:00.000Z
+  - id: evidence-replaced-seal
+    status: active
+    value:
+      kind: directional
+      status: corroborated
+      summary: 义仓封蜡在雨夜被替换，逆向卷边与仍有柔性的蜡屑互相支持。
+      supportsClaimIds:
+        - claim-warehouse-opened-after-rain
+      contradictsClaimIds:
+        - claim-seal-untouched
+      sourceIds:
+        - chapter-0002-final
+        - seal-fragment
+      verificationMethod: 比较内深外浅压痕、贴回卷边和雨夜后的蜡质状态。
+      limitations:
+        - 不能单独识别开仓者，也不能证明仓内盐货何时被调换。
+      expectedRevealChapter: null
+      revealedChapter: 2
+    sourceChapter: 2
+    evidence: 第二章验盐亭核对封蜡碎片与仓门残留。
+    updatedAt: 2026-07-27T08:00:00.000Z
+  - id: evidence-father-reverse-route
+    status: active
+    value:
+      kind: foreshadowing
+      status: observed
+      summary: 沈父残页中的旧号与反向货路可能指向一批已注销盐引仍在流通。
+      supportsClaimIds:
+        - claim-cancelled-permit-reused
+      contradictsClaimIds: []
+      sourceIds:
+        - chapter-0003-final
+        - father-ledger-page
+      verificationMethod: 尚待与盐引注销簿、脚费记录和南闸过船簿三方核对。
+      limitations:
+        - 当前只能确认反向货路，不能确认旧号是否注销或由谁复用。
+      expectedRevealChapter: 9
+      revealedChapter: null
+    sourceChapter: 3
+    evidence: 第三章韩九交出的沈父夜航残页。
+    updatedAt: 2026-07-27T08:00:00.000Z

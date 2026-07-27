@@ -86,7 +86,8 @@ Codex Novel combines plain-text project durability, approval-gated serial produc
 - committed-chapter integrity audits;
 - structured market positioning and source-bound opening milestones.
 - separate short-complete and long-volume milestone rubrics;
-- schema-bound scene value changes, stable character voice profiles, and a two-round repair budget.
+- schema-bound premise, scope, antagonist layer, capability, evidence, period, agency, consequence, and scene-value checks with a two-round repair budget.
+- graded evidence plus earliest/target/latest reveal windows whose status commits atomically with continuity.
 - multi-option opening-hook records, cross-volume arc grids, local publication learning, and committed-only DOCX/EPUB export.
 
 The project deliberately remains a Codex-native production system rather than becoming another model-provider frontend.

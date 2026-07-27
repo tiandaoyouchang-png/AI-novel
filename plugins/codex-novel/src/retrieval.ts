@@ -32,7 +32,8 @@ const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 
 export type RetrievalCandidate = {
@@ -85,6 +86,7 @@ export async function rebuildRetrievalIndex(
     const absolute = path.join(workspace, relative);
     const fingerprint = await fingerprintFile(absolute);
     const store = continuityStoreSchema.parse(parse(await fs.readFile(absolute, "utf8")));
+    if (domain === "evidence") continue;
     for (const entry of store.entries.filter((item) => item.status === "active")) {
       documents.push({
         id: `continuity:${domain}:${entry.id}`,

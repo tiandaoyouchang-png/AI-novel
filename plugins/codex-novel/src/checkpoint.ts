@@ -20,7 +20,8 @@ const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 
 function safeLabel(label: string): string {
@@ -48,7 +49,8 @@ export async function generateCheckpoint(
     resources: [] as string[],
     relationships: [] as string[],
     characters: [] as string[],
-    storyCards: [] as string[]
+    storyCards: [] as string[],
+    evidence: [] as string[]
   };
   const qualityDebt: string[] = [];
   const sources: Array<{ path: string; fingerprint: string }> = [];

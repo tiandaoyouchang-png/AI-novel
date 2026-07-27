@@ -1,0 +1,92 @@
+schemaVersion: 1
+corePremise:
+  oneSentence: 不会武功的账房沈砚，用重量、账目和盐务漏洞调查临河县赈盐失踪案。
+  signatureMechanism: 每次关键推进必须来自重量、封印、脚程、税票或账目之间可复核的矛盾。
+  protectedElements:
+    - 沈砚不会武功，不能正面击败职业杀手。
+    - 第一卷只解决临河县三万斤赈盐去向及本地责任链。
+    - 证据必须经过提出解释、排除替代项、交叉验证和说明局限。
+  forbiddenDrift:
+    - 不升级为全国谋反、皇位争夺、禁术剑法或皇帝特赐解决案件。
+    - 不用新幕后人物套娃代替对已有事实的重新解释。
+maxScope: county
+maxHiddenAntagonistLayers: 1
+capabilityBoundaries:
+  - characterId: 沈砚
+    allowed:
+      - id: ledger-audit
+        description: 核对账册、票据、重量、编号和经手顺序。
+      - id: cargo-trace
+        description: 根据封印、脚程、仓损和货路记录追踪盐货。
+      - id: evidence-protocol
+        description: 把账目异常转化为盟友可独立复核的证据协议。
+    prohibited:
+      - 正面击败职业杀手或临时施展武功。
+      - 无铺垫识毒、制迷烟、统兵或获得最高司法权。
+    requiresSupportFor:
+      - evidence-protocol
+  - characterId: 周嵩
+    allowed:
+      - id: county-procedure
+        description: 调动县衙书吏、仓吏和堂审程序施压。
+    prohibited:
+      - 直接调动禁军或代表朝廷宣布全国性阴谋。
+    requiresSupportFor: []
+  - characterId: 顾青昭
+    allowed:
+      - id: medical-records
+        description: 比较病案、症候、药材和盐样的有限关联。
+      - id: protected-channel
+        description: 在承担身份风险后请求御史线的有限协助。
+    prohibited:
+      - 单凭银针或一次尝盐作出确定性定罪。
+      - 绕过县府程序直接保释嫌疑人。
+    requiresSupportFor: []
+  - characterId: 沈禾
+    allowed:
+      - id: dock-network
+        description: 通过药铺、脚夫和码头熟人核对货路。
+      - id: medicine-code
+        description: 识别事先约定的药方剂量编码。
+    prohibited:
+      - 无训练潜入严密官署或正面击败多人。
+    requiresSupportFor: []
+investigationRules:
+  coincidenceBudgetPerChapter: 0
+  requireAlternativeExplanations: true
+  evidenceMustNotNameCulprit: true
+  requireVerificationLimitation: true
+periodRules:
+  era: 架空古代县域盐政
+  prohibitedModernTerms:
+    - 媒体报道
+    - 鉴定报告
+    - 水线照片
+    - 工业副产盐
+  institutionalConstraints:
+    - 账房与医者发现的异常只能形成调查方向，必须经书吏记录、证人证言、物证核验或堂审质证才能成为案证。
+    - 县衙、府衙、转运司与盐商的权限和利益必须在行动前说明，不能由上级官员临场一句话解决。
+  physicalConstraints:
+    - 盐样、载重、水线、纸张与毒性判断必须说明观察方法、对照物和结论局限。
+    - 同一封信、同一件物证和同一人物不能同时出现在互斥地点或状态。
+supportingCharacters:
+  - characterId: 顾青昭
+    independentGoal: 查清灾民病症与赈盐流向的关系，同时保护自己的御史线身份。
+    uniqueDomain: 病案、药理与有限官府渠道。
+    mayContradictProtagonist: true
+  - characterId: 沈禾
+    independentGoal: 保护药铺与码头熟人，不接受只被当作跑腿者。
+    uniqueDomain: 药铺、脚夫和码头人情网。
+    mayContradictProtagonist: true
+consequenceRules:
+  failureCannotAutoReward: true
+  permanentCosts:
+    - 证人死亡或失踪后不能马上用更完整的新证据抵消。
+    - 身份暴露、伤势、物证灭失和信任破裂必须至少跨越后续三个章节。
+prohibitedNarrativeShortcuts:
+  - 反派亲口说出全部计划
+  - 恰好发现完整密账
+  - 果然不同凡响
+  - 沈砚真厉害
+  - 尚方宝剑
+  - 破晓剑法

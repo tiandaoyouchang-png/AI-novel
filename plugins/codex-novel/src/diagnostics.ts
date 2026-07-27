@@ -113,7 +113,7 @@ export async function guideWorkspace(workspace: string): Promise<{
       nextAction: "完成人物与世界基础设定",
       prompt:
         `请读取 Codex Novel Skill，继续 ${workspace}。根据已批准选题和开篇钩子，` +
-        "完善故事圣经、世界规则、角色卡和风格设定，重要设定等我确认。"
+        "完善故事圣经、世界规则、角色卡、风格设定、核心边界和揭秘时间表，重要设定等我确认。"
     };
   }
   if (state.workflow.phase === "foundation_approved") {
@@ -175,6 +175,19 @@ export function friendlyError(message: string): string {
   }
   if (message.includes("Accepted artifacts changed after approval")) {
     return `${message}\n\n已批准设定后来被改动。请先确认改动范围，再使用 invalidate 让依赖内容明确失效。`;
+  }
+  if (
+    message.includes("ENOENT") &&
+    (
+      message.includes("story-guardrails.yaml") ||
+      message.includes("reveal-policy.yaml") ||
+      message.includes("evidence.yaml")
+    )
+  ) {
+    return (
+      `${message}\n\n这是 v0.4 新增的质量门禁文件。不要让系统自动猜测旧书规则；` +
+      "请参照 README 的“从 v0.3 升级工作区”补齐文件，再作废并重新批准基础设定。"
+    );
   }
   if (message.includes("No continuity-committed chapters are available to export")) {
     return `${message}\n\n只有完成正文验收并提交角色/剧情连续性的章节才能导出。`;
