@@ -1,0 +1,45 @@
+schemaVersion: 1
+selectedHookId: hook-ledger
+candidates:
+  - id: hook-ledger
+    title: 封仓夜的活账
+    hypothesis: 小账房被迫在封仓夜重做一份会杀人的假账，能同时建立职业机制、生命压力和继续阅读问题
+    openingSample: 封仓钟敲到第三声时，沈砚在死人的袖口里摸出一页还热着的盐账。账上每一笔亏空都写着他的名字，最后一行却是明日才会入库的官盐。他刚想把纸折回去，仓门外便有人高声宣读新任账房名单，第一个名字正是沈砚。
+    targetEmotion: 压迫、惊疑和破局期待
+    readerQuestion: 谁提前写好了明日的假账，又为什么一定要沈砚接手
+    risks:
+      - 专业账术信息过密会削弱人物处境
+  - id: hook-fire
+    title: 盐仓纵火
+    hypothesis: 直接以盐仓大火和救人选择开场，能用强动作快速吸引男频读者
+    openingSample: 盐仓起火时，沈砚离生门只有七步。他却逆着逃命的人群折回账房，因为火墙后有人正用妹妹的声音求救。等他踹开门，里面没有妹妹，只有一具抱着总账的尸体，以及墙上用盐水写下的四个字：账房偿命。
+    targetEmotion: 紧迫和危险
+    readerQuestion: 谁用妹妹诱导沈砚返回账房
+    risks:
+      - 动作开场可能掩盖账术破局的核心差异
+  - id: hook-arrest
+    title: 当街拿人
+    hypothesis: 主角因一笔不存在的盐税当街被捕，能迅速建立不公和翻案动机
+    openingSample: 官差把枷锁扣上沈砚脖子时，他还在替街边盐贩数最后三枚铜钱。罪状说他三年前经手过一笔万斤官盐，可那一年他尚未进盐仓。围观者散去后，押他的老吏压低声音说：想活到县衙，就先想清楚谁替你补了那本账。
+    targetEmotion: 不公、危险和求证欲
+    readerQuestion: 三年前是谁借用了沈砚的身份
+    risks:
+      - 冤案开局较常见，视觉辨识度不足
+testProtocol:
+  blindLabels: true
+  targetReaders: 喜欢历史悬疑、专业破局与小人物升级的番茄男频读者
+  minimumSampleSize: 5
+  questions:
+    - 读完后最想立刻知道的问题是什么
+    - 是否愿意继续阅读下一章以及原因
+    - 能否说出主角必须立即解决的危险
+  successSignals:
+    - 至少三名目标读者选择继续阅读且能复述账术钩子
+    - 最多人主动追问假账为何提前写好
+rejected:
+  - id: hook-fire
+    reason: 强动作压过了账术证据链，不能准确代表作品的长期阅读回报
+  - id: hook-arrest
+    reason: 冤案结构清晰但同类感较强，差异化弱于封仓夜活账
+notes:
+  - 当前记录为创作决策示例，不宣称已经获得真实平台留存数据

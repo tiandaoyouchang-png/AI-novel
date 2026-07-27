@@ -15,6 +15,7 @@ Adopted:
 - many small Markdown/YAML artifacts instead of one opaque database document;
 - human-editable source of truth;
 - clean separation between manuscript, notes, and derived outputs.
+- named, fingerprinted local revisions with safe restore.
 
 Not adopted in V1:
 
@@ -86,5 +87,6 @@ Codex Novel combines plain-text project durability, approval-gated serial produc
 - structured market positioning and source-bound opening milestones.
 - separate short-complete and long-volume milestone rubrics;
 - schema-bound scene value changes, stable character voice profiles, and a two-round repair budget.
+- multi-option opening-hook records, cross-volume arc grids, local publication learning, and committed-only DOCX/EPUB export.
 
 The project deliberately remains a Codex-native production system rather than becoming another model-provider frontend.

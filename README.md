@@ -13,7 +13,7 @@
 
 Codex 负责理解、策划、写作、审稿和局部修复；`novelctl` 负责确定性的状态检查、阶段推进、连续性提交、故障恢复、检索索引、检查点和导出。所有关键内容都保存在本地 Markdown/YAML 文件中，作者可以阅读、修改、版本管理，也可以随时停止后继续。
 
-> 当前版本：`0.2.0`，处于可运行的工程验证阶段。项目尚未接入番茄小说或知乎盐选的自动发布接口，也不承诺平台流量、签约结果或作品收入。
+> 当前版本：`0.3.0`，处于可运行的工程验证阶段。项目尚未接入番茄小说或知乎盐选的自动发布接口，也不承诺平台流量、签约结果或作品收入。
 
 ## 为什么要做这个项目
 
@@ -63,7 +63,13 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 | 连续性 | 跨章持续累积 | 全篇状态一致 |
 | 完成条件 | 当前连载目标完成 | 故事完整闭环 |
 
-### 3. 动态角色卡与剧情卡
+### 3. 开篇钩子实验
+
+入选题材在简介批准前还要比较 2～3 个不同开篇。系统记录每个开篇的假设、目标情绪、读者问题、匿名盲测流程、可观察成功信号，以及最终选择和淘汰原因。
+
+没有真实目标读者参与时，只能记录为作者决策或内部预测，不能伪装成盲测数据。
+
+### 4. 动态角色卡与剧情卡
 
 角色卡和剧情卡不是创建后不再变化的静态提示词，而是跟随已经验收的正文持续更新。
 
@@ -87,7 +93,19 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 - `continuity/characters.yaml` 只保存生死、位置、伤势、目标和知识等会随剧情变化的状态；
 - 每章根据明确的参与角色选择性加载档案，不会把所有角色资料都塞入上下文。
 
-### 4. 防止角色错乱和“死而复生”
+### 5. 跨卷情节与人物弧线
+
+长篇连载在进入正文生产前需要建立 `planning/arc-grid.yaml`，把主线、支线、谜团、关系线和角色弧连接到各卷：
+
+- 每卷需要推进的节拍；
+- 已经向读者作出的承诺；
+- 依赖的人物和剧情线；
+- 计划兑现位置与兑现债务；
+- 最近推进章节和最大允许闲置章数。
+
+弧线网格只负责规划未来；动态剧情卡负责记录已经发生的事实，两者不能互相覆盖。系统会报告超过闲置上限的活跃剧情线。
+
+### 6. 防止角色错乱和“死而复生”
 
 在生成下一章上下文前，系统会读取角色生命状态和本章出场合同：
 
@@ -99,7 +117,7 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 
 这套机制不能替代作者判断，但能把高风险错误从“写完以后才发现”提前到章节生产之前。
 
-### 5. 有界上下文，而不是把整本书反复塞给模型
+### 7. 有界上下文，而不是把整本书反复塞给模型
 
 每次写作只组装当前章节真正需要的内容：
 
@@ -118,7 +136,7 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 
 系统还提供可删除、可重建的 SQLite 全文检索索引。索引只负责寻找较早的交接、连续性条目和角色档案；每条结果都要重新校验源文件指纹，索引无权修改剧情状态。
 
-### 6. 可恢复的状态机
+### 8. 可恢复的状态机与命名版本
 
 作品级阶段：
 
@@ -155,6 +173,14 @@ flowchart LR
 
 如果中途异常，可以使用 `recover` 恢复到提交前快照。
 
+作者还可以为大改建立命名修订版本。每个版本保存权威文件指纹和相对上一版本的差异摘要。执行恢复时，系统会先自动保存“恢复前版本”，再恢复目标文件并使旧检索索引失效。
+
+### 9. 连载库存与发布后学习
+
+长篇根据“已连续性提交章节数－已发布章节数”计算真实可发布库存、缓冲天数和红黄绿健康状态。草稿和未验收正文不会计入库存。
+
+发布数据采用本地、主动导入方式。系统不会自动上传作品指标，也不会根据少量数据直接改写已批准定位；它只生成带原始假设和复盘问题的学习底稿。
+
 ## 系统架构
 
 ```text
@@ -167,6 +193,8 @@ Codex
           ├─ planning/        简介、人物、世界与卷计划
           ├─ chapters/        合同、上下文、草稿、审查与正文
           ├─ continuity/      动态角色卡、剧情卡与连续性账本
+          ├─ publication/     连载计划与作者导入的发布指标
+          ├─ imports/         尚未成为权威正文的已有稿件
           ├─ reports/         里程碑和质量报告
           ├─ runtime/         事务快照、事件与恢复信息
           └─ exports/         仅由已提交正文生成的导出文件
@@ -212,7 +240,10 @@ cd ../..
 node plugins/codex-novel/dist/novelctl.cjs status examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs validate examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs topics examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs hooks examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs arcs examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs cards examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs cadence examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs index examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs search examples/commercial-demo --query "青盐 夜航簿"
 node plugins/codex-novel/dist/novelctl.cjs milestone examples/commercial-demo --type opening-three
@@ -223,12 +254,20 @@ node plugins/codex-novel/dist/novelctl.cjs milestone examples/commercial-demo --
 ```bash
 node plugins/codex-novel/dist/novelctl.cjs export examples/commercial-demo --format md
 node plugins/codex-novel/dist/novelctl.cjs export examples/commercial-demo --format txt
+node plugins/codex-novel/dist/novelctl.cjs export examples/commercial-demo --format docx
+node plugins/codex-novel/dist/novelctl.cjs export examples/commercial-demo --format epub
 ```
 
 ### 3. 创建自己的项目
 
 ```bash
 node plugins/codex-novel/dist/novelctl.cjs init novels/my-story --title "我的小说"
+```
+
+不熟悉命令时，也可以运行交互式引导：
+
+```bash
+node plugins/codex-novel/dist/novelctl.cjs guide
 ```
 
 然后在 Codex 中使用下面的起始指令：
@@ -240,7 +279,7 @@ plugins/codex-novel/skills/write-long-form-novel/SKILL.md，
 
 目标平台：番茄小说
 创作形态：长篇连载
-暂时不要直接写正文，先完成市场扫描、候选选题和选题决策。
+暂时不要直接写正文，先完成市场扫描、候选选题、选题决策和 2～3 个开篇钩子实验。
 ```
 
 知乎盐选短篇示例：
@@ -268,6 +307,7 @@ plugins/codex-novel/skills/write-long-form-novel/SKILL.md，
   → 对比评分
   → 原创边界
   → 选题决策
+  → 多开篇钩子实验
   → 市场定位
 ```
 
@@ -276,12 +316,14 @@ plugins/codex-novel/skills/write-long-form-novel/SKILL.md，
 - `discovery/market-scan.yaml`
 - `discovery/topic-candidates.yaml`
 - `discovery/topic-decision.yaml`
+- `discovery/hook-experiments.yaml`
 - `planning/market-position.yaml`
 
 运行检查：
 
 ```bash
 node plugins/codex-novel/dist/novelctl.cjs topics novels/my-story
+node plugins/codex-novel/dist/novelctl.cjs hooks novels/my-story
 ```
 
 ### 阶段二：作品基础
@@ -293,6 +335,7 @@ Codex 与作者共同确认：
 - 世界规则；
 - 角色阵容；
 - 当前卷或短篇整体计划；
+- 长篇跨卷主线、支线和角色弧网格；
 - 质量规则和平台字数范围。
 
 每次上游决策发生实质变化，都应让相关下游产物失效并重新审批，不能静默覆盖。
@@ -350,9 +393,17 @@ node plugins/codex-novel/dist/novelctl.cjs milestone novels/my-story --type shor
 node plugins/codex-novel/dist/novelctl.cjs milestone novels/my-story --type volume
 ```
 
+查看长篇剧情线是否闲置、库存是否健康：
+
+```bash
+node plugins/codex-novel/dist/novelctl.cjs arcs novels/my-story
+node plugins/codex-novel/dist/novelctl.cjs cadence novels/my-story
+node plugins/codex-novel/dist/novelctl.cjs cadence novels/my-story --published-through 20
+```
+
 ## `novelctl` 命令
 
-所有命令都使用以下形式：
+大多数命令使用以下形式；`revision` 和 `metrics import` 会在工作区前多一个动作名：
 
 ```bash
 node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
@@ -365,6 +416,8 @@ node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
 | `validate` | 检查结构、状态与文件指纹一致性 |
 | `cards` | 查看当前动态角色卡和剧情卡 |
 | `topics` | 检查市场扫描、候选题和选题决策 |
+| `hooks` | 检查多开篇钩子、盲测信号和淘汰记录 |
+| `arcs` | 检查跨卷主线、支线、角色弧和闲置剧情线 |
 | `phase` | 推进作品级阶段 |
 | `context` | 为当前章节编译有界上下文 |
 | `quality` | 对草稿或最终正文执行机械质量检查 |
@@ -375,8 +428,15 @@ node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
 | `index` | 重建可删除的 SQLite 全文检索索引 |
 | `search` | 从索引中查找仍与权威源文件一致的候选资料 |
 | `invalidate` | 在上游决策变化时显式作废相关产物 |
-| `export` | 按章节顺序导出已提交正文 |
+| `revision` | 创建、列出或安全恢复命名修订版本 |
+| `cadence` | 查看连载库存、缓冲天数和发布进度 |
+| `metrics import` | 导入作者提供的本地章节指标 |
+| `learn` | 生成发布后假设复盘底稿 |
+| `import` | 将 Markdown/TXT 旧稿导入隔离区等待连续性提取 |
+| `export` | 导出 MD、TXT、DOCX 或 EPUB |
 | `recover` | 恢复被中断的连续性事务 |
+| `doctor` | 检查 Node.js、SQLite 和工作区健康状态 |
+| `guide` | 给出当前最安全的下一步或交互创建作品 |
 
 查看完整参数：
 
@@ -401,7 +461,24 @@ node plugins/codex-novel/dist/novelctl.cjs quality novels/my-story --source fina
 node plugins/codex-novel/dist/novelctl.cjs invalidate novels/my-story \
   --artifact foundation \
   --reason "主角身份与核心能力发生变化"
+
+# 大改前建立命名版本，必要时安全恢复
+node plugins/codex-novel/dist/novelctl.cjs revision create novels/my-story --name "第三章加强反转前"
+node plugins/codex-novel/dist/novelctl.cjs revision list novels/my-story
+node plugins/codex-novel/dist/novelctl.cjs revision restore novels/my-story --id <版本ID>
+
+# 导入旧稿；导入内容不会直接成为已验收正文
+node plugins/codex-novel/dist/novelctl.cjs import novels/old-story \
+  --source drafts/old-story.md \
+  --title "旧稿书名"
+
+# 本地导入发布指标并生成复盘底稿
+node plugins/codex-novel/dist/novelctl.cjs metrics import novels/my-story --file metrics.csv
+node plugins/codex-novel/dist/novelctl.cjs learn novels/my-story
 ```
+
+指标 CSV 至少包含 `chapter,observedAt`，可选列为
+`impressions,readers,completionRate,continuationRate,follows,comments`。两个比例字段使用 `0～1`，例如 `0.55` 表示 55%。
 
 ## 示例项目：《盐火照夜》
 
@@ -412,11 +489,13 @@ node plugins/codex-novel/dist/novelctl.cjs invalidate novels/my-story \
 - 带日期和来源的市场扫描；
 - 番茄长篇与知乎盐选短篇候选题对比；
 - 明确的选题取舍与原创保护；
+- 三个匿名开篇钩子、测试信号和淘汰记录；
 - 读者定位、作品简介、世界规则、人物和卷计划；
 - 三章合同、上下文、草稿、审稿、最终正文和连续性变化；
 - 动态角色卡与剧情卡；
 - 独立角色语言/行为档案；
 - 场景级细纲与章节情绪目标；
+- 跨卷主线与人物弧网格；
 - 绑定终稿的结构化章节交接；
 - 有授权来源的场景风格样例；
 - 可重建的全文检索索引；
@@ -477,22 +556,27 @@ npm test
 - 检索结果失效过滤；
 - 自动/手动检查点；
 - 长篇卷级与短篇整体验收分流；
-- 章节产物、指纹和连续性提交链。
+- 章节产物、指纹和连续性提交链；
+- 多开篇钩子实验门禁；
+- 跨卷弧线闲置检测；
+- 命名修订与恢复前自动备份；
+- 长篇库存与发布进度；
+- 本地指标导入和学习报告；
+- 旧稿隔离导入；
+- DOCX/EPUB 导出；
+- doctor 和下一步引导。
 
 ## 当前限制与后续方向
 
-以下能力尚未进入经过验证的 V1 核心：
+以下能力尚未进入经过验证的核心：
 
-- 导入已有长篇稿件；
 - 旧工作区的自动结构迁移；
 - 面向百万字作品的语义向量检索与分布式索引；
-- EPUB、DOCX 和平台投稿包；
+- 平台专用投稿包；
 - 番茄小说、知乎盐选的自动发布；
-- 跨卷人物弧线和子情节节拍总表；
-- 作者可见的命名版本与一键恢复界面；
-- 连载库存和更新节奏看板；
-- 基于真实发布数据的匿名复盘；
 - 可视化创作控制台。
+
+当前旧稿导入仅支持 Markdown/TXT，并保持在隔离区；发布指标需要作者主动提供 CSV；修订历史和连载节奏目前通过命令行使用，尚无可视化界面。
 
 新增能力应同时提供样例、状态迁移方案和自动化测试，避免为了功能数量破坏现有连续性保障。
 

@@ -14,6 +14,8 @@ import {
   chapterHandoffSchema,
   characterCardValueSchema,
   continuityStoreSchema,
+  arcGridSchema,
+  hookExperimentsSchema,
   topicCandidatesSchema,
   topicDecisionSchema,
   type ContinuityDomain,
@@ -114,6 +116,13 @@ export async function compileChapterContext(
   if (!selectedTopic) {
     throw new Error(`Selected topic does not exist: ${topicDecision.selectedId}.`);
   }
+  const hookExperiments = hookExperimentsSchema.parse(
+    parse(await fs.readFile(path.join(workspace, "discovery", "hook-experiments.yaml"), "utf8"))
+  );
+  const selectedHook = hookExperiments.candidates.find(
+    (candidate) => candidate.id === hookExperiments.selectedHookId
+  );
+  if (!selectedHook) throw new Error("Selected opening hook does not exist.");
   const characterProfiles = await selectCharacterProfiles(workspace, contract.participants);
   const styleProfile = await readStyleProfile(workspace);
   const styleExamples = await readStyleExamples(workspace);
@@ -121,6 +130,9 @@ export async function compileChapterContext(
   const selectedStyleExamples = styleExamples.examples
     .filter((example) => example.sceneTypes.some((sceneType) => sceneTypes.has(sceneType)))
     .slice(0, 2);
+  const arcGrid = arcGridSchema.parse(
+    parse(await fs.readFile(path.join(workspace, "planning", "arc-grid.yaml"), "utf8"))
+  );
 
   const terms = [
     ...contract.participants,
@@ -128,6 +140,18 @@ export async function compileChapterContext(
     ...contract.keywords,
     ...contract.protectedFacts
   ];
+  const normalizedTerms = terms.map((term) => term.toLocaleLowerCase());
+  const selectedArcs = arcGrid.arcs.filter((arc) => {
+    if (contract.threadIds.includes(arc.id)) return true;
+    const searchable = [
+      arc.id,
+      arc.title,
+      ...arc.promises,
+      ...arc.dependencies,
+      arc.payoffTarget.description
+    ].join("\n").toLocaleLowerCase();
+    return normalizedTerms.some((term) => searchable.includes(term));
+  });
   const retrievalCandidates = await queryRetrievalIndex(workspace, terms, 6);
   const retrievedHistory = await Promise.all(
     retrievalCandidates.map(async (candidate) => ({
@@ -193,12 +217,14 @@ export async function compileChapterContext(
     "current-focus.md",
     "discovery/topic-candidates.yaml",
     "discovery/topic-decision.yaml",
+    "discovery/hook-experiments.yaml",
     "discovery/topic-selection-report.json",
     "planning/market-position.yaml",
     "planning/story-bible.md",
     "planning/world-rules.yaml",
     "planning/characters/character-roster.md",
     "planning/volumes/current-volume.md",
+    "planning/arc-grid.yaml",
     "planning/style-profile.yaml",
     "planning/style-examples.yaml",
     ...characterProfiles.map(({ path: relative }) => relative),
@@ -315,6 +341,17 @@ export async function compileChapterContext(
     `- differentiator: ${selectedTopic.differentiator}`,
     `- originality boundaries: ${topicDecision.protectedOriginality.join("; ")}`,
     "",
+    ...(chapter <= 3
+      ? [
+          "## Accepted Opening Hook",
+          "",
+          `- title: ${selectedHook.title}`,
+          `- hypothesis: ${selectedHook.hypothesis}`,
+          `- target emotion: ${selectedHook.targetEmotion}`,
+          `- reader question: ${selectedHook.readerQuestion}`,
+          ""
+        ]
+      : []),
     "## Author Intent",
     "",
     takePrefix(await fs.readFile(path.join(workspace, "author-intent.md"), "utf8"), 1_200),
@@ -326,6 +363,22 @@ export async function compileChapterContext(
     "## Current Volume",
     "",
     takePrefix(await fs.readFile(path.join(workspace, "planning/volumes/current-volume.md"), "utf8"), 1_800),
+    "",
+    "## Relevant Cross-Volume Arcs",
+    ""
+  );
+  if (selectedArcs.length === 0) {
+    sections.push("- No matching planned arc. Do not invent a new cross-volume promise without updating the grid.");
+  } else {
+    for (const arc of selectedArcs) {
+      sections.push(
+        `- [${arc.type}/${arc.id}] ${arc.title}; status: ${arc.status}; ` +
+        `payoff: volume ${arc.payoffTarget.volume} — ${arc.payoffTarget.description}; ` +
+        `promises: ${arc.promises.join("; ")}`
+      );
+    }
+  }
+  sections.push(
     "",
     "## Relevant Continuity",
     ""

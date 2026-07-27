@@ -34,6 +34,11 @@ import { validateCurrentChapterContext } from "./context.js";
 import { readCurrentQualityReport } from "./quality.js";
 import { validateTopicSelection } from "./topics.js";
 import { loadCharacterProfiles, validateCreativeProfiles } from "./profiles.js";
+import {
+  inspectArcGrid,
+  requireProductionArcGrid,
+  validateHookExperiments
+} from "./planning.js";
 
 const PHASE_TRANSITIONS: Record<BookPhase, readonly BookPhase[]> = {
   preview: ["brief_approved"],
@@ -60,9 +65,20 @@ const WORKSPACE_DIRECTORIES = [
   "continuity/checkpoints",
   "chapters",
   "runtime/runs",
+  "runtime/revisions",
   "derived",
-  "exports"
+  "exports",
+  "publication",
+  "reports/learning",
+  "imports/chapters"
 ];
+
+const OPTIONAL_WORKSPACE_DIRECTORIES = new Set([
+  "runtime/runs",
+  "runtime/revisions",
+  "reports/learning",
+  "imports/chapters"
+]);
 
 const INITIAL_FILES: Record<string, string> = {
   "discovery/market-scan.yaml": [
@@ -100,6 +116,21 @@ const INITIAL_FILES: Record<string, string> = {
     "protectedOriginality: []",
     ""
   ].join("\n"),
+  "discovery/hook-experiments.yaml": [
+    "# (TODO: compare two or three anonymous opening-hook variants before brief approval)",
+    "schemaVersion: 1",
+    'selectedHookId: "(TODO)"',
+    "candidates: []",
+    "testProtocol:",
+    "  blindLabels: true",
+    '  targetReaders: "(TODO)"',
+    "  minimumSampleSize: 3",
+    "  questions: []",
+    "  successSignals: []",
+    "rejected: []",
+    "notes: []",
+    ""
+  ].join("\n"),
   "author-intent.md": "# Author Intent\n\nDescribe what this novel should become and what must not be lost.\n",
   "current-focus.md": "# Current Focus\n\nDescribe the focus for the next one to three chapters.\n",
   "planning/novel-brief.md": "# Novel Brief\n\n(TODO: approve the reader promise, protagonist path, conflict, and progression loop.)\n",
@@ -124,6 +155,12 @@ const INITIAL_FILES: Record<string, string> = {
   "planning/world-rules.yaml": "schemaVersion: 1\nrules: []\n",
   "planning/characters/character-roster.md": "# Character Roster\n\n(TODO)\n",
   "planning/volumes/current-volume.md": "# Current Volume Plan\n\n(TODO)\n",
+  "planning/arc-grid.yaml": [
+    "# Long serials require at least one cross-volume arc before production.",
+    "schemaVersion: 1",
+    "arcs: []",
+    ""
+  ].join("\n"),
   "planning/quality-rules.yaml": [
     "schemaVersion: 1",
     "bannedWords: []",
@@ -174,6 +211,14 @@ const INITIAL_FILES: Record<string, string> = {
   "continuity/relationships.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/characters.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/story-cards.yaml": "schemaVersion: 1\nentries: []\n",
+  "publication/serial-plan.yaml": [
+    "schemaVersion: 1",
+    "updatesPerWeek: 7",
+    "targetBufferDays: 7",
+    "publishedThroughChapter: 0",
+    "blockedDays: []",
+    ""
+  ].join("\n"),
   "runtime/events.jsonl": ""
 };
 
@@ -202,6 +247,7 @@ async function artifactFingerprint(workspace: string, artifact: ArtifactKey): Pr
       "discovery/market-scan.yaml",
       "discovery/topic-candidates.yaml",
       "discovery/topic-decision.yaml",
+      "discovery/hook-experiments.yaml",
       "discovery/topic-selection-report.json",
       "planning/novel-brief.md",
       "planning/market-position.yaml"
@@ -383,11 +429,13 @@ export async function transitionPhase(workspace: string, to: BookPhase): Promise
       "discovery/market-scan.yaml",
       "discovery/topic-candidates.yaml",
       "discovery/topic-decision.yaml",
+      "discovery/hook-experiments.yaml",
       "discovery/topic-selection-report.json",
       "planning/novel-brief.md",
       "planning/market-position.yaml"
     ]);
     await validateTopicSelection(workspace);
+    await validateHookExperiments(workspace);
   } else if (to === "foundation_approved") {
     await requireUsableFiles(workspace, [
       "planning/story-bible.md",
@@ -399,6 +447,7 @@ export async function transitionPhase(workspace: string, to: BookPhase): Promise
     await validateCreativeProfiles(workspace);
   } else if (to === "production") {
     await requireUsableFiles(workspace, ["planning/volumes/current-volume.md"]);
+    await requireProductionArcGrid(workspace);
   } else if (to === "completed" && before.workflow.chapterStatus !== "continuity_committed") {
     throw new Error("The current chapter must be continuity-committed before completing the book.");
   }
@@ -671,7 +720,17 @@ export async function validateWorkspace(workspace: string): Promise<NovelState> 
   if (state.artifacts.foundation.status === "accepted") {
     await validateCreativeProfiles(workspace);
   }
-  const requiredDirectories = WORKSPACE_DIRECTORIES.filter((relative) => relative !== "runtime/runs");
+  if (state.artifacts.brief.status === "accepted") {
+    await validateHookExperiments(workspace);
+  }
+  if (state.workflow.phase === "production" || state.workflow.phase === "completed") {
+    await requireProductionArcGrid(workspace);
+  } else if (state.artifacts.brief.status === "accepted") {
+    await inspectArcGrid(workspace);
+  }
+  const requiredDirectories = WORKSPACE_DIRECTORIES.filter(
+    (relative) => !OPTIONAL_WORKSPACE_DIRECTORIES.has(relative)
+  );
   const missingDirectories: string[] = [];
   for (const relative of requiredDirectories) {
     if (!(await pathExists(path.join(workspace, relative)))) missingDirectories.push(relative);

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import * as path from "node:path";
+import { createInterface } from "node:readline/promises";
+import { stdin, stdout } from "node:process";
 import { readState } from "./io.js";
 import { compileChapterContext } from "./context.js";
 import { getContinuityCards, recoverContinuityTransaction } from "./continuity.js";
@@ -27,6 +29,20 @@ import {
   validateWorkspace
 } from "./workspace.js";
 import { bookPhaseSchema, chapterStatusSchema } from "./schema.js";
+import { inspectArcGrid, validateHookExperiments } from "./planning.js";
+import { createRevision, listRevisions, restoreRevision } from "./revisions.js";
+import {
+  generateLearningReport,
+  importPublicationMetrics,
+  inspectCadence,
+  updatePublishedThrough
+} from "./production.js";
+import { exportDocument, importManuscript } from "./documents.js";
+import {
+  friendlyError,
+  guideWorkspace,
+  runDoctor
+} from "./diagnostics.js";
 
 function usage(): string {
   return [
@@ -39,6 +55,8 @@ function usage(): string {
     "  cards <workspace> [--json]",
     "  invalidate <workspace> --artifact brief|foundation|current-volume-plan --reason <text>",
     "  topics <workspace> [--policy-date YYYY-MM-DD]",
+    "  hooks <workspace> [--json]",
+    "  arcs <workspace> [--json]",
     "  phase <workspace> --to <phase>",
     "  context <workspace> [--max-chars 20000]",
     "  quality <workspace> [--source draft|final]",
@@ -48,8 +66,17 @@ function usage(): string {
     "  search <workspace> --query <text> [--limit 8]",
     "  advance <workspace> --to <chapter-status>",
     "  next <workspace>",
-    "  export <workspace> [--format md|txt]",
+    "  revision create <workspace> --name <name>",
+    "  revision list <workspace> [--json]",
+    "  revision restore <workspace> --id <revision-id>",
+    "  cadence <workspace> [--published-through <chapter>]",
+    "  metrics import <workspace> --file <metrics.csv>",
+    "  learn <workspace> [--json]",
+    "  import <workspace> --source <manuscript.md|txt> --title <title>",
+    "  export <workspace> [--format md|txt|docx|epub]",
     "  recover <workspace>",
+    "  doctor [workspace] [--json]",
+    "  guide [workspace]",
     "",
     "Book phases: preview, brief_approved, foundation_approved, production, completed",
     "Chapter statuses: not_started, planned, drafted, reviewed, accepted, continuity_committed"
@@ -62,11 +89,108 @@ function option(args: readonly string[], name: string): string | undefined {
   return args[index + 1];
 }
 
+async function interactiveGuide(): Promise<void> {
+  if (!stdin.isTTY || !stdout.isTTY) {
+    throw new Error("guide without a workspace requires an interactive terminal.");
+  }
+  const prompt = createInterface({ input: stdin, output: stdout });
+  try {
+    const workspace = (await prompt.question("作品目录（例如 novels/my-story）：")).trim();
+    const title = (await prompt.question("书名：")).trim();
+    const platform = (await prompt.question("目标平台（fanqie / zhihu-salt）：")).trim();
+    const form = (await prompt.question("作品形态（long-serial / short-complete）：")).trim();
+    const genre = (await prompt.question("题材偏好：")).trim();
+    if (!workspace || !title) throw new Error("作品目录和书名不能为空。");
+    if (platform !== "fanqie" && platform !== "zhihu-salt") {
+      throw new Error("目标平台只能是 fanqie 或 zhihu-salt。");
+    }
+    if (form !== "long-serial" && form !== "short-complete") {
+      throw new Error("作品形态只能是 long-serial 或 short-complete。");
+    }
+    const resolved = path.resolve(workspace);
+    await initializeWorkspace(resolved, { title });
+    console.log(
+      `\n已创建：${resolved}\n\n请在 Codex 中发送：\n` +
+      `请读取 Codex Novel Skill，继续 ${resolved}。目标平台：${platform}；` +
+      `作品形态：${form}；题材：${genre || "待探索"}。先完成市场扫描、候选选题和开篇钩子实验，不要直接写正文。`
+    );
+  } finally {
+    prompt.close();
+  }
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const command = args[0];
   if (!command || command === "help" || command === "--help") {
     console.log(usage());
+    return;
+  }
+
+  if (command === "doctor") {
+    const workspaceArg = args[1]?.startsWith("--") ? undefined : args[1];
+    const result = await runDoctor(workspaceArg);
+    console.log(
+      args.includes("--json")
+        ? JSON.stringify(result, null, 2)
+        : result.checks.map(
+          (check) =>
+            `${check.ok ? "✓" : "✗"} ${check.message}` +
+            (check.action ? `\n  下一步：${check.action}` : "")
+        ).join("\n")
+    );
+    if (!result.ok) process.exitCode = 2;
+    return;
+  }
+
+  if (command === "guide" && !args[1]) {
+    await interactiveGuide();
+    return;
+  }
+
+  if (command === "revision") {
+    const action = args[1];
+    const revisionWorkspace = args[2];
+    if (!revisionWorkspace) throw new Error("revision requires create/list/restore and a workspace path.");
+    const workspace = path.resolve(revisionWorkspace);
+    if (action === "create") {
+      const name = option(args, "--name");
+      if (!name) throw new Error("revision create requires --name.");
+      const revision = await createRevision(workspace, name);
+      console.log(args.includes("--json") ? JSON.stringify(revision, null, 2) : `已创建修订版本 ${revision.id}：${revision.name}`);
+      return;
+    }
+    if (action === "list") {
+      const revisions = await listRevisions(workspace);
+      console.log(
+        args.includes("--json")
+          ? JSON.stringify(revisions, null, 2)
+          : revisions.length === 0
+            ? "还没有命名修订版本。"
+            : revisions.map((revision) => `- ${revision.id} ${revision.name} (${revision.createdAt})`).join("\n")
+      );
+      return;
+    }
+    if (action === "restore") {
+      const id = option(args, "--id");
+      if (!id) throw new Error("revision restore requires --id.");
+      const result = await restoreRevision(workspace, id);
+      console.log(
+        `已恢复版本 ${result.restored.id}；恢复前状态已自动保存为 ${result.safetyRevision.id}。`
+      );
+      return;
+    }
+    throw new Error("revision action must be create, list, or restore.");
+  }
+
+  if (command === "metrics") {
+    if (args[1] !== "import" || !args[2]) {
+      throw new Error("Use metrics import <workspace> --file <metrics.csv>.");
+    }
+    const source = option(args, "--file");
+    if (!source) throw new Error("metrics import requires --file.");
+    const result = await importPublicationMetrics(path.resolve(args[2]), path.resolve(source));
+    console.log(args.includes("--json") ? JSON.stringify(result, null, 2) : `已导入 ${result.imported} 条发布指标，共 ${result.total} 条。`);
     return;
   }
 
@@ -192,6 +316,32 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "hooks") {
+    const experiment = await validateHookExperiments(workspace);
+    console.log(
+      json
+        ? JSON.stringify(experiment, null, 2)
+        : `开篇钩子实验有效：${experiment.candidates.length} 个候选，选择 ${experiment.selectedHookId}，` +
+          `${experiment.rejected.length} 个方案已记录淘汰原因。`
+    );
+    return;
+  }
+
+  if (command === "arcs") {
+    const { report } = await inspectArcGrid(workspace);
+    console.log(
+      json
+        ? JSON.stringify(report, null, 2)
+        : [
+            `弧线总数：${report.totalArcs}；活跃：${report.activeArcs}；闲置超限：${report.idleArcs.length}`,
+            `待兑现：${report.payoffDebt.length}`,
+            ...report.warnings.map((warning) => `- ${warning}`)
+          ].join("\n")
+    );
+    if (report.idleArcs.length > 0) process.exitCode = 2;
+    return;
+  }
+
   if (command === "advance") {
     const to = chapterStatusSchema.parse(option(args, "--to"));
     const state = await advanceChapter(workspace, to);
@@ -300,12 +450,51 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "cadence") {
+    const published = option(args, "--published-through");
+    const report = published === undefined
+      ? await inspectCadence(workspace)
+      : await updatePublishedThrough(workspace, Number(published));
+    console.log(
+      json
+        ? JSON.stringify(report, null, 2)
+        : report.applicable
+          ? `库存 ${report.readyInventory} 章，约 ${report.bufferDays} 天，健康状态：${report.health}。`
+          : "短篇完结项目不使用连载库存。"
+    );
+    return;
+  }
+
+  if (command === "learn") {
+    const result = await generateLearningReport(workspace);
+    console.log(json ? JSON.stringify(result, null, 2) : `已生成发布后复盘底稿：${result.output}`);
+    return;
+  }
+
+  if (command === "import") {
+    const source = option(args, "--source");
+    const title = option(args, "--title");
+    if (!source || !title) throw new Error("import requires --source and --title.");
+    const result = await importManuscript(workspace, path.resolve(source), title);
+    console.log(
+      `已识别 ${result.chapters} 个章节。导入内容尚未成为权威正文；请先让 Codex 提取人物、时间线和伏笔：${result.manifest}`
+    );
+    return;
+  }
+
   if (command === "export") {
     const formatOption = option(args, "--format") ?? "md";
-    if (formatOption !== "md" && formatOption !== "txt") {
-      throw new Error("export --format must be md or txt.");
+    if (
+      formatOption !== "md" &&
+      formatOption !== "txt" &&
+      formatOption !== "docx" &&
+      formatOption !== "epub"
+    ) {
+      throw new Error("export --format must be md, txt, docx, or epub.");
     }
-    const result = await exportNovel(workspace, formatOption);
+    const result = formatOption === "docx" || formatOption === "epub"
+      ? await exportDocument(workspace, formatOption)
+      : await exportNovel(workspace, formatOption);
     console.log(
       json
         ? JSON.stringify(result, null, 2)
@@ -320,11 +509,17 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "guide") {
+    const result = await guideWorkspace(workspace);
+    console.log(`# ${result.title}\n\n下一步：${result.nextAction}\n\n可复制给 Codex：\n${result.prompt}`);
+    return;
+  }
+
   throw new Error(`Unknown command: ${command}\n\n${usage()}`);
 }
 
 main().catch((error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
-  console.error(`novelctl: ${message}`);
+  console.error(`novelctl: ${friendlyError(message)}`);
   process.exitCode = 1;
 });

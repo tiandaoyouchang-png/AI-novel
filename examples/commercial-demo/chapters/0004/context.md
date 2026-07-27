@@ -176,6 +176,11 @@
 
 半枚无字火漆与沈父旧账使用同一种北泽蜡。顾青昭收到新密令：案子可以结，沈砚必须进京。
 
+## Relevant Cross-Volume Arcs
+
+- [main-plot/card-main-green-salt] 夜航簿与盐仓黑账; status: active; payoff: volume 3 — 让沈砚公开父亲留下的分布式证据并迫使幕后主使现身; promises: 查明夜航簿记录的走私网络; 解释沈父失踪与盐仓黑账的关系
+- [character-arc/card-arc-shen-agency] 沈砚从被迫补账到主动存证; status: active; payoff: volume 2 — 沈砚在妹妹安全与公开证据之间作出不可撤回的主动选择; promises: 沈砚必须正面承担三年前补假账的责任; 他要从保护唯一账本转向保护共同作证的人
+
 ## Relevant Continuity
 
 - [facts/fact-evidence-distributed] {"statement":"东字三、地字十九、玄字七三个异常袋号已分别交由在场脚夫记忆，顾青昭掌握全部三个。","certainty":"observed"} (source chapter 3; evidence: 沈砚在火场喊出袋号，顾青昭复述并指定三名脚夫分别记忆。)
@@ -227,12 +232,14 @@
 - current-focus.md: d92058e62a7a528684192e954f75bda5d193ccf156c15ebbd98c00113871a45f
 - discovery/topic-candidates.yaml: a624f3a217d6e5d75273fd233957a643471ebf1408d70e6d22c3fab7026fef2f
 - discovery/topic-decision.yaml: c377f4fb52a73d764417f64bee762b47773f06d598192183fd65569e18cfb1ee
+- discovery/hook-experiments.yaml: 50b738eb4ba2d5ad45cd7d8abde258504b49d7363be8c93b374391db9f4a95a2
 - discovery/topic-selection-report.json: 510e1cb850eedfec19f3f189a00570920767483c9739ea7d64929dce98d92ba0
 - planning/market-position.yaml: cb7f88cd98d4093c8c135370643369007e3441a16e408759f9fe6c9f3c8d0b9a
 - planning/story-bible.md: 031001f8339f0ecafbf4c4b8010347ca2dd9ae5161038b13bc1f77d62a69ebc2
 - planning/world-rules.yaml: 17fddd2509ac93e642fa9d50b86f71e15a884f109c2acaf3b5c2d9bb05b8cb47
 - planning/characters/character-roster.md: 1bb3fe96eb05bd0b0bf6816edc2b0fcf99ad4d496f126541c593524d66d4974e
 - planning/volumes/current-volume.md: 13d062d5401af0d9786c115035c780707eda26c6ddaf951cc3e6e11e55965638
+- planning/arc-grid.yaml: 1b90ae8f208ed4635f02b9c538dd2c8eabbbcee2f485b9a7af7bcf6c2e2fd12d
 - planning/style-profile.yaml: 08c4d64a13f91e3c9672dbb59e81bda1b2bf1f72933603dca9744a0220763b51
 - planning/style-examples.yaml: 7015b80b853312698ec3e523e77816f39212e28e3e388c30ffe8e9dd282d0b17
 - planning/characters/char-gu-qingzhao.yaml: b39f52f3b0250e7e852c3087fc73268599efd6045ff5824fc5c9eb819db4938b

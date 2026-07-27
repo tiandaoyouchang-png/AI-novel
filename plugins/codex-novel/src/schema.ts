@@ -756,6 +756,222 @@ export const topicDecisionSchema = z
   })
   .strict();
 
+export const hookExperimentsSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    selectedHookId: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+    candidates: z
+      .array(
+        z
+          .object({
+            id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+            title: z.string().min(1),
+            hypothesis: z.string().min(1),
+            openingSample: z.string().min(80).max(4_000),
+            targetEmotion: z.string().min(1),
+            readerQuestion: z.string().min(1),
+            risks: z.array(z.string().min(1)).min(1)
+          })
+          .strict()
+      )
+      .min(2)
+      .max(3),
+    testProtocol: z
+      .object({
+        blindLabels: z.literal(true),
+        targetReaders: z.string().min(1),
+        minimumSampleSize: z.number().int().min(3),
+        questions: z.array(z.string().min(1)).min(2),
+        successSignals: z.array(z.string().min(1)).min(1)
+      })
+      .strict(),
+    rejected: z
+      .array(
+        z
+          .object({
+            id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+            reason: z.string().min(1)
+          })
+          .strict()
+      )
+      .min(1),
+    notes: z.array(z.string().min(1)).default([])
+  })
+  .strict()
+  .superRefine((experiment, context) => {
+    const ids = experiment.candidates.map((candidate) => candidate.id);
+    if (new Set(ids).size !== ids.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["candidates"],
+        message: "Hook candidate IDs must be unique."
+      });
+    }
+    if (!ids.includes(experiment.selectedHookId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["selectedHookId"],
+        message: "Selected hook must reference a candidate."
+      });
+    }
+    const rejectedIds = experiment.rejected.map((candidate) => candidate.id);
+    if (new Set(rejectedIds).size !== rejectedIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["rejected"],
+        message: "Rejected hook IDs must be unique."
+      });
+    }
+    if (rejectedIds.includes(experiment.selectedHookId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["rejected"],
+        message: "Selected hook cannot also be rejected."
+      });
+    }
+    const expectedRejected = ids.filter((id) => id !== experiment.selectedHookId);
+    if (
+      expectedRejected.length !== rejectedIds.length ||
+      expectedRejected.some((id) => !rejectedIds.includes(id))
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["rejected"],
+        message: "Every unselected hook must have a rejection reason."
+      });
+    }
+  });
+
+export const arcGridSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    arcs: z.array(
+      z
+        .object({
+          id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+          type: z.enum(["main-plot", "subplot", "character-arc", "mystery", "relationship"]),
+          title: z.string().min(1),
+          status: z.enum(["planned", "active", "dormant", "resolved", "abandoned"]),
+          introducedIn: z
+            .object({
+              volume: z.number().int().positive(),
+              chapter: z.number().int().positive().nullable()
+            })
+            .strict(),
+          promises: z.array(z.string().min(1)).min(1),
+          dependencies: z.array(z.string().min(1)),
+          payoffTarget: z
+            .object({
+              volume: z.number().int().positive(),
+              chapter: z.number().int().positive().nullable(),
+              description: z.string().min(1)
+            })
+            .strict(),
+          lastAdvancedChapter: z.number().int().nonnegative(),
+          maxIdleChapters: z.number().int().positive(),
+          dormantReason: z.string().min(1).nullable(),
+          volumeBeats: z
+            .array(
+              z
+                .object({
+                  volume: z.number().int().positive(),
+                  objective: z.string().min(1),
+                  status: z.enum(["planned", "active", "delivered", "changed", "dropped"]),
+                  payoffDebt: z.string().min(1)
+                })
+                .strict()
+            )
+            .min(1)
+        })
+        .strict()
+    )
+  })
+  .strict()
+  .superRefine((grid, context) => {
+    const ids = new Set<string>();
+    for (const [index, arc] of grid.arcs.entries()) {
+      if (ids.has(arc.id)) {
+        context.addIssue({
+          code: "custom",
+          path: ["arcs", index, "id"],
+          message: `Duplicate arc ID: ${arc.id}`
+        });
+      }
+      if (arc.status === "dormant" && !arc.dormantReason) {
+        context.addIssue({
+          code: "custom",
+          path: ["arcs", index, "dormantReason"],
+          message: "A deliberately dormant arc requires a reason."
+        });
+      }
+      const volumes = arc.volumeBeats.map((beat) => beat.volume);
+      if (new Set(volumes).size !== volumes.length) {
+        context.addIssue({
+          code: "custom",
+          path: ["arcs", index, "volumeBeats"],
+          message: "An arc can have only one beat per volume."
+        });
+      }
+      ids.add(arc.id);
+    }
+  });
+
+export const serialPlanSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    updatesPerWeek: z.number().int().min(1).max(21),
+    targetBufferDays: z.number().int().min(1).max(90),
+    publishedThroughChapter: z.number().int().nonnegative(),
+    blockedDays: z.array(
+      z
+        .object({
+          date: isoDateSchema,
+          reason: z.string().min(1)
+        })
+        .strict()
+    )
+  })
+  .strict();
+
+export const publicationMetricSchema = z
+  .object({
+    chapter: z.number().int().positive(),
+    observedAt: isoDateSchema,
+    impressions: z.number().int().nonnegative().optional(),
+    readers: z.number().int().nonnegative().optional(),
+    completionRate: z.number().min(0).max(1).optional(),
+    continuationRate: z.number().min(0).max(1).optional(),
+    follows: z.number().int().nonnegative().optional(),
+    comments: z.number().int().nonnegative().optional()
+  })
+  .strict();
+
+export const revisionManifestSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+    name: z.string().min(1),
+    createdAt: z.string().datetime(),
+    stateFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    baseRevisionId: z.string().nullable(),
+    files: z.array(
+      z
+        .object({
+          path: z.string().min(1),
+          fingerprint: z.string().regex(/^[a-f0-9]{64}$/)
+        })
+        .strict()
+    ),
+    diffSummary: z
+      .object({
+        added: z.array(z.string()),
+        changed: z.array(z.string()),
+        removed: z.array(z.string())
+      })
+      .strict()
+  })
+  .strict();
+
 const topicRankingSchema = z
   .object({
     id: z.string().min(1),
@@ -1086,6 +1302,11 @@ export type WorkForm = z.infer<typeof workFormSchema>;
 export type MarketScan = z.infer<typeof marketScanSchema>;
 export type TopicCandidates = z.infer<typeof topicCandidatesSchema>;
 export type TopicDecision = z.infer<typeof topicDecisionSchema>;
+export type HookExperiments = z.infer<typeof hookExperimentsSchema>;
+export type ArcGrid = z.infer<typeof arcGridSchema>;
+export type SerialPlan = z.infer<typeof serialPlanSchema>;
+export type PublicationMetric = z.infer<typeof publicationMetricSchema>;
+export type RevisionManifest = z.infer<typeof revisionManifestSchema>;
 export type TopicSelectionReport = z.infer<typeof topicSelectionReportSchema>;
 export type StoryMilestoneType = z.infer<typeof storyMilestoneTypeSchema>;
 

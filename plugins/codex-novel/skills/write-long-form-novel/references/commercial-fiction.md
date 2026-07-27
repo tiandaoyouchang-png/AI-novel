@@ -59,6 +59,8 @@ Keep two judgments separate:
 
 A commercial review must cite chapter evidence and name the next bounded action. It must also define a target-reader hypothesis and observable success signal. Internal `pass` means “ready for reader testing,” never “proven market success.”
 
+Before brief approval, compare two or three genuinely different openings for the selected topic. Blind labels must hide the author's preferred option, and every alternative must preserve the same core premise so the test compares openings rather than unrelated books. Record selection and rejection reasons even when no external test is available.
+
 ## Chapter economics
 
 Every chapter must earn its place. Require:
@@ -96,6 +98,8 @@ Give each volume:
 
 Plan the current volume firmly and distant volumes lightly. Replan when the engine changes; do not force chapters to obey stale outlines.
 At a volume boundary, run `novelctl milestone --type volume`; it generates form-specific review dimensions and a named continuity checkpoint.
+
+Use `planning/arc-grid.yaml` to make cross-volume promises and payoff debt visible. An active line that exceeds its declared idle limit requires an explicit advance, dormancy reason, merge, payoff, or abandonment decision. Do not create a chapter merely to touch every subplot.
 
 ## Review priorities
 
