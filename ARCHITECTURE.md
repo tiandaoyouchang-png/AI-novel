@@ -67,7 +67,7 @@ Every state transition:
 
 Failed validation must not modify authoritative state.
 
-Continuity commit is a journaled multi-file transaction. It validates the accepted prose fingerprint, snapshots every affected YAML store and state, writes a pending marker, applies deterministic changes, commits state last, and clears the marker. The seven stores cover facts, timeline, threads, resources, relationships, dynamic character cards, and dynamic story cards. `novelctl recover` restores the before snapshot after an interrupted commit.
+Continuity commit is a journaled multi-file transaction. It validates the accepted prose fingerprint, snapshots every affected YAML store, reveal policy, and state, writes a pending marker, applies deterministic changes, commits state last, and clears the marker. The eight stores cover facts, timeline, threads, resources, relationships, dynamic character cards, dynamic story cards, and graded evidence. Reveal statuses used by accepted prose are updated in the same transaction. `novelctl recover` restores the before snapshot after an interrupted commit.
 
 ## Implemented production safeguards
 
@@ -78,13 +78,15 @@ Continuity commit is a journaled multi-file transaction. It validates the accept
 - a topic-selection report whose source fingerprints are bound to brief approval;
 - structured market positioning bound to the brief and enforced by chapter length contracts;
 - strict chapter contracts, reviews, quality reports, continuity stores, and deltas;
-- schema-v2 chapter contracts with emotional targets and scene-level goal/conflict/value-change plans;
+- schema-v3 chapter contracts with scope, capability, investigation, evidence, reveal, coincidence, agency, consequence, period, and scene-level obligations;
+- foundation-level premise, scale, ability, period, consequence, and prohibited-shortcut guardrails;
+- graded evidence records plus earliest/target/latest reveal windows and prerequisite checks;
 - cross-volume main-plot, subplot, mystery, relationship, and character-arc grids with idle-line detection;
 - stable per-character motivation/voice profiles selected only for chapter participants;
 - abstract style profiles plus user-owned, authorized, or public-domain scene examples;
 - bounded context compilation using contract IDs, scene types, active continuity, structured handoffs, and verified retrieval candidates;
 - dynamic character/story cards, dead-character onstage blocking, and redacted hidden-knowledge IDs;
-- structured review checks for character voice, information boundaries, and scene value changes with a hard two-round repair budget;
+- ten structured review checks covering voice, information, scene change, premise, scope, abilities, evidence, period, supporting-character agency, and consequences, with a hard two-round repair budget;
 - fingerprint-bound structured chapter handoffs instead of rolling free-text summaries;
 - rebuildable SQLite full-text retrieval whose stale candidates are discarded before source re-read;
 - interval/manual checkpoints and separate opening, short-complete, and volume milestones;
@@ -105,7 +107,6 @@ Continuity commit is a journaled multi-file transaction. It validates the accept
 
 - schema migration for version-1 workspaces;
 - platform-specific publishing packages;
-- chapter-number reveal policies for facts beyond the current hidden-ID redaction;
 - automatic platform publication and account integrations;
 - centralized anonymous telemetry; current metrics remain local and author-supplied;
 - semantic/vector retrieval beyond the current fingerprint-checked SQLite index;

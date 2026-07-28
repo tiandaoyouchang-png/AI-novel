@@ -34,6 +34,59 @@
 - value shift: 只有沈砚理解的暗线转为盟友可独立复核的协议。
 - emotional change: 被保护在外转为主动进入行动线。
 
+## Story Guardrails
+
+- core premise: 不会武功的账房沈砚，用重量、账目和盐务漏洞调查临河县赈盐失踪案。
+- signature mechanism: 每次关键推进必须来自重量、封印、脚程、税票或账目之间可复核的矛盾。
+- protected elements: 沈砚不会武功，不能正面击败职业杀手。; 第一卷只解决临河县三万斤赈盐去向及本地责任链。; 证据必须经过提出解释、排除替代项、交叉验证和说明局限。
+- forbidden drift: 不升级为全国谋反、皇位争夺、禁术剑法或皇帝特赐解决案件。; 不用新幕后人物套娃代替对已有事实的重新解释。
+- maximum story scope: county
+- maximum hidden antagonist layers: 1
+- prohibited shortcuts: 反派亲口说出全部计划; 恰好发现完整密账; 果然不同凡响; 沈砚真厉害; 尚方宝剑; 破晓剑法
+- period: 架空古代县域盐政
+- institutional constraints: 账房与医者发现的异常只能形成调查方向，必须经书吏记录、证人证言、物证核验或堂审质证才能成为案证。; 县衙、府衙、转运司与盐商的权限和利益必须在行动前说明，不能由上级官员临场一句话解决。
+- physical constraints: 盐样、载重、水线、纸张与毒性判断必须说明观察方法、对照物和结论局限。; 同一封信、同一件物证和同一人物不能同时出现在互斥地点或状态。
+
+## Chapter Guardrail Commitments
+
+- scope level: county
+- antagonist layer: 1/1
+- outcome cost: 沈砚建立了可分发的证据协议，但沈禾和顾青昭因此各自暴露一条原本安全的人情线。
+- lasting failure consequence: 即使编码被识破，县衙重做的假账仍会进入钦差初验，且被暴露的人情线不能自动恢复。
+- scheduled reveals: none
+- coincidences used: 0/0
+
+### Capability Uses
+
+- 沈砚/evidence-protocol: 把异常袋号编码进经手顺序，让账外盟友能独立复核。; support: 沈禾
+- 周嵩/county-procedure: 用县衙书吏、统一口径和逐笔监看限制沈砚。
+- 顾青昭/protected-channel: 判断是否承担身份暴露代价，启用一次有限御史渠道。
+- 沈禾/medicine-code: 独立识别药方剂量对应的异常袋号。
+
+### Investigation Chain
+
+- anomaly: 周嵩要求重做的赈盐损耗能够在总数上自洽，却无法解释三个异常袋号的经手顺序。
+- alternative explanations: 三个袋号只是火场后抄录混乱造成的偶然错序。; 有人用统一损耗口径掩盖同一批盐在多个经手环节被替换。
+- elimination tests: 比较袋号、经手顺序、脚夫记忆与药方剂量映射，检查错序是否能由单次誊抄解释。
+- result: 三个袋号的错序跨越不同经手人，不能由一次誊抄失误解释，形成可外部复核的调查方向。
+- limitation: 该编码只能证明货路需要复核，不能直接证明周嵩或任何具体经手人有罪。
+
+### Supporting Character Agency
+
+- 顾青昭: goal=保住病案调查与御史线，不让沈砚单方面决定她承担的身份风险。; decision=暂不公开御史身份，只发送一条可否认的核验请求。
+- 沈禾: goal=保护药铺与脚夫，不再只接受不知风险的跑腿任务。; decision=先独立复核药方编码，再自行选择一名可信脚夫执行，不把完整名单交给沈砚。
+
+### Period and Countermove Checks
+
+- physical: 编码依赖账目经手顺序、纸面数字与药方剂量，不依赖照片、化验或现代通信。
+- institutional: 御史渠道只提供有限核验，不能替代县衙证据登记、证人证言与后续质证。
+- vocabulary: 使用账房、书吏、盐引、脚夫和药方等时代内词汇，不使用媒体或鉴定报告。
+- antagonist countermove: 周嵩安排两名书吏逐笔监看，并用总数自洽的损耗口径掩护经手错序。
+
+## Reveal Schedule
+
+- No reveal is scheduled for this chapter. Do not reveal protected answers early.
+
 ## Character Profiles
 
 ### 顾青昭 (char-gu-qingzhao)
@@ -207,6 +260,7 @@
 - [characters/char-zhou-song] {"name":"周嵩","lifeStatus":"alive","currentLocation":"临河县义仓前院","currentGoal":"以重做总账为名控制沈砚和幸存证据","knowledgeIds":["fact-evidence-distributed"],"hiddenKnowledgeIds":[],"condition":["公开维持清名","幕后责任未证实"]} (source chapter 3; evidence: 周嵩当众召沈砚进入县衙重做焚毁总账。)
 - [storyCards/card-arc-shen-agency] {"type":"character-arc","status":"active","summary":"沈砚从替权力补账的被动账房转向让证据由普通人共同保存的行动者。","currentBeat":"放弃唯一总账，选择救人并分散证据。","nextPressure":"在再次被迫做假账时守住主动选择与妹妹安全。","characterIds":["char-shen-yan","char-zhou-song"],"threadIds":["thread-father-ledger"],"payoffDebt":"让沈砚正面承担三年前补假账的责任，而非只把它当作外部把柄。"} (source chapter 3; evidence: 第三章终稿中沈砚用多份人证替代唯一账本。)
 - [storyCards/card-main-green-salt] {"type":"main-plot","status":"active","summary":"沈砚追查赈盐调包与反向货路。","currentBeat":"救人取代抢账，袋号证据被分散，父亲残页指向城外安民营。","nextPressure":"沈砚必须在县令眼皮下做出可被复核的假账。","characterIds":["char-shen-yan","char-gu-qingzhao","char-han-jiu","char-zhou-song"],"threadIds":["thread-green-salt","thread-father-ledger","thread-warehouse-fire"],"payoffDebt":"查明反向货路、纵火安排与周嵩控制沈砚之间的因果链。"} (source chapter 3; evidence: 第三章终稿兑现韩九生还，并把主线升级到县衙内的强制合作。)
+- [evidence/evidence-abnormal-bag-numbers] {"kind":"association","status":"corroborated","summary":"东字三、地字十九、玄字七三个异常袋号由不同脚夫分别记住，顾青昭能独立复述。","supportsClaimIds":["claim-bag-numbers-cross-location"],"contradictsClaimIds":["claim-single-clerical-error"],"sourceIds":["chapter-0003-final","witness-footmen"],"verificationMethod":"三名脚夫隔离复述后，与顾青昭记录交叉核对。","limitations":["只能证明三个袋号值得追查，不能证明调包者或县令责任。"],"expectedRevealChapter":null,"revealedChapter":3} (source chapter 3; evidence: 第三章火场中分散记忆并完成相互独立复述。)
 
 ## Retrieved History Candidates
 
@@ -236,6 +290,8 @@
 - discovery/topic-selection-report.json: 510e1cb850eedfec19f3f189a00570920767483c9739ea7d64929dce98d92ba0
 - planning/market-position.yaml: cb7f88cd98d4093c8c135370643369007e3441a16e408759f9fe6c9f3c8d0b9a
 - planning/story-bible.md: 031001f8339f0ecafbf4c4b8010347ca2dd9ae5161038b13bc1f77d62a69ebc2
+- planning/story-guardrails.yaml: 5d199c1bc1913e37e91bda605bdb1bb859668080a12f2152bc1f1043fef9ff0f
+- planning/reveal-policy.yaml: ff5386c0c842c11b2ddc0316efbc11da2f04430823b7913d7efdbcd23734e2a8
 - planning/world-rules.yaml: 17fddd2509ac93e642fa9d50b86f71e15a884f109c2acaf3b5c2d9bb05b8cb47
 - planning/characters/character-roster.md: 1bb3fe96eb05bd0b0bf6816edc2b0fcf99ad4d496f126541c593524d66d4974e
 - planning/volumes/current-volume.md: 13d062d5401af0d9786c115035c780707eda26c6ddaf951cc3e6e11e55965638
@@ -253,7 +309,8 @@
 - continuity/relationships.yaml: f2cf93ff009790f756c6e363b4f631d9a0688d6acfc13bf8faf58a20bad12428
 - continuity/characters.yaml: 097da709b4adc01466ccc53dc2494ad04a15eb24356374e41f3be048a96e19b7
 - continuity/story-cards.yaml: d7220ee0fc783216928b4c9efdf3efea3f0af549a69e08a760aaf6004c4720fc
-- chapters/0004/contract.yaml: 4dbe585910af4c6f42145e8d11e5866197f8dbaf3cc3d88e8d983b2d574a81b8
+- continuity/evidence.yaml: 047368a24a9995b40323c778ce5227878a80fc7156810196b4493471072e3f7a
+- chapters/0004/contract.yaml: 2211261051ad95963b7c3833636c568361aefc0e31c31b0d299ac8f952082537
 - chapters/0003/final.md: 71ee78dd37f44c56fd7d9c1f32cd3043f0e474f06f097afdd8f125c48663a550
 - chapters/0003/handoff.yaml: c0cf132da0b0e6c904c44acb69f981f2914bf6fca6b675fc25e1743cf7801f30
 

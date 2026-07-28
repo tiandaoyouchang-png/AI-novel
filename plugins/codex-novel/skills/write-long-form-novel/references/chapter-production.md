@@ -2,9 +2,9 @@
 
 ## Chapter contract
 
-Write schema-v2 `chapters/NNNN/contract.yaml` with:
+Write schema-v3 `chapters/NNNN/contract.yaml` with:
 
-- `schemaVersion: 2`;
+- `schemaVersion: 3`;
 - chapter number and title;
 - immediate goal and resistance;
 - required events and protected facts;
@@ -17,6 +17,15 @@ Write schema-v2 `chapters/NNNN/contract.yaml` with:
 - one emotional target for the chapter;
 - one or more scene beats, each with a stable ID, scene type, location, participants, goal, conflict, value shift, and emotional change;
 - target length and acceptable range.
+- `scopeLevel` and `antagonistLayer`, which cannot exceed the accepted foundation ceilings;
+- every `capabilityUse`, bound to an allowed character capability and required support;
+- an `investigationChain` for investigation scenes: anomaly, at least two alternative explanations, elimination tests, result, and limitation;
+- `evidenceMoves` that distinguish discover, hypothesize, test, corroborate, challenge, and admit;
+- scheduled `revealIds`, never earlier than their reveal window and only after corroborated prerequisites;
+- an explicit coincidence list within the chapter budget;
+- an independent goal and decision for each configured supporting character who appears;
+- `outcomeCost` and a lasting `failureConsequence`;
+- physical, institutional, vocabulary, and antagonist-countermove checks.
 
 Use arrays for required events, protected facts, prohibited crossings, participants, locations, thread IDs, resource IDs, relationship IDs, world-rule IDs, and keywords.
 
@@ -31,6 +40,7 @@ Run `novelctl quality --source draft` before review and `--source final` before 
 
 - requested length range;
 - banned words and explicit no-go rules;
+- prohibited modern terms and literal narrative shortcuts from the accepted story guardrails;
 - duplicate paragraphs or suspicious repeated n-grams;
 - required names and events;
 - obvious POV or tense drift;
@@ -38,10 +48,10 @@ Run `novelctl quality --source draft` before review and `--source final` before 
 
 ## Review
 
-Write schema-v2 `review.yaml`:
+Write schema-v3 `review.yaml`:
 
 ```yaml
-schemaVersion: 2
+schemaVersion: 3
 reviewRound: 1 # or 2
 sourceFingerprint: "<sha256 of the exact draft being reviewed>"
 verdict: pass | repair | replan
@@ -55,9 +65,30 @@ checks:
   sceneValueChanges:
     status: pass | fail
     evidence: concise source-bound evidence
+  corePremiseAlignment:
+    status: pass | fail
+    evidence: how the signature mechanism, not generic escalation, causes the turn
+  scopeDiscipline:
+    status: pass | fail
+    evidence: why the conflict stays inside the approved scale
+  capabilityBoundaries:
+    status: pass | fail
+    evidence: every decisive ability was declared or supported
+  evidenceChain:
+    status: pass | fail
+    evidence: anomaly, alternatives, verification, corroboration, and limitation
+  periodAuthenticity:
+    status: pass | fail
+    evidence: physical method, vocabulary, and institutional path
+  supportingCharacterAgency:
+    status: pass | fail
+    evidence: each present supporting character makes an independent decision
+  consequenceIntegrity:
+    status: pass | fail
+    evidence: failure is not an automatic reward and costs persist
 blockingIssues:
   - id: issue-001
-    category: continuity | causality | character | information | scene | pacing | style | contract
+    category: continuity | causality | character | information | scene | pacing | style | contract | scope | capability | evidence | period | consequence
     evidence: concise location or fact
     repair: bounded instruction
 warnings: []
@@ -65,7 +96,7 @@ warnings: []
 
 Use `repair` for local problems and `replan` only when the chapter responsibility is structurally impossible. Do not rewrite prose inside the review.
 
-A passing review requires all three explicit checks to pass. A non-passing review must fail at least one check and identify a blocking issue. After review round two, do not start a third automatic rewrite; stop for author direction.
+A passing review requires all ten explicit checks to pass. A non-passing review must fail at least one check and identify a blocking issue. After any repair, recheck the complete causal chain rather than only the original failure. After review round two, do not start a third automatic rewrite; stop for author direction.
 
 The review fingerprint is a hard acceptance boundary. `final.md` must be byte-for-byte identical to the passing reviewed draft. If a repair changes prose, return to `drafted`, rerun quality and review, then promote that exact candidate.
 
@@ -80,7 +111,7 @@ schemaVersion: 1
 chapter: 1
 sourceFingerprint: "<sha256 of final.md>"
 changes:
-  - domain: facts | timeline | threads | resources | relationships | characters | storyCards
+  - domain: facts | timeline | threads | resources | relationships | characters | storyCards | evidence
     operation: upsert | retire
     id: stable-id
     value: {}
@@ -88,6 +119,8 @@ changes:
 ```
 
 Do not commit a delta extracted from a rejected draft. Run the `continuity_committed` transition only after delta validation succeeds.
+
+Evidence entries distinguish anomaly, directional, association, adjudicative, and foreshadowing roles. Record observed/contested/corroborated/admitted/discredited status, supported and contradicted claim IDs, source IDs, verification method, and at least one limitation. Every non-hypothesis evidence action in the chapter contract must have a matching evidence upsert in the delta with a compatible resulting status.
 
 Write `handoff.yaml` from the same accepted `final.md`:
 

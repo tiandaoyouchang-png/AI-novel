@@ -13,6 +13,7 @@ import {
   marketPositionSchema,
   qualityReportSchema,
   qualityRulesSchema,
+  storyGuardrailsSchema,
   type QualityReport
 } from "./schema.js";
 
@@ -54,6 +55,9 @@ export async function runQualityCheck(
   const position = marketPositionSchema.parse(
     parse(await fs.readFile(path.join(workspace, "planning", "market-position.yaml"), "utf8"))
   );
+  const guardrails = storyGuardrailsSchema.parse(
+    parse(await fs.readFile(path.join(workspace, "planning", "story-guardrails.yaml"), "utf8"))
+  );
   if (contract.chapter !== chapter) {
     throw new Error(`Chapter contract ${contract.chapter} does not match current chapter ${chapter}.`);
   }
@@ -87,6 +91,16 @@ export async function runQualityCheck(
   }
   for (const banned of rules.bannedWords) {
     if (prose.includes(banned)) blockingIssues.push(`Banned word appears: ${banned}`);
+  }
+  for (const modernTerm of guardrails.periodRules.prohibitedModernTerms) {
+    if (prose.includes(modernTerm)) {
+      blockingIssues.push(`Period vocabulary violation: ${modernTerm}`);
+    }
+  }
+  for (const shortcut of guardrails.prohibitedNarrativeShortcuts) {
+    if (prose.includes(shortcut)) {
+      blockingIssues.push(`Prohibited narrative shortcut appears: ${shortcut}`);
+    }
   }
   if (paragraphs.length < rules.minParagraphs) {
     blockingIssues.push(`Paragraph count ${paragraphs.length} is below minimum ${rules.minParagraphs}.`);

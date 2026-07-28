@@ -62,6 +62,10 @@ Before approval, include:
 
 `style-examples.yaml` is an optional library of scene-tagged micro-examples. Every entry must declare `user-owned`, `authorized`, or `public-domain` rights and a source. Unlicensed excerpts are invalid.
 
+`story-guardrails.yaml` is a schema-v1 foundation contract. It locks the premise and signature mechanism, maximum scope, hidden-antagonist ceiling, character capability boundaries, investigation and coincidence rules, period/institution/physics rules, supporting-character goals, permanent consequences, and literal narrative shortcuts that the deterministic quality gate can reject. Changing it requires foundation invalidation and re-approval.
+
+`reveal-policy.yaml` is a schema-v1 schedule for material answers. Each stable reveal ID has an earliest, target, and latest chapter, prerequisite evidence IDs, and a planned/delayed/revealed/cancelled status. The context compiler hides protected meanings before the earliest chapter. A continuity commit marks reveal IDs used by the accepted schema-v3 contract as revealed in the same journaled transaction.
+
 ### Volume planning
 
 `volumes/current-volume.md` defines the volume promise, escalation ladder, midpoint shift, climax, payoff, and transition into the next volume. Plan the current volume more firmly than distant volumes.

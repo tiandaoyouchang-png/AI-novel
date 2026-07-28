@@ -12,7 +12,7 @@ workflow:
   reviewRound: 0
   delegatedThroughChapter: null
   blockingReason: null
-  updatedAt: 2026-07-26T09:56:41.787Z
+  updatedAt: 2026-07-27T16:13:01.592Z
 artifacts:
   brief:
     status: accepted
@@ -20,12 +20,12 @@ artifacts:
     acceptedAt: 2026-07-26T09:56:41.675Z
   foundation:
     status: accepted
-    fingerprint: f3f6825399c7974593180b54711abee67b4b9bab69d73b57a5c6ee553e8591e3
-    acceptedAt: 2026-07-26T09:56:41.735Z
+    fingerprint: c2ee3c895b12d30a846aec1c86aa2bae671db96a8ffd7286dd0456af215b78ca
+    acceptedAt: 2026-07-27T16:13:01.513Z
   currentVolumePlan:
     status: accepted
     fingerprint: 13d062d5401af0d9786c115035c780707eda26c6ddaf951cc3e6e11e55965638
-    acceptedAt: 2026-07-26T09:56:41.787Z
+    acceptedAt: 2026-07-27T16:13:01.592Z
 continuity:
   lastCommittedChapter: 3
   checkpointInterval: 10

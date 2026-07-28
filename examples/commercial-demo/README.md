@@ -8,6 +8,8 @@ It demonstrates:
 - three scored candidate topics across 番茄长篇 and 知乎盐选短篇, an explicit selection trade-off, originality protections, and a passing topic-selection report;
 - three anonymous opening-hook alternatives with a selected option, test protocol, and recorded rejection reasons;
 - a reader-positioned brief, story engine, world rules, cast, and current-volume plan;
+- premise, scope, capability, coincidence, period, consequence, and shortcut guardrails;
+- a graded evidence ledger plus chapter-number reveal windows and prerequisites;
 - a cross-volume main-plot and character-arc grid with payoff debt and idle limits;
 - stable per-character motivation/voice profiles and a rights-declared style profile/example library;
 - three contracts with explicit reader payoff, emotional target, scene beats, value changes, protected facts, and ending pull;
@@ -29,6 +31,8 @@ node plugins/codex-novel/dist/novelctl.cjs validate examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs topics examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs hooks examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs arcs examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs guardrails examples/commercial-demo
+node plugins/codex-novel/dist/novelctl.cjs reveals examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs cards examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs cadence examples/commercial-demo
 node plugins/codex-novel/dist/novelctl.cjs index examples/commercial-demo

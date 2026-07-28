@@ -13,9 +13,12 @@ import {
   writeState
 } from "./io.js";
 import {
+  chapterContractSchema,
   characterCardValueSchema,
   continuityDeltaSchema,
   continuityStoreSchema,
+  evidenceValueSchema,
+  revealPolicySchema,
   storyCardValueSchema,
   type ContinuityDomain,
   type ContinuityStore,
@@ -30,7 +33,8 @@ const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 
 const pendingTransactionSchema = z
@@ -143,6 +147,7 @@ function validateDomainValue(
 ): void {
   if (domain === "characters") characterCardValueSchema.parse(value);
   if (domain === "storyCards") storyCardValueSchema.parse(value);
+  if (domain === "evidence") evidenceValueSchema.parse(value);
 }
 
 function applyChanges(
@@ -199,11 +204,20 @@ function applyChanges(
 async function restoreFromRun(workspace: string, runId: string): Promise<void> {
   const runDirectory = path.join(workspace, "runtime", "runs", runId);
   for (const domain of Object.keys(DOMAIN_FILES) as ContinuityDomain[]) {
-    const backup = await fs.readFile(path.join(runDirectory, "continuity.before", DOMAIN_FILES[domain]), "utf8");
+    const backupPath = path.join(runDirectory, "continuity.before", DOMAIN_FILES[domain]);
+    if (!(await pathExists(backupPath))) continue;
+    const backup = await fs.readFile(backupPath, "utf8");
     await atomicWriteText(path.join(workspace, "continuity", DOMAIN_FILES[domain]), backup);
   }
   const stateBefore = await fs.readFile(path.join(runDirectory, "state.before.yaml"), "utf8");
   await atomicWriteText(path.join(workspace, STATE_FILE), stateBefore);
+  const revealBefore = path.join(runDirectory, "reveal-policy.before.yaml");
+  if (await pathExists(revealBefore)) {
+    await atomicWriteText(
+      path.join(workspace, "planning", "reveal-policy.yaml"),
+      await fs.readFile(revealBefore, "utf8")
+    );
+  }
 }
 
 export async function commitContinuityDelta(
@@ -215,6 +229,10 @@ export async function commitContinuityDelta(
   const chapterDirectory = String(chapter).padStart(4, "0");
   const finalPath = path.join(workspace, "chapters", chapterDirectory, "final.md");
   const deltaPath = path.join(workspace, "chapters", chapterDirectory, "delta.yaml");
+  const contractPath = path.join(workspace, "chapters", chapterDirectory, "contract.yaml");
+  const contract = await pathExists(contractPath)
+    ? chapterContractSchema.parse(parse(await fs.readFile(contractPath, "utf8")))
+    : null;
   const delta = continuityDeltaSchema.parse(parse(await fs.readFile(deltaPath, "utf8")));
 
   if (delta.chapter !== chapter) {
@@ -230,6 +248,50 @@ export async function commitContinuityDelta(
     stores[domain] = await readStore(workspace, domain);
   }
   const updated = applyChanges(stores, delta);
+  const evidenceChanges = new Map(
+    delta.changes
+      .filter((change) => change.domain === "evidence" && change.operation === "upsert")
+      .map((change) => [change.id, evidenceValueSchema.parse(change.value)])
+  );
+  if (contract?.schemaVersion === 3) {
+    for (const move of contract.evidenceMoves) {
+      if (move.action === "hypothesize") continue;
+      const evidence = evidenceChanges.get(move.evidenceId);
+      if (!evidence) {
+        throw new Error(
+          `Evidence move ${move.action}/${move.evidenceId} must be recorded in the chapter continuity delta.`
+        );
+      }
+      const allowedStatuses: Record<typeof move.action, string[]> = {
+        discover: ["observed"],
+        test: ["contested", "corroborated", "discredited"],
+        corroborate: ["corroborated"],
+        challenge: ["contested", "discredited"],
+        admit: ["admitted"]
+      };
+      if (!allowedStatuses[move.action].includes(evidence.status)) {
+        throw new Error(
+          `Evidence move ${move.action}/${move.evidenceId} produced invalid status ${evidence.status}.`
+        );
+      }
+    }
+  }
+
+  const revealPolicyPath = path.join(workspace, "planning", "reveal-policy.yaml");
+  const revealPolicy = revealPolicySchema.parse(
+    parse(await fs.readFile(revealPolicyPath, "utf8"))
+  );
+  const updatedRevealPolicy = structuredClone(revealPolicy);
+  if (contract?.schemaVersion === 3) {
+    const revealIds = new Set(contract.revealIds);
+    for (const reveal of updatedRevealPolicy.reveals) {
+      if (!revealIds.has(reveal.id)) continue;
+      reveal.status = "revealed";
+      reveal.revealedChapter = chapter;
+      reveal.delayReason = null;
+    }
+  }
+  revealPolicySchema.parse(updatedRevealPolicy);
 
   const runId = `continuity-${now().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`;
   const runDirectory = path.join(workspace, "runtime", "runs", runId);
@@ -245,7 +307,15 @@ export async function commitContinuityDelta(
   }
   await Promise.all([
     atomicWriteText(path.join(runDirectory, "state.before.yaml"), stringify(before, { lineWidth: 0 })),
-    atomicWriteText(path.join(runDirectory, "state.after.yaml"), stringify(after, { lineWidth: 0 }))
+    atomicWriteText(path.join(runDirectory, "state.after.yaml"), stringify(after, { lineWidth: 0 })),
+    atomicWriteText(
+      path.join(runDirectory, "reveal-policy.before.yaml"),
+      stringify(revealPolicy, { lineWidth: 0 })
+    ),
+    atomicWriteText(
+      path.join(runDirectory, "reveal-policy.after.yaml"),
+      stringify(updatedRevealPolicy, { lineWidth: 0 })
+    )
   ]);
   await atomicWriteText(
     pendingPath(workspace),
@@ -259,6 +329,10 @@ export async function commitContinuityDelta(
         stringify(updated[domain], { lineWidth: 0 })
       );
     }
+    await atomicWriteText(
+      revealPolicyPath,
+      stringify(updatedRevealPolicy, { lineWidth: 0 })
+    );
     await writeState(workspace, after);
   } catch (error) {
     await restoreFromRun(workspace, runId);

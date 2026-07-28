@@ -1,6 +1,6 @@
 {
   "name": "codex-novel",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A Codex-native, local-first system for selecting, writing, reviewing, and maintaining long and short fiction.",
   "author": {
     "name": "tiandaoyouchang-png",
@@ -12,7 +12,7 @@
   "interface": {
     "displayName": "Codex Novel Studio",
     "shortDescription": "Build market-backed long or short fiction with Codex.",
-    "longDescription": "Compare evidence-backed topics and opening hooks for Fanqie or Zhihu Salt, then manage cross-volume arcs, named revisions, scene-level writing, release cadence, local learning metrics, recovery, and multi-format export with continuity protection.",
+    "longDescription": "Compare market-backed topics and opening hooks for Fanqie or Zhihu Salt, lock premise, scope, abilities, evidence and reveal timing, then manage scene writing, continuity, revisions, release cadence and export.",
     "developerName": "tiandaoyouchang-png",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

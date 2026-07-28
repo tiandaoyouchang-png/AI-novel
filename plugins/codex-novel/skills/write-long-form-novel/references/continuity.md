@@ -9,6 +9,7 @@
 - `continuity/relationships.yaml`: relationship state and evidence.
 - `continuity/characters.yaml`: dynamic character cards with life status, current location, goal, condition, and visible/hidden knowledge IDs.
 - `continuity/story-cards.yaml`: dynamic main-plot, subplot, and character-arc cards with current beat, next pressure, linked characters/threads, and payoff debt.
+- `continuity/evidence.yaml`: graded clues and proof with claim links, source IDs, verification method, limitations, status, and protected reveal timing.
 
 Each file uses `schemaVersion: 1` and an `entries` array. Every entry has a stable ID, active/retired status, structured value, source chapter, evidence, and update time. Do not store speculative next events as truth.
 
@@ -37,7 +38,7 @@ Use `--json` for a machine-readable view. The command validates card references 
 
 Select context by current participants, locations, active threads, resources, chapter scene beats, and obligations. Load only matching static character profiles and authorized style examples. Prefer exact YAML facts and fingerprint-bound `handoff.yaml` files over free-running summaries. Use the disposable SQLite full-text index only to identify candidates, then re-read their authoritative sources.
 
-Rebuild with `novelctl index`; inspect with `novelctl search --query "<terms>"`. An index may be deleted and rebuilt. Stale source fingerprints are discarded, and the index must never update continuity.
+Rebuild with `novelctl index`; inspect with `novelctl search --query "<terms>"`. An index may be deleted and rebuilt. Stale source fingerprints are discarded, and the index must never update continuity. Protected evidence is deliberately excluded from semantic retrieval; load it only through explicit chapter evidence IDs so the context compiler can enforce reveal redaction.
 
 ## Commit rule
 
@@ -49,7 +50,7 @@ Apply continuity deltas only after:
 4. contradictions are resolved or explicitly blocked;
 5. a pre-change snapshot exists.
 
-Commit all related continuity modules as one journaled transaction. The CLI saves before/after snapshots, validates the final-prose fingerprint, applies all seven stores, and advances state last. On an interruption, keep the next chapter blocked and run `novelctl recover` to restore the before snapshot.
+Commit all related continuity modules as one journaled transaction. The CLI saves before/after snapshots, validates the final-prose fingerprint, applies all eight stores, updates accepted reveal statuses, and advances state last. On an interruption, keep the next chapter blocked and run `novelctl recover` to restore the continuity, reveal policy, and state before snapshot.
 
 ## Checkpoints
 

@@ -107,17 +107,17 @@ var require_visit = __commonJS({
     visit.BREAK = BREAK;
     visit.SKIP = SKIP;
     visit.REMOVE = REMOVE;
-    function visit_(key, node, visitor, path18) {
-      const ctrl = callVisitor(key, node, visitor, path18);
+    function visit_(key, node, visitor, path19) {
+      const ctrl = callVisitor(key, node, visitor, path19);
       if (identity.isNode(ctrl) || identity.isPair(ctrl)) {
-        replaceNode(key, path18, ctrl);
-        return visit_(key, ctrl, visitor, path18);
+        replaceNode(key, path19, ctrl);
+        return visit_(key, ctrl, visitor, path19);
       }
       if (typeof ctrl !== "symbol") {
         if (identity.isCollection(node)) {
-          path18 = Object.freeze(path18.concat(node));
+          path19 = Object.freeze(path19.concat(node));
           for (let i = 0; i < node.items.length; ++i) {
-            const ci = visit_(i, node.items[i], visitor, path18);
+            const ci = visit_(i, node.items[i], visitor, path19);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -128,13 +128,13 @@ var require_visit = __commonJS({
             }
           }
         } else if (identity.isPair(node)) {
-          path18 = Object.freeze(path18.concat(node));
-          const ck = visit_("key", node.key, visitor, path18);
+          path19 = Object.freeze(path19.concat(node));
+          const ck = visit_("key", node.key, visitor, path19);
           if (ck === BREAK)
             return BREAK;
           else if (ck === REMOVE)
             node.key = null;
-          const cv = visit_("value", node.value, visitor, path18);
+          const cv = visit_("value", node.value, visitor, path19);
           if (cv === BREAK)
             return BREAK;
           else if (cv === REMOVE)
@@ -155,17 +155,17 @@ var require_visit = __commonJS({
     visitAsync.BREAK = BREAK;
     visitAsync.SKIP = SKIP;
     visitAsync.REMOVE = REMOVE;
-    async function visitAsync_(key, node, visitor, path18) {
-      const ctrl = await callVisitor(key, node, visitor, path18);
+    async function visitAsync_(key, node, visitor, path19) {
+      const ctrl = await callVisitor(key, node, visitor, path19);
       if (identity.isNode(ctrl) || identity.isPair(ctrl)) {
-        replaceNode(key, path18, ctrl);
-        return visitAsync_(key, ctrl, visitor, path18);
+        replaceNode(key, path19, ctrl);
+        return visitAsync_(key, ctrl, visitor, path19);
       }
       if (typeof ctrl !== "symbol") {
         if (identity.isCollection(node)) {
-          path18 = Object.freeze(path18.concat(node));
+          path19 = Object.freeze(path19.concat(node));
           for (let i = 0; i < node.items.length; ++i) {
-            const ci = await visitAsync_(i, node.items[i], visitor, path18);
+            const ci = await visitAsync_(i, node.items[i], visitor, path19);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -176,13 +176,13 @@ var require_visit = __commonJS({
             }
           }
         } else if (identity.isPair(node)) {
-          path18 = Object.freeze(path18.concat(node));
-          const ck = await visitAsync_("key", node.key, visitor, path18);
+          path19 = Object.freeze(path19.concat(node));
+          const ck = await visitAsync_("key", node.key, visitor, path19);
           if (ck === BREAK)
             return BREAK;
           else if (ck === REMOVE)
             node.key = null;
-          const cv = await visitAsync_("value", node.value, visitor, path18);
+          const cv = await visitAsync_("value", node.value, visitor, path19);
           if (cv === BREAK)
             return BREAK;
           else if (cv === REMOVE)
@@ -209,23 +209,23 @@ var require_visit = __commonJS({
       }
       return visitor;
     }
-    function callVisitor(key, node, visitor, path18) {
+    function callVisitor(key, node, visitor, path19) {
       if (typeof visitor === "function")
-        return visitor(key, node, path18);
+        return visitor(key, node, path19);
       if (identity.isMap(node))
-        return visitor.Map?.(key, node, path18);
+        return visitor.Map?.(key, node, path19);
       if (identity.isSeq(node))
-        return visitor.Seq?.(key, node, path18);
+        return visitor.Seq?.(key, node, path19);
       if (identity.isPair(node))
-        return visitor.Pair?.(key, node, path18);
+        return visitor.Pair?.(key, node, path19);
       if (identity.isScalar(node))
-        return visitor.Scalar?.(key, node, path18);
+        return visitor.Scalar?.(key, node, path19);
       if (identity.isAlias(node))
-        return visitor.Alias?.(key, node, path18);
+        return visitor.Alias?.(key, node, path19);
       return void 0;
     }
-    function replaceNode(key, path18, node) {
-      const parent = path18[path18.length - 1];
+    function replaceNode(key, path19, node) {
+      const parent = path19[path19.length - 1];
       if (identity.isCollection(parent)) {
         parent.items[key] = node;
       } else if (identity.isPair(parent)) {
@@ -835,10 +835,10 @@ var require_Collection = __commonJS({
     var createNode = require_createNode();
     var identity = require_identity();
     var Node = require_Node();
-    function collectionFromPath(schema, path18, value) {
+    function collectionFromPath(schema, path19, value) {
       let v = value;
-      for (let i = path18.length - 1; i >= 0; --i) {
-        const k = path18[i];
+      for (let i = path19.length - 1; i >= 0; --i) {
+        const k = path19[i];
         if (typeof k === "number" && Number.isInteger(k) && k >= 0) {
           const a = [];
           a[k] = v;
@@ -857,7 +857,7 @@ var require_Collection = __commonJS({
         sourceObjects: /* @__PURE__ */ new Map()
       });
     }
-    var isEmptyPath = (path18) => path18 == null || typeof path18 === "object" && !!path18[Symbol.iterator]().next().done;
+    var isEmptyPath = (path19) => path19 == null || typeof path19 === "object" && !!path19[Symbol.iterator]().next().done;
     var Collection = class extends Node.NodeBase {
       constructor(type, schema) {
         super(type);
@@ -887,11 +887,11 @@ var require_Collection = __commonJS({
        * be a Pair instance or a `{ key, value }` object, which may not have a key
        * that already exists in the map.
        */
-      addIn(path18, value) {
-        if (isEmptyPath(path18))
+      addIn(path19, value) {
+        if (isEmptyPath(path19))
           this.add(value);
         else {
-          const [key, ...rest] = path18;
+          const [key, ...rest] = path19;
           const node = this.get(key, true);
           if (identity.isCollection(node))
             node.addIn(rest, value);
@@ -905,8 +905,8 @@ var require_Collection = __commonJS({
        * Removes a value from the collection.
        * @returns `true` if the item was found and removed.
        */
-      deleteIn(path18) {
-        const [key, ...rest] = path18;
+      deleteIn(path19) {
+        const [key, ...rest] = path19;
         if (rest.length === 0)
           return this.delete(key);
         const node = this.get(key, true);
@@ -920,8 +920,8 @@ var require_Collection = __commonJS({
        * scalar values from their surrounding node; to disable set `keepScalar` to
        * `true` (collections are always returned intact).
        */
-      getIn(path18, keepScalar) {
-        const [key, ...rest] = path18;
+      getIn(path19, keepScalar) {
+        const [key, ...rest] = path19;
         const node = this.get(key, true);
         if (rest.length === 0)
           return !keepScalar && identity.isScalar(node) ? node.value : node;
@@ -939,8 +939,8 @@ var require_Collection = __commonJS({
       /**
        * Checks if the collection includes a value with the key `key`.
        */
-      hasIn(path18) {
-        const [key, ...rest] = path18;
+      hasIn(path19) {
+        const [key, ...rest] = path19;
         if (rest.length === 0)
           return this.has(key);
         const node = this.get(key, true);
@@ -950,8 +950,8 @@ var require_Collection = __commonJS({
        * Sets a value in this collection. For `!!set`, `value` needs to be a
        * boolean to add/remove the item from the set.
        */
-      setIn(path18, value) {
-        const [key, ...rest] = path18;
+      setIn(path19, value) {
+        const [key, ...rest] = path19;
         if (rest.length === 0) {
           this.set(key, value);
         } else {
@@ -3466,9 +3466,9 @@ var require_Document = __commonJS({
           this.contents.add(value);
       }
       /** Adds a value to the document. */
-      addIn(path18, value) {
+      addIn(path19, value) {
         if (assertCollection(this.contents))
-          this.contents.addIn(path18, value);
+          this.contents.addIn(path19, value);
       }
       /**
        * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
@@ -3543,14 +3543,14 @@ var require_Document = __commonJS({
        * Removes a value from the document.
        * @returns `true` if the item was found and removed.
        */
-      deleteIn(path18) {
-        if (Collection.isEmptyPath(path18)) {
+      deleteIn(path19) {
+        if (Collection.isEmptyPath(path19)) {
           if (this.contents == null)
             return false;
           this.contents = null;
           return true;
         }
-        return assertCollection(this.contents) ? this.contents.deleteIn(path18) : false;
+        return assertCollection(this.contents) ? this.contents.deleteIn(path19) : false;
       }
       /**
        * Returns item at `key`, or `undefined` if not found. By default unwraps
@@ -3565,10 +3565,10 @@ var require_Document = __commonJS({
        * scalar values from their surrounding node; to disable set `keepScalar` to
        * `true` (collections are always returned intact).
        */
-      getIn(path18, keepScalar) {
-        if (Collection.isEmptyPath(path18))
+      getIn(path19, keepScalar) {
+        if (Collection.isEmptyPath(path19))
           return !keepScalar && identity.isScalar(this.contents) ? this.contents.value : this.contents;
-        return identity.isCollection(this.contents) ? this.contents.getIn(path18, keepScalar) : void 0;
+        return identity.isCollection(this.contents) ? this.contents.getIn(path19, keepScalar) : void 0;
       }
       /**
        * Checks if the document includes a value with the key `key`.
@@ -3579,10 +3579,10 @@ var require_Document = __commonJS({
       /**
        * Checks if the document includes a value at `path`.
        */
-      hasIn(path18) {
-        if (Collection.isEmptyPath(path18))
+      hasIn(path19) {
+        if (Collection.isEmptyPath(path19))
           return this.contents !== void 0;
-        return identity.isCollection(this.contents) ? this.contents.hasIn(path18) : false;
+        return identity.isCollection(this.contents) ? this.contents.hasIn(path19) : false;
       }
       /**
        * Sets a value in this document. For `!!set`, `value` needs to be a
@@ -3599,13 +3599,13 @@ var require_Document = __commonJS({
        * Sets a value in this document. For `!!set`, `value` needs to be a
        * boolean to add/remove the item from the set.
        */
-      setIn(path18, value) {
-        if (Collection.isEmptyPath(path18)) {
+      setIn(path19, value) {
+        if (Collection.isEmptyPath(path19)) {
           this.contents = value;
         } else if (this.contents == null) {
-          this.contents = Collection.collectionFromPath(this.schema, Array.from(path18), value);
+          this.contents = Collection.collectionFromPath(this.schema, Array.from(path19), value);
         } else if (assertCollection(this.contents)) {
-          this.contents.setIn(path18, value);
+          this.contents.setIn(path19, value);
         }
       }
       /**
@@ -5565,9 +5565,9 @@ var require_cst_visit = __commonJS({
     visit.BREAK = BREAK;
     visit.SKIP = SKIP;
     visit.REMOVE = REMOVE;
-    visit.itemAtPath = (cst, path18) => {
+    visit.itemAtPath = (cst, path19) => {
       let item = cst;
-      for (const [field, index] of path18) {
+      for (const [field, index] of path19) {
         const tok = item?.[field];
         if (tok && "items" in tok) {
           item = tok.items[index];
@@ -5576,23 +5576,23 @@ var require_cst_visit = __commonJS({
       }
       return item;
     };
-    visit.parentCollection = (cst, path18) => {
-      const parent = visit.itemAtPath(cst, path18.slice(0, -1));
-      const field = path18[path18.length - 1][0];
+    visit.parentCollection = (cst, path19) => {
+      const parent = visit.itemAtPath(cst, path19.slice(0, -1));
+      const field = path19[path19.length - 1][0];
       const coll = parent?.[field];
       if (coll && "items" in coll)
         return coll;
       throw new Error("Parent collection not found");
     };
-    function _visit(path18, item, visitor) {
-      let ctrl = visitor(item, path18);
+    function _visit(path19, item, visitor) {
+      let ctrl = visitor(item, path19);
       if (typeof ctrl === "symbol")
         return ctrl;
       for (const field of ["key", "value"]) {
         const token = item[field];
         if (token && "items" in token) {
           for (let i = 0; i < token.items.length; ++i) {
-            const ci = _visit(Object.freeze(path18.concat([[field, i]])), token.items[i], visitor);
+            const ci = _visit(Object.freeze(path19.concat([[field, i]])), token.items[i], visitor);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -5603,10 +5603,10 @@ var require_cst_visit = __commonJS({
             }
           }
           if (typeof ctrl === "function" && field === "key")
-            ctrl = ctrl(item, path18);
+            ctrl = ctrl(item, path19);
         }
       }
-      return typeof ctrl === "function" ? ctrl(item, path18) : ctrl;
+      return typeof ctrl === "function" ? ctrl(item, path19) : ctrl;
     }
     exports2.visit = visit;
   }
@@ -6908,14 +6908,14 @@ var require_parser = __commonJS({
             case "scalar":
             case "single-quoted-scalar":
             case "double-quoted-scalar": {
-              const fs15 = this.flowScalar(this.type);
+              const fs16 = this.flowScalar(this.type);
               if (atNextItem || it.value) {
-                map2.items.push({ start, key: fs15, sep: [] });
+                map2.items.push({ start, key: fs16, sep: [] });
                 this.onKeyLine = true;
               } else if (it.sep) {
-                this.stack.push(fs15);
+                this.stack.push(fs16);
               } else {
-                Object.assign(it, { key: fs15, sep: [] });
+                Object.assign(it, { key: fs16, sep: [] });
                 this.onKeyLine = true;
               }
               return;
@@ -7043,13 +7043,13 @@ var require_parser = __commonJS({
             case "scalar":
             case "single-quoted-scalar":
             case "double-quoted-scalar": {
-              const fs15 = this.flowScalar(this.type);
+              const fs16 = this.flowScalar(this.type);
               if (!it || it.value)
-                fc.items.push({ start: [], key: fs15, sep: [] });
+                fc.items.push({ start: [], key: fs16, sep: [] });
               else if (it.sep)
-                this.stack.push(fs15);
+                this.stack.push(fs16);
               else
-                Object.assign(it, { key: fs15, sep: [] });
+                Object.assign(it, { key: fs16, sep: [] });
               return;
             }
             case "flow-map-end":
@@ -7257,7 +7257,7 @@ var require_public_api = __commonJS({
       }
       return doc;
     }
-    function parse15(src, reviver, options) {
+    function parse16(src, reviver, options) {
       let _reviver = void 0;
       if (typeof reviver === "function") {
         _reviver = reviver;
@@ -7298,7 +7298,7 @@ var require_public_api = __commonJS({
         return value.toString(options);
       return new Document.Document(value, _replacer, options).toString(options);
     }
-    exports2.parse = parse15;
+    exports2.parse = parse16;
     exports2.parseAllDocuments = parseAllDocuments;
     exports2.parseDocument = parseDocument;
     exports2.stringify = stringify8;
@@ -7638,7 +7638,7 @@ var require_BufferList = __commonJS({
         this.head = this.tail = null;
         this.length = 0;
       };
-      BufferList.prototype.join = function join16(s) {
+      BufferList.prototype.join = function join17(s) {
         if (this.length === 0) return "";
         var p = this.head;
         var ret = "" + p.data;
@@ -10225,8 +10225,8 @@ var require_utils = __commonJS({
       var result = transform2[inputType][outputType](input);
       return result;
     };
-    exports2.resolve = function(path18) {
-      var parts = path18.split("/");
+    exports2.resolve = function(path19) {
+      var parts = path19.split("/");
       var result = [];
       for (var index = 0; index < parts.length; index++) {
         var part = parts[index];
@@ -16079,18 +16079,18 @@ var require_object = __commonJS({
       var object2 = new ZipObject(name, zipObjectContent, o);
       this.files[name] = object2;
     };
-    var parentFolder = function(path18) {
-      if (path18.slice(-1) === "/") {
-        path18 = path18.substring(0, path18.length - 1);
+    var parentFolder = function(path19) {
+      if (path19.slice(-1) === "/") {
+        path19 = path19.substring(0, path19.length - 1);
       }
-      var lastSlash = path18.lastIndexOf("/");
-      return lastSlash > 0 ? path18.substring(0, lastSlash) : "";
+      var lastSlash = path19.lastIndexOf("/");
+      return lastSlash > 0 ? path19.substring(0, lastSlash) : "";
     };
-    var forceTrailingSlash = function(path18) {
-      if (path18.slice(-1) !== "/") {
-        path18 += "/";
+    var forceTrailingSlash = function(path19) {
+      if (path19.slice(-1) !== "/") {
+        path19 += "/";
       }
-      return path18;
+      return path19;
     };
     var folderAdd = function(name, createFolders) {
       createFolders = typeof createFolders !== "undefined" ? createFolders : defaults.createFolders;
@@ -17090,7 +17090,7 @@ var require_lib3 = __commonJS({
 });
 
 // src/cli.ts
-var path17 = __toESM(require("node:path"), 1);
+var path18 = __toESM(require("node:path"), 1);
 var import_promises = require("node:readline/promises");
 var import_node_process = require("node:process");
 
@@ -17869,10 +17869,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path18) {
-  if (!path18)
+function getElementAtPath(obj, path19) {
+  if (!path19)
     return obj;
-  return path18.reduce((acc, key) => acc?.[key], obj);
+  return path19.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -18281,11 +18281,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path18, issues) {
+function prefixIssues(path19, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path18);
+    iss.path.unshift(path19);
     return iss;
   });
 }
@@ -18432,16 +18432,16 @@ function flattenError(error51, mapper = (issue2) => issue2.message) {
 }
 function formatError(error51, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error52, path18 = []) => {
+  const processError = (error52, path19 = []) => {
     for (const issue2 of error52.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path18, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path19, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path18, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path19, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path18, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path19, ...issue2.path]);
       } else {
-        const fullpath = [...path18, ...issue2.path];
+        const fullpath = [...path19, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -18468,17 +18468,17 @@ function formatError(error51, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error51, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error52, path18 = []) => {
+  const processError = (error52, path19 = []) => {
     var _a3, _b;
     for (const issue2 of error52.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path18, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path19, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path18, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path19, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path18, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path19, ...issue2.path]);
       } else {
-        const fullpath = [...path18, ...issue2.path];
+        const fullpath = [...path19, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -18510,8 +18510,8 @@ function treeifyError(error51, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path18 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path18) {
+  const path19 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path19) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -31203,13 +31203,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path18 = ref.slice(1).split("/").filter(Boolean);
-  if (path18.length === 0) {
+  const path19 = ref.slice(1).split("/").filter(Boolean);
+  if (path19.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path18[0] === defsKey) {
-    const key = path18[1];
+  if (path19[0] === defsKey) {
+    const key = path19[1];
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -31634,6 +31634,15 @@ var chapterStatusSchema = external_exports.enum([
   "continuity_committed"
 ]);
 var artifactStatusSchema = external_exports.enum(["missing", "draft", "accepted", "stale"]);
+var scopeLevelSchema = external_exports.enum([
+  "household",
+  "village",
+  "county",
+  "prefecture",
+  "province",
+  "court",
+  "national"
+]);
 var artifactRecordSchema = external_exports.object({
   status: artifactStatusSchema,
   fingerprint: external_exports.string().regex(/^[a-f0-9]{64}$/).nullable(),
@@ -31667,8 +31676,25 @@ var novelStateSchema = external_exports.object({
     checkpointInterval: external_exports.number().int().positive()
   }).strict()
 }).strict();
-var chapterContractSchema = external_exports.object({
-  schemaVersion: external_exports.literal(2),
+var sceneBeatSchema = external_exports.object({
+  id: external_exports.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+  type: external_exports.enum([
+    "dialogue",
+    "action",
+    "investigation",
+    "intimacy",
+    "reveal",
+    "transition",
+    "other"
+  ]),
+  location: external_exports.string().min(1),
+  participants: external_exports.array(external_exports.string().min(1)).min(1),
+  goal: external_exports.string().min(1),
+  conflict: external_exports.string().min(1),
+  valueShift: external_exports.string().min(1),
+  emotionalChange: external_exports.string().min(1)
+}).strict();
+var chapterContractBaseSchema = external_exports.object({
   chapter: external_exports.number().int().positive(),
   title: external_exports.string().min(1),
   goal: external_exports.string().min(1),
@@ -31689,32 +31715,14 @@ var chapterContractSchema = external_exports.object({
   netChange: external_exports.string().min(1),
   endingPull: external_exports.string().min(1),
   emotionalTarget: external_exports.string().min(1),
-  sceneBeats: external_exports.array(
-    external_exports.object({
-      id: external_exports.string().regex(/^[a-z0-9][a-z0-9-]*$/),
-      type: external_exports.enum([
-        "dialogue",
-        "action",
-        "investigation",
-        "intimacy",
-        "reveal",
-        "transition",
-        "other"
-      ]),
-      location: external_exports.string().min(1),
-      participants: external_exports.array(external_exports.string().min(1)).min(1),
-      goal: external_exports.string().min(1),
-      conflict: external_exports.string().min(1),
-      valueShift: external_exports.string().min(1),
-      emotionalChange: external_exports.string().min(1)
-    }).strict()
-  ).min(1),
+  sceneBeats: external_exports.array(sceneBeatSchema).min(1),
   targetLength: external_exports.object({
     min: external_exports.number().int().positive(),
     target: external_exports.number().int().positive(),
     max: external_exports.number().int().positive()
   }).strict()
-}).strict().superRefine((contract, context) => {
+}).strict();
+function validateContractShape(contract, context) {
   if (!(contract.targetLength.min <= contract.targetLength.target && contract.targetLength.target <= contract.targetLength.max)) {
     context.addIssue({
       code: "custom",
@@ -31749,21 +31757,104 @@ var chapterContractSchema = external_exports.object({
     }
     sceneIds.add(scene.id);
   }
+}
+var chapterContractV2Schema = chapterContractBaseSchema.extend({ schemaVersion: external_exports.literal(2) }).strict().superRefine(validateContractShape);
+var chapterContractV3Schema = chapterContractBaseSchema.extend({
+  schemaVersion: external_exports.literal(3),
+  scopeLevel: scopeLevelSchema,
+  antagonistLayer: external_exports.number().int().min(0).max(3),
+  capabilityUses: external_exports.array(
+    external_exports.object({
+      characterId: external_exports.string().min(1),
+      capabilityId: external_exports.string().min(1),
+      purpose: external_exports.string().min(1),
+      supportCharacterId: external_exports.string().min(1).nullable()
+    }).strict()
+  ),
+  investigationChain: external_exports.object({
+    anomaly: external_exports.string().min(1),
+    alternativeExplanations: external_exports.array(external_exports.string().min(1)).min(2),
+    eliminationTests: external_exports.array(external_exports.string().min(1)).min(1),
+    result: external_exports.string().min(1),
+    limitation: external_exports.string().min(1)
+  }).strict().nullable(),
+  evidenceMoves: external_exports.array(
+    external_exports.object({
+      evidenceId: external_exports.string().min(1),
+      action: external_exports.enum(["discover", "hypothesize", "test", "corroborate", "challenge", "admit"]),
+      claimId: external_exports.string().min(1),
+      expectedResult: external_exports.string().min(1)
+    }).strict()
+  ),
+  revealIds: external_exports.array(external_exports.string().min(1)),
+  coincidences: external_exports.array(
+    external_exports.object({
+      description: external_exports.string().min(1),
+      cost: external_exports.string().min(1)
+    }).strict()
+  ),
+  supportingCharacterAgency: external_exports.array(
+    external_exports.object({
+      characterId: external_exports.string().min(1),
+      independentGoal: external_exports.string().min(1),
+      decision: external_exports.string().min(1)
+    }).strict()
+  ),
+  outcomeCost: external_exports.string().min(1),
+  failureConsequence: external_exports.string().min(1),
+  periodChecks: external_exports.object({
+    physical: external_exports.string().min(1),
+    institutional: external_exports.string().min(1),
+    vocabulary: external_exports.string().min(1),
+    antagonistCountermove: external_exports.string().min(1)
+  }).strict()
+}).strict().superRefine((contract, context) => {
+  validateContractShape(contract, context);
+  const hasInvestigation = contract.sceneBeats.some((scene) => scene.type === "investigation");
+  if (hasInvestigation && !contract.investigationChain) {
+    context.addIssue({
+      code: "custom",
+      path: ["investigationChain"],
+      message: "Investigation scenes require anomaly, alternatives, tests, result, and limitation."
+    });
+  }
+  for (const [index, agency] of contract.supportingCharacterAgency.entries()) {
+    if (!contract.participants.includes(agency.characterId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["supportingCharacterAgency", index, "characterId"],
+        message: "Supporting character agency must reference a chapter participant."
+      });
+    }
+  }
+  const agencyIds = contract.supportingCharacterAgency.map((agency) => agency.characterId);
+  if (new Set(agencyIds).size !== agencyIds.length) {
+    context.addIssue({
+      code: "custom",
+      path: ["supportingCharacterAgency"],
+      message: "A supporting character may have only one chapter agency commitment."
+    });
+  }
+  if (new Set(contract.revealIds).size !== contract.revealIds.length) {
+    context.addIssue({
+      code: "custom",
+      path: ["revealIds"],
+      message: "Reveal IDs must be unique within a chapter contract."
+    });
+  }
 });
+var chapterContractSchema = external_exports.union([
+  chapterContractV3Schema,
+  chapterContractV2Schema
+]);
 var reviewCheckSchema = external_exports.object({
   status: external_exports.enum(["pass", "fail"]),
   evidence: external_exports.string().min(1)
 }).strict();
-var chapterReviewSchema = external_exports.object({
-  schemaVersion: external_exports.literal(2),
+var chapterReviewBaseSchema = external_exports.object({
   reviewRound: external_exports.number().int().min(1).max(2),
   sourceFingerprint: external_exports.string().regex(/^[a-f0-9]{64}$/),
   verdict: external_exports.enum(["pass", "repair", "replan"]),
-  checks: external_exports.object({
-    characterVoice: reviewCheckSchema,
-    informationBoundaries: reviewCheckSchema,
-    sceneValueChanges: reviewCheckSchema
-  }).strict(),
   blockingIssues: external_exports.array(
     external_exports.object({
       id: external_exports.string().min(1),
@@ -31775,14 +31866,20 @@ var chapterReviewSchema = external_exports.object({
         "scene",
         "pacing",
         "style",
-        "contract"
+        "contract",
+        "scope",
+        "capability",
+        "evidence",
+        "period",
+        "consequence"
       ]),
       evidence: external_exports.string().min(1),
       repair: external_exports.string().min(1)
     }).strict()
   ),
   warnings: external_exports.array(external_exports.string().min(1))
-}).strict().superRefine((review, context) => {
+}).strict();
+function validateReviewShape(review, context) {
   if (review.verdict === "pass" && review.blockingIssues.length > 0) {
     context.addIssue({
       code: "custom",
@@ -31812,7 +31909,34 @@ var chapterReviewSchema = external_exports.object({
       message: "A non-passing review must fail at least one explicit check."
     });
   }
-});
+}
+var chapterReviewV2Schema = chapterReviewBaseSchema.extend({
+  schemaVersion: external_exports.literal(2),
+  checks: external_exports.object({
+    characterVoice: reviewCheckSchema,
+    informationBoundaries: reviewCheckSchema,
+    sceneValueChanges: reviewCheckSchema
+  }).strict()
+}).strict().superRefine(validateReviewShape);
+var chapterReviewV3Schema = chapterReviewBaseSchema.extend({
+  schemaVersion: external_exports.literal(3),
+  checks: external_exports.object({
+    characterVoice: reviewCheckSchema,
+    informationBoundaries: reviewCheckSchema,
+    sceneValueChanges: reviewCheckSchema,
+    corePremiseAlignment: reviewCheckSchema,
+    scopeDiscipline: reviewCheckSchema,
+    capabilityBoundaries: reviewCheckSchema,
+    evidenceChain: reviewCheckSchema,
+    periodAuthenticity: reviewCheckSchema,
+    supportingCharacterAgency: reviewCheckSchema,
+    consequenceIntegrity: reviewCheckSchema
+  }).strict()
+}).strict().superRefine(validateReviewShape);
+var chapterReviewSchema = external_exports.union([
+  chapterReviewV3Schema,
+  chapterReviewV2Schema
+]);
 var characterProfileSchema = external_exports.object({
   schemaVersion: external_exports.literal(1),
   id: external_exports.string().regex(/^[a-z0-9][a-z0-9-]*$/),
@@ -31942,6 +32066,131 @@ var chapterContextManifestSchema = external_exports.object({
     paths.add(source2.path);
   }
 });
+var storyGuardrailsSchema = external_exports.object({
+  schemaVersion: external_exports.literal(1),
+  corePremise: external_exports.object({
+    oneSentence: external_exports.string().min(1),
+    signatureMechanism: external_exports.string().min(1),
+    protectedElements: external_exports.array(external_exports.string().min(1)).min(2),
+    forbiddenDrift: external_exports.array(external_exports.string().min(1)).min(1)
+  }).strict(),
+  maxScope: scopeLevelSchema,
+  maxHiddenAntagonistLayers: external_exports.number().int().min(0).max(3),
+  capabilityBoundaries: external_exports.array(
+    external_exports.object({
+      characterId: external_exports.string().min(1),
+      allowed: external_exports.array(
+        external_exports.object({
+          id: external_exports.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+          description: external_exports.string().min(1)
+        }).strict()
+      ).min(1),
+      prohibited: external_exports.array(external_exports.string().min(1)).min(1),
+      requiresSupportFor: external_exports.array(external_exports.string().min(1))
+    }).strict()
+  ).min(1),
+  investigationRules: external_exports.object({
+    coincidenceBudgetPerChapter: external_exports.number().int().min(0).max(2),
+    requireAlternativeExplanations: external_exports.literal(true),
+    evidenceMustNotNameCulprit: external_exports.literal(true),
+    requireVerificationLimitation: external_exports.literal(true)
+  }).strict(),
+  periodRules: external_exports.object({
+    era: external_exports.string().min(1),
+    prohibitedModernTerms: external_exports.array(external_exports.string().min(1)),
+    institutionalConstraints: external_exports.array(external_exports.string().min(1)).min(1),
+    physicalConstraints: external_exports.array(external_exports.string().min(1)).min(1)
+  }).strict(),
+  supportingCharacters: external_exports.array(
+    external_exports.object({
+      characterId: external_exports.string().min(1),
+      independentGoal: external_exports.string().min(1),
+      uniqueDomain: external_exports.string().min(1),
+      mayContradictProtagonist: external_exports.boolean()
+    }).strict()
+  ),
+  consequenceRules: external_exports.object({
+    failureCannotAutoReward: external_exports.literal(true),
+    permanentCosts: external_exports.array(external_exports.string().min(1)).min(1)
+  }).strict(),
+  prohibitedNarrativeShortcuts: external_exports.array(external_exports.string().min(1)).min(1)
+}).strict().superRefine((guardrails, context) => {
+  const characters = /* @__PURE__ */ new Set();
+  for (const [index, boundary] of guardrails.capabilityBoundaries.entries()) {
+    if (characters.has(boundary.characterId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["capabilityBoundaries", index, "characterId"],
+        message: `Duplicate capability boundary: ${boundary.characterId}`
+      });
+    }
+    const capabilityIds = boundary.allowed.map((capability) => capability.id);
+    if (new Set(capabilityIds).size !== capabilityIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["capabilityBoundaries", index, "allowed"],
+        message: "Capability IDs must be unique per character."
+      });
+    }
+    characters.add(boundary.characterId);
+  }
+});
+var revealPolicySchema = external_exports.object({
+  schemaVersion: external_exports.literal(1),
+  reveals: external_exports.array(
+    external_exports.object({
+      id: external_exports.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+      subject: external_exports.string().min(1),
+      earliestChapter: external_exports.number().int().positive(),
+      targetChapter: external_exports.number().int().positive(),
+      latestChapter: external_exports.number().int().positive(),
+      prerequisiteEvidenceIds: external_exports.array(external_exports.string().min(1)),
+      status: external_exports.enum(["planned", "revealed", "delayed", "cancelled"]),
+      revealedChapter: external_exports.number().int().positive().nullable(),
+      delayReason: external_exports.string().min(1).nullable()
+    }).strict()
+  )
+}).strict().superRefine((policy, context) => {
+  const ids = /* @__PURE__ */ new Set();
+  for (const [index, reveal] of policy.reveals.entries()) {
+    if (ids.has(reveal.id)) {
+      context.addIssue({
+        code: "custom",
+        path: ["reveals", index, "id"],
+        message: `Duplicate reveal ID: ${reveal.id}`
+      });
+    }
+    if (!(reveal.earliestChapter <= reveal.targetChapter && reveal.targetChapter <= reveal.latestChapter)) {
+      context.addIssue({
+        code: "custom",
+        path: ["reveals", index],
+        message: "Expected earliestChapter <= targetChapter <= latestChapter."
+      });
+    }
+    if (reveal.status === "revealed" && reveal.revealedChapter === null) {
+      context.addIssue({
+        code: "custom",
+        path: ["reveals", index, "revealedChapter"],
+        message: "A revealed item requires revealedChapter."
+      });
+    }
+    if (reveal.status !== "revealed" && reveal.revealedChapter !== null) {
+      context.addIssue({
+        code: "custom",
+        path: ["reveals", index, "revealedChapter"],
+        message: "Only a revealed item may set revealedChapter."
+      });
+    }
+    if (reveal.status === "delayed" && !reveal.delayReason) {
+      context.addIssue({
+        code: "custom",
+        path: ["reveals", index, "delayReason"],
+        message: "A delayed reveal requires a reason."
+      });
+    }
+    ids.add(reveal.id);
+  }
+});
 var continuityDomainSchema = external_exports.enum([
   "facts",
   "timeline",
@@ -31949,7 +32198,8 @@ var continuityDomainSchema = external_exports.enum([
   "resources",
   "relationships",
   "characters",
-  "storyCards"
+  "storyCards",
+  "evidence"
 ]);
 var characterCardValueSchema = external_exports.object({
   name: external_exports.string().min(1),
@@ -31970,6 +32220,26 @@ var storyCardValueSchema = external_exports.object({
   threadIds: external_exports.array(external_exports.string().min(1)),
   payoffDebt: external_exports.string().min(1)
 }).strict();
+var evidenceValueSchema = external_exports.object({
+  kind: external_exports.enum(["anomaly", "directional", "association", "adjudicative", "foreshadowing"]),
+  status: external_exports.enum(["observed", "contested", "corroborated", "admitted", "discredited"]),
+  summary: external_exports.string().min(1),
+  supportsClaimIds: external_exports.array(external_exports.string().min(1)),
+  contradictsClaimIds: external_exports.array(external_exports.string().min(1)),
+  sourceIds: external_exports.array(external_exports.string().min(1)).min(1),
+  verificationMethod: external_exports.string().min(1),
+  limitations: external_exports.array(external_exports.string().min(1)).min(1),
+  expectedRevealChapter: external_exports.number().int().positive().nullable(),
+  revealedChapter: external_exports.number().int().positive().nullable()
+}).strict().superRefine((evidence, context) => {
+  if (evidence.expectedRevealChapter !== null && evidence.revealedChapter !== null && evidence.revealedChapter < evidence.expectedRevealChapter) {
+    context.addIssue({
+      code: "custom",
+      path: ["revealedChapter"],
+      message: "Evidence cannot reveal its protected meaning before the expected chapter."
+    });
+  }
+});
 var continuityEntrySchema = external_exports.object({
   id: external_exports.string().min(1),
   status: external_exports.enum(["active", "retired"]),
@@ -32463,7 +32733,8 @@ var checkpointSchema = external_exports.object({
     resources: external_exports.array(external_exports.string().min(1)),
     relationships: external_exports.array(external_exports.string().min(1)),
     characters: external_exports.array(external_exports.string().min(1)),
-    storyCards: external_exports.array(external_exports.string().min(1))
+    storyCards: external_exports.array(external_exports.string().min(1)),
+    evidence: external_exports.array(external_exports.string().min(1)).default([])
   }).strict(),
   qualityDebt: external_exports.array(external_exports.string().min(1)),
   sources: external_exports.array(
@@ -32853,7 +33124,8 @@ var DOMAIN_FILES = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 function ftsQuery(terms) {
   return [...new Set(
@@ -32880,6 +33152,7 @@ async function rebuildRetrievalIndex(workspace) {
     const absolute = path4.join(workspace, relative);
     const fingerprint = await fingerprintFile(absolute);
     const store = continuityStoreSchema.parse((0, import_yaml3.parse)(await fs3.readFile(absolute, "utf8")));
+    if (domain2 === "evidence") continue;
     for (const entry of store.entries.filter((item) => item.status === "active")) {
       documents.push({
         id: `continuity:${domain2}:${entry.id}`,
@@ -33019,14 +33292,27 @@ var DOMAIN_FILES2 = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 function takePrefix(content, maxChars) {
   const trimmed = content.trim();
   return trimmed.length <= maxChars ? trimmed : `${trimmed.slice(0, maxChars)}
 [truncated]`;
 }
-function contextValue(domain2, value) {
+function contextValue(domain2, value, chapter) {
+  if (domain2 === "evidence") {
+    const evidence = evidenceValueSchema.parse(value);
+    if (evidence.expectedRevealChapter !== null && chapter < evidence.expectedRevealChapter) {
+      return {
+        kind: evidence.kind,
+        status: evidence.status,
+        protectedMeaning: true,
+        expectedRevealChapter: evidence.expectedRevealChapter
+      };
+    }
+    return evidence;
+  }
   if (domain2 !== "characters") return value;
   const character = characterCardValueSchema.parse(value);
   return {
@@ -33086,6 +33372,12 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     (candidate) => candidate.id === hookExperiments.selectedHookId
   );
   if (!selectedHook) throw new Error("Selected opening hook does not exist.");
+  const guardrails = storyGuardrailsSchema.parse(
+    (0, import_yaml4.parse)(await fs4.readFile(path5.join(workspace, "planning", "story-guardrails.yaml"), "utf8"))
+  );
+  const revealPolicy = revealPolicySchema.parse(
+    (0, import_yaml4.parse)(await fs4.readFile(path5.join(workspace, "planning", "reveal-policy.yaml"), "utf8"))
+  );
   const characterProfiles = await selectCharacterProfiles(workspace, contract.participants);
   const styleProfile = await readStyleProfile(workspace);
   const styleExamples = await readStyleExamples(workspace);
@@ -33112,7 +33404,7 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     ].join("\n").toLocaleLowerCase();
     return normalizedTerms.some((term) => searchable.includes(term));
   });
-  const retrievalCandidates = await queryRetrievalIndex(workspace, terms, 6);
+  const retrievalCandidates = (await queryRetrievalIndex(workspace, terms, 6)).filter((candidate) => candidate.kind !== "continuity-evidence");
   const retrievedHistory = await Promise.all(
     retrievalCandidates.map(async (candidate) => ({
       ...candidate,
@@ -33126,7 +33418,8 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     resources: new Set(contract.resourceIds),
     relationships: new Set(contract.relationshipIds),
     characters: new Set(contract.participants),
-    storyCards: new Set(contract.threadIds)
+    storyCards: new Set(contract.threadIds),
+    evidence: new Set(contract.schemaVersion === 3 ? contract.evidenceMoves.map((move) => move.evidenceId) : [])
   };
   const selected = [];
   const deadParticipants = [];
@@ -33168,6 +33461,8 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     "discovery/topic-selection-report.json",
     "planning/market-position.yaml",
     "planning/story-bible.md",
+    "planning/story-guardrails.yaml",
+    "planning/reveal-policy.yaml",
     "planning/world-rules.yaml",
     "planning/characters/character-roster.md",
     "planning/volumes/current-volume.md",
@@ -33224,6 +33519,84 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
       `- emotional change: ${scene.emotionalChange}`,
       ""
     );
+  }
+  sections.push(
+    "## Story Guardrails",
+    "",
+    `- core premise: ${guardrails.corePremise.oneSentence}`,
+    `- signature mechanism: ${guardrails.corePremise.signatureMechanism}`,
+    `- protected elements: ${guardrails.corePremise.protectedElements.join("; ")}`,
+    `- forbidden drift: ${guardrails.corePremise.forbiddenDrift.join("; ")}`,
+    `- maximum story scope: ${guardrails.maxScope}`,
+    `- maximum hidden antagonist layers: ${guardrails.maxHiddenAntagonistLayers}`,
+    `- prohibited shortcuts: ${guardrails.prohibitedNarrativeShortcuts.join("; ")}`,
+    `- period: ${guardrails.periodRules.era}`,
+    `- institutional constraints: ${guardrails.periodRules.institutionalConstraints.join("; ")}`,
+    `- physical constraints: ${guardrails.periodRules.physicalConstraints.join("; ")}`,
+    ""
+  );
+  if (contract.schemaVersion === 3) {
+    sections.push(
+      "## Chapter Guardrail Commitments",
+      "",
+      `- scope level: ${contract.scopeLevel}`,
+      `- antagonist layer: ${contract.antagonistLayer}/${guardrails.maxHiddenAntagonistLayers}`,
+      `- outcome cost: ${contract.outcomeCost}`,
+      `- lasting failure consequence: ${contract.failureConsequence}`,
+      `- scheduled reveals: ${contract.revealIds.join("; ") || "none"}`,
+      `- coincidences used: ${contract.coincidences.length}/${guardrails.investigationRules.coincidenceBudgetPerChapter}`,
+      "",
+      "### Capability Uses",
+      ""
+    );
+    for (const use of contract.capabilityUses) {
+      sections.push(
+        `- ${use.characterId}/${use.capabilityId}: ${use.purpose}` + (use.supportCharacterId ? `; support: ${use.supportCharacterId}` : "")
+      );
+    }
+    if (contract.investigationChain) {
+      sections.push(
+        "",
+        "### Investigation Chain",
+        "",
+        `- anomaly: ${contract.investigationChain.anomaly}`,
+        `- alternative explanations: ${contract.investigationChain.alternativeExplanations.join("; ")}`,
+        `- elimination tests: ${contract.investigationChain.eliminationTests.join("; ")}`,
+        `- result: ${contract.investigationChain.result}`,
+        `- limitation: ${contract.investigationChain.limitation}`
+      );
+    }
+    sections.push("", "### Supporting Character Agency", "");
+    for (const agency of contract.supportingCharacterAgency) {
+      sections.push(
+        `- ${agency.characterId}: goal=${agency.independentGoal}; decision=${agency.decision}`
+      );
+    }
+    sections.push(
+      "",
+      "### Period and Countermove Checks",
+      "",
+      `- physical: ${contract.periodChecks.physical}`,
+      `- institutional: ${contract.periodChecks.institutional}`,
+      `- vocabulary: ${contract.periodChecks.vocabulary}`,
+      `- antagonist countermove: ${contract.periodChecks.antagonistCountermove}`,
+      ""
+    );
+  }
+  sections.push("## Reveal Schedule", "");
+  const relevantReveals = revealPolicy.reveals.filter(
+    (reveal) => reveal.status !== "cancelled" && (contract.schemaVersion === 3 && contract.revealIds.includes(reveal.id) || chapter >= reveal.targetChapter - 2 && chapter <= reveal.latestChapter)
+  );
+  if (relevantReveals.length === 0) {
+    sections.push("- No reveal is scheduled for this chapter. Do not reveal protected answers early.", "");
+  } else {
+    for (const reveal of relevantReveals) {
+      const subject = chapter < reveal.earliestChapter ? "[protected until earliest chapter]" : reveal.subject;
+      sections.push(
+        `- ${reveal.id}: ${subject}; window=${reveal.earliestChapter}-${reveal.latestChapter}; target=${reveal.targetChapter}; status=${reveal.status}; prerequisites=${reveal.prerequisiteEvidenceIds.join(", ") || "none"}`
+      );
+    }
+    sections.push("");
   }
   sections.push("## Character Profiles", "");
   for (const { profile } of characterProfiles) {
@@ -33328,7 +33701,7 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
   } else {
     for (const entry of selected) {
       sections.push(
-        `- [${entry.domain}/${entry.id}] ${JSON.stringify(contextValue(entry.domain, entry.value))} (source chapter ${entry.sourceChapter}; evidence: ${entry.evidence})`
+        `- [${entry.domain}/${entry.id}] ${JSON.stringify(contextValue(entry.domain, entry.value, chapter))} (source chapter ${entry.sourceChapter}; evidence: ${entry.evidence})`
       );
     }
   }
@@ -33462,7 +33835,8 @@ var DOMAIN_FILES3 = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 function safeLabel(label) {
   const normalized = label.normalize("NFKC").toLowerCase().replace(/[^\p{Letter}\p{Number}]+/gu, "-").replace(/^-+|-+$/g, "");
@@ -33480,7 +33854,8 @@ async function generateCheckpoint(workspace, requestedLabel) {
     resources: [],
     relationships: [],
     characters: [],
-    storyCards: []
+    storyCards: [],
+    evidence: []
   };
   const qualityDebt = [];
   const sources = [];
@@ -33527,7 +33902,8 @@ var DOMAIN_FILES4 = {
   resources: "resources.yaml",
   relationships: "relationships.yaml",
   characters: "characters.yaml",
-  storyCards: "story-cards.yaml"
+  storyCards: "story-cards.yaml",
+  evidence: "evidence.yaml"
 };
 var pendingTransactionSchema = external_exports.object({
   schemaVersion: external_exports.literal(1),
@@ -33604,6 +33980,7 @@ async function getContinuityCards(workspace) {
 function validateDomainValue(domain2, value) {
   if (domain2 === "characters") characterCardValueSchema.parse(value);
   if (domain2 === "storyCards") storyCardValueSchema.parse(value);
+  if (domain2 === "evidence") evidenceValueSchema.parse(value);
 }
 function applyChanges(stores, delta) {
   const updated = structuredClone(stores);
@@ -33651,17 +34028,28 @@ function applyChanges(stores, delta) {
 async function restoreFromRun(workspace, runId) {
   const runDirectory = path7.join(workspace, "runtime", "runs", runId);
   for (const domain2 of Object.keys(DOMAIN_FILES4)) {
-    const backup = await fs6.readFile(path7.join(runDirectory, "continuity.before", DOMAIN_FILES4[domain2]), "utf8");
+    const backupPath = path7.join(runDirectory, "continuity.before", DOMAIN_FILES4[domain2]);
+    if (!await pathExists(backupPath)) continue;
+    const backup = await fs6.readFile(backupPath, "utf8");
     await atomicWriteText(path7.join(workspace, "continuity", DOMAIN_FILES4[domain2]), backup);
   }
   const stateBefore = await fs6.readFile(path7.join(runDirectory, "state.before.yaml"), "utf8");
   await atomicWriteText(path7.join(workspace, STATE_FILE), stateBefore);
+  const revealBefore = path7.join(runDirectory, "reveal-policy.before.yaml");
+  if (await pathExists(revealBefore)) {
+    await atomicWriteText(
+      path7.join(workspace, "planning", "reveal-policy.yaml"),
+      await fs6.readFile(revealBefore, "utf8")
+    );
+  }
 }
 async function commitContinuityDelta(workspace, before, after) {
   const chapter = before.workflow.currentChapter;
   const chapterDirectory2 = String(chapter).padStart(4, "0");
   const finalPath = path7.join(workspace, "chapters", chapterDirectory2, "final.md");
   const deltaPath = path7.join(workspace, "chapters", chapterDirectory2, "delta.yaml");
+  const contractPath = path7.join(workspace, "chapters", chapterDirectory2, "contract.yaml");
+  const contract = await pathExists(contractPath) ? chapterContractSchema.parse((0, import_yaml6.parse)(await fs6.readFile(contractPath, "utf8"))) : null;
   const delta = continuityDeltaSchema.parse((0, import_yaml6.parse)(await fs6.readFile(deltaPath, "utf8")));
   if (delta.chapter !== chapter) {
     throw new Error(`Continuity delta chapter ${delta.chapter} does not match current chapter ${chapter}.`);
@@ -33675,6 +34063,47 @@ async function commitContinuityDelta(workspace, before, after) {
     stores[domain2] = await readStore(workspace, domain2);
   }
   const updated = applyChanges(stores, delta);
+  const evidenceChanges = new Map(
+    delta.changes.filter((change) => change.domain === "evidence" && change.operation === "upsert").map((change) => [change.id, evidenceValueSchema.parse(change.value)])
+  );
+  if (contract?.schemaVersion === 3) {
+    for (const move of contract.evidenceMoves) {
+      if (move.action === "hypothesize") continue;
+      const evidence = evidenceChanges.get(move.evidenceId);
+      if (!evidence) {
+        throw new Error(
+          `Evidence move ${move.action}/${move.evidenceId} must be recorded in the chapter continuity delta.`
+        );
+      }
+      const allowedStatuses = {
+        discover: ["observed"],
+        test: ["contested", "corroborated", "discredited"],
+        corroborate: ["corroborated"],
+        challenge: ["contested", "discredited"],
+        admit: ["admitted"]
+      };
+      if (!allowedStatuses[move.action].includes(evidence.status)) {
+        throw new Error(
+          `Evidence move ${move.action}/${move.evidenceId} produced invalid status ${evidence.status}.`
+        );
+      }
+    }
+  }
+  const revealPolicyPath = path7.join(workspace, "planning", "reveal-policy.yaml");
+  const revealPolicy = revealPolicySchema.parse(
+    (0, import_yaml6.parse)(await fs6.readFile(revealPolicyPath, "utf8"))
+  );
+  const updatedRevealPolicy = structuredClone(revealPolicy);
+  if (contract?.schemaVersion === 3) {
+    const revealIds = new Set(contract.revealIds);
+    for (const reveal of updatedRevealPolicy.reveals) {
+      if (!revealIds.has(reveal.id)) continue;
+      reveal.status = "revealed";
+      reveal.revealedChapter = chapter;
+      reveal.delayReason = null;
+    }
+  }
+  revealPolicySchema.parse(updatedRevealPolicy);
   const runId = `continuity-${now().replace(/[:.]/g, "-")}-${(0, import_node_crypto3.randomUUID)().slice(0, 8)}`;
   const runDirectory = path7.join(workspace, "runtime", "runs", runId);
   const beforeDirectory = path7.join(runDirectory, "continuity.before");
@@ -33688,7 +34117,15 @@ async function commitContinuityDelta(workspace, before, after) {
   }
   await Promise.all([
     atomicWriteText(path7.join(runDirectory, "state.before.yaml"), (0, import_yaml6.stringify)(before, { lineWidth: 0 })),
-    atomicWriteText(path7.join(runDirectory, "state.after.yaml"), (0, import_yaml6.stringify)(after, { lineWidth: 0 }))
+    atomicWriteText(path7.join(runDirectory, "state.after.yaml"), (0, import_yaml6.stringify)(after, { lineWidth: 0 })),
+    atomicWriteText(
+      path7.join(runDirectory, "reveal-policy.before.yaml"),
+      (0, import_yaml6.stringify)(revealPolicy, { lineWidth: 0 })
+    ),
+    atomicWriteText(
+      path7.join(runDirectory, "reveal-policy.after.yaml"),
+      (0, import_yaml6.stringify)(updatedRevealPolicy, { lineWidth: 0 })
+    )
   ]);
   await atomicWriteText(
     pendingPath(workspace),
@@ -33701,6 +34138,10 @@ async function commitContinuityDelta(workspace, before, after) {
         (0, import_yaml6.stringify)(updated[domain2], { lineWidth: 0 })
       );
     }
+    await atomicWriteText(
+      revealPolicyPath,
+      (0, import_yaml6.stringify)(updatedRevealPolicy, { lineWidth: 0 })
+    );
     await writeState(workspace, after);
   } catch (error51) {
     await restoreFromRun(workspace, runId);
@@ -33785,6 +34226,9 @@ async function runQualityCheck(workspace, source2) {
   const position = marketPositionSchema.parse(
     (0, import_yaml7.parse)(await fs7.readFile(path8.join(workspace, "planning", "market-position.yaml"), "utf8"))
   );
+  const guardrails = storyGuardrailsSchema.parse(
+    (0, import_yaml7.parse)(await fs7.readFile(path8.join(workspace, "planning", "story-guardrails.yaml"), "utf8"))
+  );
   if (contract.chapter !== chapter) {
     throw new Error(`Chapter contract ${contract.chapter} does not match current chapter ${chapter}.`);
   }
@@ -33810,6 +34254,16 @@ async function runQualityCheck(workspace, source2) {
   }
   for (const banned of rules.bannedWords) {
     if (prose.includes(banned)) blockingIssues.push(`Banned word appears: ${banned}`);
+  }
+  for (const modernTerm of guardrails.periodRules.prohibitedModernTerms) {
+    if (prose.includes(modernTerm)) {
+      blockingIssues.push(`Period vocabulary violation: ${modernTerm}`);
+    }
+  }
+  for (const shortcut of guardrails.prohibitedNarrativeShortcuts) {
+    if (prose.includes(shortcut)) {
+      blockingIssues.push(`Prohibited narrative shortcut appears: ${shortcut}`);
+    }
   }
   if (paragraphs.length < rules.minParagraphs) {
     blockingIssues.push(`Paragraph count ${paragraphs.length} is below minimum ${rules.minParagraphs}.`);
@@ -34479,10 +34933,10 @@ async function validateTopicSelection(workspace, policyDate = (/* @__PURE__ */ n
 }
 
 // src/workspace.ts
-var fs11 = __toESM(require("node:fs/promises"), 1);
-var path12 = __toESM(require("node:path"), 1);
+var fs12 = __toESM(require("node:fs/promises"), 1);
+var path13 = __toESM(require("node:path"), 1);
 var import_node_crypto4 = require("node:crypto");
-var import_yaml11 = __toESM(require_dist(), 1);
+var import_yaml12 = __toESM(require_dist(), 1);
 
 // src/planning.ts
 var fs10 = __toESM(require("node:fs/promises"), 1);
@@ -34562,6 +35016,214 @@ async function requireProductionArcGrid(workspace) {
     throw new Error("Long serial production requires at least one cross-volume arc.");
   }
   return grid;
+}
+
+// src/guardrails.ts
+var fs11 = __toESM(require("node:fs/promises"), 1);
+var path12 = __toESM(require("node:path"), 1);
+var import_yaml11 = __toESM(require_dist(), 1);
+var SCOPE_ORDER = [
+  "household",
+  "village",
+  "county",
+  "prefecture",
+  "province",
+  "court",
+  "national"
+];
+async function readGuardrails(workspace) {
+  return storyGuardrailsSchema.parse(
+    (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "planning", "story-guardrails.yaml"), "utf8"))
+  );
+}
+async function readRevealPolicy(workspace) {
+  return revealPolicySchema.parse(
+    (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "planning", "reveal-policy.yaml"), "utf8"))
+  );
+}
+async function readEvidence(workspace) {
+  const store = continuityStoreSchema.parse(
+    (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "continuity", "evidence.yaml"), "utf8"))
+  );
+  return new Map(
+    store.entries.filter((entry) => entry.status === "active").map((entry) => [entry.id, evidenceValueSchema.parse(entry.value)])
+  );
+}
+async function readCharacterAliases(workspace) {
+  const profileDirectory = path12.join(workspace, "planning", "characters");
+  const profileFiles = (await fs11.readdir(profileDirectory)).filter((file2) => file2.endsWith(".yaml"));
+  const aliases = /* @__PURE__ */ new Map();
+  for (const file2 of profileFiles) {
+    const profile = characterProfileSchema.parse(
+      (0, import_yaml11.parse)(await fs11.readFile(path12.join(profileDirectory, file2), "utf8"))
+    );
+    aliases.set(profile.id, profile.id);
+    aliases.set(profile.name, profile.id);
+  }
+  return aliases;
+}
+async function validateStoryGuardrails(workspace) {
+  const guardrails = await readGuardrails(workspace);
+  const policy = await readRevealPolicy(workspace);
+  const position = marketPositionSchema.parse(
+    (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "planning", "market-position.yaml"), "utf8"))
+  );
+  if (position.workForm === "long-serial" && policy.reveals.length === 0) {
+    throw new Error("Long serial production requires at least one scheduled reveal.");
+  }
+  const characterAliases = await readCharacterAliases(workspace);
+  const unknownCapabilities = guardrails.capabilityBoundaries.map((boundary) => boundary.characterId).filter((id) => !characterAliases.has(id));
+  const unknownSupporting = guardrails.supportingCharacters.map((character) => character.characterId).filter((id) => !characterAliases.has(id));
+  if (unknownCapabilities.length > 0 || unknownSupporting.length > 0) {
+    throw new Error(
+      `Story guardrails reference unknown character profiles. Capabilities: ${unknownCapabilities.join(", ") || "none"}; supporting: ${unknownSupporting.join(", ") || "none"}.`
+    );
+  }
+}
+async function inspectRevealPolicy(workspace) {
+  const [state, policy] = await Promise.all([readState(workspace), readRevealPolicy(workspace)]);
+  const chapter = state.workflow.currentChapter;
+  const planned = policy.reveals.filter(
+    (reveal) => reveal.status === "planned" || reveal.status === "delayed"
+  );
+  return {
+    chapter,
+    planned: planned.length,
+    dueNow: planned.filter((reveal) => reveal.targetChapter === chapter).map((reveal) => reveal.id),
+    overdue: planned.filter((reveal) => reveal.status === "planned").filter((reveal) => reveal.latestChapter < chapter).map((reveal) => reveal.id),
+    delayed: policy.reveals.filter((reveal) => reveal.status === "delayed").map((reveal) => ({ id: reveal.id, reason: reveal.delayReason ?? "unspecified" })),
+    protected: planned.filter((reveal) => reveal.earliestChapter > chapter).map((reveal) => ({
+      id: reveal.id,
+      earliestChapter: reveal.earliestChapter,
+      targetChapter: reveal.targetChapter
+    }))
+  };
+}
+async function validateChapterGuardrails(workspace, rawContract) {
+  const contract = chapterContractV3Schema.parse(rawContract);
+  const [guardrails, policy, evidence, characterAliases] = await Promise.all([
+    readGuardrails(workspace),
+    readRevealPolicy(workspace),
+    readEvidence(workspace),
+    readCharacterAliases(workspace)
+  ]);
+  const issues = [];
+  const canonical = (id) => characterAliases.get(id) ?? id;
+  const participants = new Set(contract.participants.map(canonical));
+  const nonPresentParticipants = new Set(contract.nonPresentParticipants.map(canonical));
+  if (SCOPE_ORDER.indexOf(scopeLevelSchema.parse(contract.scopeLevel)) > SCOPE_ORDER.indexOf(guardrails.maxScope)) {
+    issues.push(
+      `Chapter scope ${contract.scopeLevel} exceeds the approved ceiling ${guardrails.maxScope}.`
+    );
+  }
+  if (contract.antagonistLayer > guardrails.maxHiddenAntagonistLayers) {
+    issues.push(
+      `Antagonist layer ${contract.antagonistLayer} exceeds the approved ceiling ${guardrails.maxHiddenAntagonistLayers}. Reinterpret existing evidence instead of adding a new mastermind.`
+    );
+  }
+  const capabilityBoundaries = new Map(
+    guardrails.capabilityBoundaries.map((boundary) => [
+      canonical(boundary.characterId),
+      {
+        allowed: new Set(boundary.allowed.map((capability) => capability.id)),
+        requiresSupportFor: new Set(boundary.requiresSupportFor)
+      }
+    ])
+  );
+  for (const use of contract.capabilityUses) {
+    const characterId = canonical(use.characterId);
+    if (!participants.has(characterId)) {
+      issues.push(`Capability user is not a chapter participant: ${use.characterId}.`);
+      continue;
+    }
+    if (nonPresentParticipants.has(characterId)) {
+      issues.push(`A non-present character cannot perform a capability use: ${use.characterId}.`);
+    }
+    const boundary = capabilityBoundaries.get(characterId);
+    if (!boundary?.allowed.has(use.capabilityId)) {
+      issues.push(
+        `Undeclared capability ${use.capabilityId} for ${use.characterId}; replan or revise guardrails explicitly.`
+      );
+    }
+    if (boundary?.requiresSupportFor.has(use.capabilityId) && !use.supportCharacterId) {
+      issues.push(
+        `Capability ${use.capabilityId} for ${use.characterId} requires a named support character.`
+      );
+    }
+    if (use.supportCharacterId && (!participants.has(canonical(use.supportCharacterId)) || nonPresentParticipants.has(canonical(use.supportCharacterId)))) {
+      issues.push(`Capability support character is not present: ${use.supportCharacterId}.`);
+    }
+  }
+  if (contract.coincidences.length > guardrails.investigationRules.coincidenceBudgetPerChapter) {
+    issues.push(
+      `Coincidence budget exceeded: ${contract.coincidences.length}/${guardrails.investigationRules.coincidenceBudgetPerChapter}.`
+    );
+  }
+  const agencyIds = new Set(
+    contract.supportingCharacterAgency.map((agency) => canonical(agency.characterId))
+  );
+  for (const supporting of guardrails.supportingCharacters) {
+    const supportingId = canonical(supporting.characterId);
+    if (participants.has(supportingId) && !nonPresentParticipants.has(supportingId) && !agencyIds.has(supportingId)) {
+      issues.push(`Participating supporting character lacks an independent decision: ${supporting.characterId}.`);
+    }
+  }
+  const reveals = new Map(policy.reveals.map((reveal) => [reveal.id, reveal]));
+  for (const revealId of contract.revealIds) {
+    const reveal = reveals.get(revealId);
+    if (!reveal) {
+      issues.push(`Unknown reveal ID: ${revealId}.`);
+      continue;
+    }
+    if (contract.chapter < reveal.earliestChapter) {
+      issues.push(
+        `Reveal ${revealId} is protected until chapter ${reveal.earliestChapter}; current chapter is ${contract.chapter}.`
+      );
+    }
+    if (contract.chapter > reveal.latestChapter && reveal.status !== "delayed") {
+      issues.push(
+        `Reveal ${revealId} is past latest chapter ${reveal.latestChapter}. Mark it delayed with a reason before replanning the payoff.`
+      );
+    }
+    if (reveal.status === "revealed" || reveal.status === "cancelled") {
+      issues.push(`Reveal ${revealId} is already ${reveal.status}.`);
+    }
+    const missingPrerequisites = reveal.prerequisiteEvidenceIds.filter((id) => {
+      const item = evidence.get(id);
+      return !item || !["corroborated", "admitted"].includes(item.status);
+    });
+    if (missingPrerequisites.length > 0) {
+      issues.push(
+        `Reveal ${revealId} lacks corroborated prerequisites: ${missingPrerequisites.join(", ")}.`
+      );
+    }
+  }
+  for (const move of contract.evidenceMoves) {
+    const existing = evidence.get(move.evidenceId);
+    if (move.action !== "discover" && !existing) {
+      issues.push(`Evidence action ${move.action} references missing evidence: ${move.evidenceId}.`);
+    }
+    if (move.action === "discover" && existing) {
+      issues.push(`Evidence ${move.evidenceId} already exists and cannot be discovered again.`);
+    }
+  }
+  if (issues.length > 0) {
+    throw new Error(`Chapter guardrails failed:
+- ${issues.join("\n- ")}`);
+  }
+}
+async function guardrailSummary(workspace) {
+  const guardrails = await readGuardrails(workspace);
+  return {
+    premise: guardrails.corePremise.oneSentence,
+    signatureMechanism: guardrails.corePremise.signatureMechanism,
+    maxScope: guardrails.maxScope,
+    maxHiddenAntagonistLayers: guardrails.maxHiddenAntagonistLayers,
+    capabilityCharacters: guardrails.capabilityBoundaries.length,
+    coincidenceBudget: guardrails.investigationRules.coincidenceBudgetPerChapter,
+    prohibitedModernTerms: guardrails.periodRules.prohibitedModernTerms,
+    prohibitedShortcuts: guardrails.prohibitedNarrativeShortcuts
+  };
 }
 
 // src/workspace.ts
@@ -34673,6 +35335,40 @@ var INITIAL_FILES = {
     ""
   ].join("\n"),
   "planning/story-bible.md": "# Story Bible\n\n(TODO)\n",
+  "planning/story-guardrails.yaml": [
+    "# (TODO: lock the signature mechanism, scope, capabilities, evidence method, period, and costs)",
+    "schemaVersion: 1",
+    "corePremise:",
+    '  oneSentence: "(TODO)"',
+    '  signatureMechanism: "(TODO)"',
+    "  protectedElements: []",
+    "  forbiddenDrift: []",
+    "maxScope: county",
+    "maxHiddenAntagonistLayers: 1",
+    "capabilityBoundaries: []",
+    "investigationRules:",
+    "  coincidenceBudgetPerChapter: 0",
+    "  requireAlternativeExplanations: true",
+    "  evidenceMustNotNameCulprit: true",
+    "  requireVerificationLimitation: true",
+    "periodRules:",
+    '  era: "(TODO)"',
+    "  prohibitedModernTerms: []",
+    "  institutionalConstraints: []",
+    "  physicalConstraints: []",
+    "supportingCharacters: []",
+    "consequenceRules:",
+    "  failureCannotAutoReward: true",
+    "  permanentCosts: []",
+    "prohibitedNarrativeShortcuts: []",
+    ""
+  ].join("\n"),
+  "planning/reveal-policy.yaml": [
+    "# Schedule protected meanings; do not write secrets directly into pre-reveal chapter context.",
+    "schemaVersion: 1",
+    "reveals: []",
+    ""
+  ].join("\n"),
   "planning/world-rules.yaml": "schemaVersion: 1\nrules: []\n",
   "planning/characters/character-roster.md": "# Character Roster\n\n(TODO)\n",
   "planning/volumes/current-volume.md": "# Current Volume Plan\n\n(TODO)\n",
@@ -34732,6 +35428,7 @@ var INITIAL_FILES = {
   "continuity/relationships.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/characters.yaml": "schemaVersion: 1\nentries: []\n",
   "continuity/story-cards.yaml": "schemaVersion: 1\nentries: []\n",
+  "continuity/evidence.yaml": "schemaVersion: 1\nentries: []\n",
   "publication/serial-plan.yaml": [
     "schemaVersion: 1",
     "updatesPerWeek: 7",
@@ -34763,21 +35460,37 @@ async function artifactFingerprint(workspace, artifact) {
       "planning/novel-brief.md",
       "planning/market-position.yaml"
     ];
-    const combined2 = (await Promise.all(briefFiles.map((relative) => fs11.readFile(path12.join(workspace, relative), "utf8")))).join("\n---\n");
+    const combined2 = (await Promise.all(briefFiles.map((relative) => fs12.readFile(path13.join(workspace, relative), "utf8")))).join("\n---\n");
     return sha256Text(combined2);
   }
   if (artifact === "currentVolumePlan") {
-    return fingerprintFile(path12.join(workspace, "planning/volumes/current-volume.md"));
+    return fingerprintFile(path13.join(workspace, "planning/volumes/current-volume.md"));
   }
   const foundationFiles = [
     "planning/story-bible.md",
+    "planning/story-guardrails.yaml",
     "planning/world-rules.yaml",
     "planning/characters/character-roster.md",
-    "planning/style-profile.yaml"
+    "planning/style-profile.yaml",
+    "planning/style-examples.yaml"
   ];
   const profiles = await loadCharacterProfiles(workspace);
   foundationFiles.push(...profiles.map(({ path: relative }) => relative));
-  const combined = (await Promise.all(foundationFiles.map((relative) => fs11.readFile(path12.join(workspace, relative), "utf8")))).join("\n---\n");
+  const revealPolicy = revealPolicySchema.parse(
+    (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "planning/reveal-policy.yaml"), "utf8"))
+  );
+  const stableRevealSchedule = revealPolicy.reveals.map((reveal) => ({
+    ...reveal,
+    status: reveal.status === "cancelled" ? "cancelled" : "planned",
+    revealedChapter: null,
+    delayReason: null
+  }));
+  const combined = [
+    ...await Promise.all(
+      foundationFiles.map((relative) => fs12.readFile(path13.join(workspace, relative), "utf8"))
+    ),
+    (0, import_yaml12.stringify)({ schemaVersion: 1, reveals: stableRevealSchedule }, { lineWidth: 0 })
+  ].join("\n---\n");
   return sha256Text(combined);
 }
 async function detectStaleArtifacts(workspace, state) {
@@ -34795,11 +35508,11 @@ async function detectStaleArtifacts(workspace, state) {
 }
 async function hasUsableContent(filePath) {
   if (!await pathExists(filePath)) return false;
-  const raw = (await fs11.readFile(filePath, "utf8")).trim();
+  const raw = (await fs12.readFile(filePath, "utf8")).trim();
   if (raw.length < 40 || raw.includes("(TODO")) return false;
-  if (path12.extname(filePath) === ".yaml") {
+  if (path13.extname(filePath) === ".yaml") {
     try {
-      const parsed = (0, import_yaml11.parse)(raw);
+      const parsed = (0, import_yaml12.parse)(raw);
       return typeof parsed === "object" && parsed !== null;
     } catch {
       return false;
@@ -34810,7 +35523,7 @@ async function hasUsableContent(filePath) {
 async function requireUsableFiles(workspace, files) {
   const missing = [];
   for (const relative of files) {
-    if (!await hasUsableContent(path12.join(workspace, relative))) missing.push(relative);
+    if (!await hasUsableContent(path13.join(workspace, relative))) missing.push(relative);
   }
   if (missing.length > 0) {
     throw new Error(`Required accepted artifacts are missing or placeholders: ${missing.join(", ")}`);
@@ -34818,11 +35531,11 @@ async function requireUsableFiles(workspace, files) {
 }
 async function createTransitionSnapshot(workspace, before, after) {
   const runId = `${now2().replace(/[:.]/g, "-")}-${(0, import_node_crypto4.randomUUID)().slice(0, 8)}`;
-  const runDirectory = path12.join(workspace, "runtime", "runs", runId);
-  await fs11.mkdir(runDirectory, { recursive: true });
+  const runDirectory = path13.join(workspace, "runtime", "runs", runId);
+  await fs12.mkdir(runDirectory, { recursive: true });
   await Promise.all([
-    atomicWriteText(path12.join(runDirectory, "state.before.yaml"), (0, import_yaml11.stringify)(before)),
-    atomicWriteText(path12.join(runDirectory, "state.after.yaml"), (0, import_yaml11.stringify)(after))
+    atomicWriteText(path13.join(runDirectory, "state.before.yaml"), (0, import_yaml12.stringify)(before)),
+    atomicWriteText(path13.join(runDirectory, "state.after.yaml"), (0, import_yaml12.stringify)(after))
   ]);
   return runId;
 }
@@ -34840,13 +35553,13 @@ async function recordTransitionEvent(workspace, state, action, runId) {
   }
 }
 async function initializeWorkspace(target, options) {
-  const workspace = path12.resolve(target);
+  const workspace = path13.resolve(target);
   if (await pathExists(workspace)) {
     throw new Error(`Workspace already exists: ${workspace}`);
   }
-  const parent = path12.dirname(workspace);
-  await fs11.mkdir(parent, { recursive: true });
-  const temporary = path12.join(parent, `.${path12.basename(workspace)}.init-${(0, import_node_crypto4.randomUUID)()}`);
+  const parent = path13.dirname(workspace);
+  await fs12.mkdir(parent, { recursive: true });
+  const temporary = path13.join(parent, `.${path13.basename(workspace)}.init-${(0, import_node_crypto4.randomUUID)()}`);
   const createdAt = now2();
   const state = {
     schemaVersion: 2,
@@ -34878,24 +35591,24 @@ async function initializeWorkspace(target, options) {
   };
   validateState(state);
   try {
-    await fs11.mkdir(temporary);
+    await fs12.mkdir(temporary);
     await Promise.all(
-      WORKSPACE_DIRECTORIES.map((relative) => fs11.mkdir(path12.join(temporary, relative), { recursive: true }))
+      WORKSPACE_DIRECTORIES.map((relative) => fs12.mkdir(path13.join(temporary, relative), { recursive: true }))
     );
     await Promise.all(
       Object.entries(INITIAL_FILES).map(
-        ([relative, content]) => atomicWriteText(path12.join(temporary, relative), content)
+        ([relative, content]) => atomicWriteText(path13.join(temporary, relative), content)
       )
     );
-    await atomicWriteText(path12.join(temporary, STATE_FILE), (0, import_yaml11.stringify)(state, { lineWidth: 0 }));
-    await fs11.rename(temporary, workspace);
+    await atomicWriteText(path13.join(temporary, STATE_FILE), (0, import_yaml12.stringify)(state, { lineWidth: 0 }));
+    await fs12.rename(temporary, workspace);
     try {
       await appendEvent(workspace, { at: createdAt, action: "workspace_initialized" });
     } catch {
     }
     return state;
   } catch (error51) {
-    await fs11.rm(temporary, { recursive: true, force: true });
+    await fs12.rm(temporary, { recursive: true, force: true });
     throw error51;
   }
 }
@@ -34919,15 +35632,18 @@ async function transitionPhase(workspace, to) {
   } else if (to === "foundation_approved") {
     await requireUsableFiles(workspace, [
       "planning/story-bible.md",
+      "planning/story-guardrails.yaml",
       "planning/world-rules.yaml",
       "planning/characters/character-roster.md",
       "planning/style-profile.yaml",
       "planning/style-examples.yaml"
     ]);
     await validateCreativeProfiles(workspace);
+    await validateStoryGuardrails(workspace);
   } else if (to === "production") {
     await requireUsableFiles(workspace, ["planning/volumes/current-volume.md"]);
     await requireProductionArcGrid(workspace);
+    await validateStoryGuardrails(workspace);
   } else if (to === "completed" && before.workflow.chapterStatus !== "continuity_committed") {
     throw new Error("The current chapter must be continuity-committed before completing the book.");
   }
@@ -34937,7 +35653,7 @@ async function transitionPhase(workspace, to) {
   after.workflow.blockingReason = null;
   if (to === "brief_approved") {
     const position = marketPositionSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "planning/market-position.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "planning/market-position.yaml"), "utf8"))
     );
     after.novel.audienceChannel = position.audienceChannel;
     after.novel.publicationFormat = position.publicationFormat;
@@ -34957,7 +35673,7 @@ async function transitionPhase(workspace, to) {
   if (to === "production") {
     after.artifacts.currentVolumePlan = {
       status: "accepted",
-      fingerprint: await fingerprintFile(path12.join(workspace, "planning/volumes/current-volume.md")),
+      fingerprint: await fingerprintFile(path13.join(workspace, "planning/volumes/current-volume.md")),
       acceptedAt: after.workflow.updatedAt
     };
   }
@@ -35027,13 +35743,19 @@ async function advanceChapter(workspace, to) {
   await requireUsableFiles(workspace, requiredByStatus[to] ?? []);
   if (to === "planned") {
     const contract = chapterContractSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
     );
     if (contract.chapter !== before.workflow.currentChapter) {
       throw new Error("Chapter contract does not match current chapter.");
     }
+    if (contract.schemaVersion !== 3) {
+      throw new Error(
+        "New chapter planning requires contract schemaVersion 3 with scope, capability, evidence, period, agency, and consequence checks."
+      );
+    }
+    await validateChapterGuardrails(workspace, contract);
     const position = marketPositionSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "planning/market-position.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "planning/market-position.yaml"), "utf8"))
     );
     const policyIssues = chapterLengthPolicyIssues(contract, position);
     if (policyIssues.length > 0) {
@@ -35046,8 +35768,14 @@ async function advanceChapter(workspace, to) {
     const quality = await readCurrentQualityReport(workspace, "draft");
     if (!quality.ok) throw new Error("Draft quality gate has blocking issues.");
     const review = chapterReviewSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
+    const contract = chapterContractSchema.parse(
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+    );
+    if (contract.schemaVersion === 3 && review.schemaVersion !== 3) {
+      throw new Error("A schema-v3 chapter contract requires a schema-v3 review.");
+    }
     if (review.sourceFingerprint !== quality.sourceFingerprint) {
       throw new Error("Review fingerprint does not match the current draft.");
     }
@@ -35061,7 +35789,7 @@ async function advanceChapter(workspace, to) {
     const quality = await readCurrentQualityReport(workspace, "final");
     if (!quality.ok) throw new Error("Final quality gate has blocking issues.");
     const review = chapterReviewSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
     if (review.verdict !== "pass") {
       throw new Error("Chapter cannot be accepted until review verdict is pass.");
@@ -35077,10 +35805,10 @@ async function advanceChapter(workspace, to) {
   }
   if (to === "continuity_committed") {
     const handoff = chapterHandoffSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "chapters", chapter, "handoff.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "chapters", chapter, "handoff.yaml"), "utf8"))
     );
     const finalFingerprint = await fingerprintFile(
-      path12.join(workspace, "chapters", chapter, "final.md")
+      path13.join(workspace, "chapters", chapter, "final.md")
     );
     if (handoff.chapter !== before.workflow.currentChapter) {
       throw new Error("Chapter handoff does not match the current chapter.");
@@ -35093,7 +35821,7 @@ async function advanceChapter(workspace, to) {
   after.workflow.chapterStatus = to;
   if (to === "reviewed") {
     const review = chapterReviewSchema.parse(
-      (0, import_yaml11.parse)(await fs11.readFile(path12.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+      (0, import_yaml12.parse)(await fs12.readFile(path13.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
     after.workflow.reviewRound = review.reviewRound;
   }
@@ -35132,14 +35860,14 @@ async function exportNovel(workspace, format) {
   const sections = [];
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
-    const finalPath = path12.join(workspace, "chapters", directory, "final.md");
+    const finalPath = path13.join(workspace, "chapters", directory, "final.md");
     if (!await hasUsableContent(finalPath)) {
       throw new Error(`Committed chapter is missing accepted prose: chapters/${directory}/final.md`);
     }
-    sections.push((await fs11.readFile(finalPath, "utf8")).trim());
+    sections.push((await fs12.readFile(finalPath, "utf8")).trim());
     chapters.push(chapter);
   }
-  const output = path12.join(workspace, "exports", `${state.novel.id}.${format}`);
+  const output = path13.join(workspace, "exports", `${state.novel.id}.${format}`);
   await atomicWriteText(output, `${sections.join("\n\n")}
 `);
   try {
@@ -35166,6 +35894,7 @@ async function validateWorkspace(workspace) {
   }
   if (state.artifacts.foundation.status === "accepted") {
     await validateCreativeProfiles(workspace);
+    await validateStoryGuardrails(workspace);
   }
   if (state.artifacts.brief.status === "accepted") {
     await validateHookExperiments(workspace);
@@ -35180,7 +35909,7 @@ async function validateWorkspace(workspace) {
   );
   const missingDirectories = [];
   for (const relative of requiredDirectories) {
-    if (!await pathExists(path12.join(workspace, relative))) missingDirectories.push(relative);
+    if (!await pathExists(path13.join(workspace, relative))) missingDirectories.push(relative);
   }
   if (missingDirectories.length > 0) {
     throw new Error(`Required workspace directories are missing: ${missingDirectories.join(", ")}`);
@@ -35193,24 +35922,24 @@ async function validateCommittedChapterArtifacts(workspace, state) {
   const issues = [];
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
-    const chapterRoot = path12.join(workspace, "chapters", directory);
+    const chapterRoot = path13.join(workspace, "chapters", directory);
     try {
       const contract = chapterContractSchema.parse(
-        (0, import_yaml11.parse)(await fs11.readFile(path12.join(chapterRoot, "contract.yaml"), "utf8"))
+        (0, import_yaml12.parse)(await fs12.readFile(path13.join(chapterRoot, "contract.yaml"), "utf8"))
       );
       const review = chapterReviewSchema.parse(
-        (0, import_yaml11.parse)(await fs11.readFile(path12.join(chapterRoot, "review.yaml"), "utf8"))
+        (0, import_yaml12.parse)(await fs12.readFile(path13.join(chapterRoot, "review.yaml"), "utf8"))
       );
       const quality = qualityReportSchema.parse(
-        JSON.parse(await fs11.readFile(path12.join(chapterRoot, "quality-final.json"), "utf8"))
+        JSON.parse(await fs12.readFile(path13.join(chapterRoot, "quality-final.json"), "utf8"))
       );
       const delta = continuityDeltaSchema.parse(
-        (0, import_yaml11.parse)(await fs11.readFile(path12.join(chapterRoot, "delta.yaml"), "utf8"))
+        (0, import_yaml12.parse)(await fs12.readFile(path13.join(chapterRoot, "delta.yaml"), "utf8"))
       );
       const handoff = chapterHandoffSchema.parse(
-        (0, import_yaml11.parse)(await fs11.readFile(path12.join(chapterRoot, "handoff.yaml"), "utf8"))
+        (0, import_yaml12.parse)(await fs12.readFile(path13.join(chapterRoot, "handoff.yaml"), "utf8"))
       );
-      const finalFingerprint = await fingerprintFile(path12.join(chapterRoot, "final.md"));
+      const finalFingerprint = await fingerprintFile(path13.join(chapterRoot, "final.md"));
       if (contract.chapter !== chapter) issues.push(`chapter ${chapter}: contract number mismatch`);
       if (review.verdict !== "pass") issues.push(`chapter ${chapter}: review is not passing`);
       if (review.sourceFingerprint !== finalFingerprint) {
@@ -35254,10 +35983,10 @@ function formatStatus(state) {
 }
 
 // src/revisions.ts
-var fs12 = __toESM(require("node:fs/promises"), 1);
-var path13 = __toESM(require("node:path"), 1);
+var fs13 = __toESM(require("node:fs/promises"), 1);
+var path14 = __toESM(require("node:path"), 1);
 var import_node_crypto5 = require("node:crypto");
-var REVISION_ROOT = path13.join("runtime", "revisions");
+var REVISION_ROOT = path14.join("runtime", "revisions");
 var AUTHORITATIVE_ROOTS = [
   "discovery",
   "planning",
@@ -35271,19 +36000,19 @@ function revisionId() {
   return `${(/* @__PURE__ */ new Date()).toISOString().replace(/\D/g, "").toLowerCase()}-${(0, import_node_crypto5.randomUUID)().slice(0, 8)}`;
 }
 function safeRelative(relative) {
-  const normalized = relative.split(path13.sep).join(path13.posix.sep);
-  if (path13.posix.isAbsolute(normalized) || normalized === ".." || normalized.startsWith("../") || normalized.includes("/../")) {
+  const normalized = relative.split(path14.sep).join(path14.posix.sep);
+  if (path14.posix.isAbsolute(normalized) || normalized === ".." || normalized.startsWith("../") || normalized.includes("/../")) {
     throw new Error(`Unsafe revision path: ${relative}`);
   }
   return normalized;
 }
 async function walkFiles(root, relative = "") {
-  const directory = path13.join(root, relative);
+  const directory = path14.join(root, relative);
   if (!await pathExists(directory)) return [];
-  const entries = await fs12.readdir(directory, { withFileTypes: true });
+  const entries = await fs13.readdir(directory, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
-    const child = path13.join(relative, entry.name);
+    const child = path14.join(relative, entry.name);
     if (entry.isDirectory()) {
       files.push(...await walkFiles(root, child));
     } else if (entry.isFile()) {
@@ -35295,7 +36024,7 @@ async function walkFiles(root, relative = "") {
 async function authoritativeFiles(workspace) {
   const files = [];
   for (const relative of AUTHORITATIVE_TOP_LEVEL) {
-    if (await pathExists(path13.join(workspace, relative))) files.push(relative);
+    if (await pathExists(path14.join(workspace, relative))) files.push(relative);
   }
   for (const root of AUTHORITATIVE_ROOTS) {
     files.push(...await walkFiles(workspace, root));
@@ -35304,18 +36033,18 @@ async function authoritativeFiles(workspace) {
 }
 async function loadManifest(revisionDirectory) {
   return revisionManifestSchema.parse(
-    JSON.parse(await fs12.readFile(path13.join(revisionDirectory, "manifest.json"), "utf8"))
+    JSON.parse(await fs13.readFile(path14.join(revisionDirectory, "manifest.json"), "utf8"))
   );
 }
 async function listRevisions(workspace) {
-  const root = path13.join(workspace, REVISION_ROOT);
+  const root = path14.join(workspace, REVISION_ROOT);
   if (!await pathExists(root)) return [];
-  const entries = await fs12.readdir(root, { withFileTypes: true });
+  const entries = await fs13.readdir(root, { withFileTypes: true });
   const manifests = [];
   for (const entry of entries) {
     if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
     try {
-      manifests.push(await loadManifest(path13.join(root, entry.name)));
+      manifests.push(await loadManifest(path14.join(root, entry.name)));
     } catch {
     }
   }
@@ -35331,14 +36060,14 @@ async function createRevision(workspace, name) {
   const currentFiles = await Promise.all(
     files.map(async (relative) => ({
       path: relative,
-      fingerprint: await fingerprintFile(path13.join(workspace, relative))
+      fingerprint: await fingerprintFile(path14.join(workspace, relative))
     }))
   );
   const currentMap = new Map(currentFiles.map((file2) => [file2.path, file2.fingerprint]));
   const id = revisionId();
-  const root = path13.join(workspace, REVISION_ROOT);
-  const temporary = path13.join(root, `.${id}.tmp`);
-  const destination = path13.join(root, id);
+  const root = path14.join(workspace, REVISION_ROOT);
+  const temporary = path14.join(root, `.${id}.tmp`);
+  const destination = path14.join(root, id);
   const manifest = revisionManifestSchema.parse({
     schemaVersion: 1,
     id,
@@ -35355,23 +36084,23 @@ async function createRevision(workspace, name) {
       removed: [...previousMap.keys()].filter((relative) => !currentMap.has(relative))
     }
   });
-  await fs12.mkdir(root, { recursive: true });
+  await fs13.mkdir(root, { recursive: true });
   try {
-    await fs12.mkdir(temporary);
+    await fs13.mkdir(temporary);
     for (const file2 of currentFiles) {
-      const source2 = path13.join(workspace, file2.path);
-      const target = path13.join(temporary, "files", file2.path);
-      await fs12.mkdir(path13.dirname(target), { recursive: true });
-      await fs12.copyFile(source2, target);
+      const source2 = path14.join(workspace, file2.path);
+      const target = path14.join(temporary, "files", file2.path);
+      await fs13.mkdir(path14.dirname(target), { recursive: true });
+      await fs13.copyFile(source2, target);
     }
     await atomicWriteText(
-      path13.join(temporary, "manifest.json"),
+      path14.join(temporary, "manifest.json"),
       `${JSON.stringify(manifest, null, 2)}
 `
     );
-    await fs12.rename(temporary, destination);
+    await fs13.rename(temporary, destination);
   } catch (error51) {
-    await fs12.rm(temporary, { recursive: true, force: true });
+    await fs13.rm(temporary, { recursive: true, force: true });
     throw error51;
   }
   await appendEvent(workspace, {
@@ -35384,27 +36113,27 @@ async function createRevision(workspace, name) {
 }
 async function restoreRevision(workspace, id) {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) throw new Error("Invalid revision ID.");
-  const revisionDirectory = path13.join(workspace, REVISION_ROOT, id);
+  const revisionDirectory = path14.join(workspace, REVISION_ROOT, id);
   const target = await loadManifest(revisionDirectory);
   const safetyRevision = await createRevision(workspace, `\u6062\u590D\u524D\u81EA\u52A8\u5907\u4EFD\uFF1A${target.name}`);
   const currentFiles = await authoritativeFiles(workspace);
   const targetPaths = new Set(target.files.map((file2) => safeRelative(file2.path)));
   for (const relative of targetPaths) {
-    const source2 = path13.join(revisionDirectory, "files", relative);
+    const source2 = path14.join(revisionDirectory, "files", relative);
     if (!await pathExists(source2)) throw new Error(`Revision snapshot is incomplete: ${relative}`);
     const actual = await fingerprintFile(source2);
     const expected = target.files.find((file2) => file2.path === relative)?.fingerprint;
     if (actual !== expected) throw new Error(`Revision snapshot fingerprint mismatch: ${relative}`);
   }
   for (const file2 of target.files) {
-    const source2 = path13.join(revisionDirectory, "files", file2.path);
-    const destination = path13.join(workspace, file2.path);
-    await atomicWriteText(destination, await fs12.readFile(source2, "utf8"));
+    const source2 = path14.join(revisionDirectory, "files", file2.path);
+    const destination = path14.join(workspace, file2.path);
+    await atomicWriteText(destination, await fs13.readFile(source2, "utf8"));
   }
   for (const relative of currentFiles) {
-    if (!targetPaths.has(relative)) await fs12.rm(path13.join(workspace, relative), { force: true });
+    if (!targetPaths.has(relative)) await fs13.rm(path14.join(workspace, relative), { force: true });
   }
-  await fs12.rm(path13.join(workspace, "derived", "retrieval.sqlite"), { force: true });
+  await fs13.rm(path14.join(workspace, "derived", "retrieval.sqlite"), { force: true });
   await appendEvent(workspace, {
     at: (/* @__PURE__ */ new Date()).toISOString(),
     action: "revision_restored",
@@ -35415,17 +36144,17 @@ async function restoreRevision(workspace, id) {
 }
 
 // src/production.ts
-var fs13 = __toESM(require("node:fs/promises"), 1);
-var path14 = __toESM(require("node:path"), 1);
-var import_yaml12 = __toESM(require_dist(), 1);
+var fs14 = __toESM(require("node:fs/promises"), 1);
+var path15 = __toESM(require("node:path"), 1);
+var import_yaml13 = __toESM(require_dist(), 1);
 async function readPosition(workspace) {
   return marketPositionSchema.parse(
-    (0, import_yaml12.parse)(await fs13.readFile(path14.join(workspace, "planning", "market-position.yaml"), "utf8"))
+    (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "planning", "market-position.yaml"), "utf8"))
   );
 }
 async function readSerialPlan(workspace) {
   return serialPlanSchema.parse(
-    (0, import_yaml12.parse)(await fs13.readFile(path14.join(workspace, "publication", "serial-plan.yaml"), "utf8"))
+    (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "publication", "serial-plan.yaml"), "utf8"))
   );
 }
 async function inspectCadence(workspace) {
@@ -35476,8 +36205,8 @@ async function updatePublishedThrough(workspace, chapter) {
   const plan = await readSerialPlan(workspace);
   plan.publishedThroughChapter = chapter;
   await atomicWriteText(
-    path14.join(workspace, "publication", "serial-plan.yaml"),
-    (0, import_yaml12.stringify)(plan, { lineWidth: 0 })
+    path15.join(workspace, "publication", "serial-plan.yaml"),
+    (0, import_yaml13.stringify)(plan, { lineWidth: 0 })
   );
   await appendEvent(workspace, {
     at: (/* @__PURE__ */ new Date()).toISOString(),
@@ -35517,7 +36246,7 @@ function optionalNumber(value) {
   return parsed;
 }
 async function importPublicationMetrics(workspace, source2) {
-  const lines = (await fs13.readFile(source2, "utf8")).split(/\r?\n/).filter((line) => line.trim().length > 0);
+  const lines = (await fs14.readFile(source2, "utf8")).split(/\r?\n/).filter((line) => line.trim().length > 0);
   if (lines.length < 2) throw new Error("Metrics CSV must include a header and at least one data row.");
   const headers = parseCsvLine(lines[0]);
   for (const required2 of ["chapter", "observedAt"]) {
@@ -35537,8 +36266,8 @@ async function importPublicationMetrics(workspace, source2) {
       comments: optionalNumber(values[indexOf("comments")])
     });
   });
-  const output = path14.join(workspace, "publication", "metrics.json");
-  const existing = await pathExists(output) ? zodMetrics(JSON.parse(await fs13.readFile(output, "utf8"))) : [];
+  const output = path15.join(workspace, "publication", "metrics.json");
+  const existing = await pathExists(output) ? zodMetrics(JSON.parse(await fs14.readFile(output, "utf8"))) : [];
   const merged = /* @__PURE__ */ new Map();
   for (const metric of [...existing, ...imported]) {
     merged.set(`${metric.chapter}:${metric.observedAt}`, metric);
@@ -35566,13 +36295,13 @@ function average(values) {
   return present.reduce((sum, value) => sum + value, 0) / present.length;
 }
 async function generateLearningReport(workspace) {
-  const metricsPath = path14.join(workspace, "publication", "metrics.json");
+  const metricsPath = path15.join(workspace, "publication", "metrics.json");
   if (!await pathExists(metricsPath)) {
     throw new Error("No publication metrics are available. Import a CSV file first.");
   }
-  const metrics = zodMetrics(JSON.parse(await fs13.readFile(metricsPath, "utf8")));
+  const metrics = zodMetrics(JSON.parse(await fs14.readFile(metricsPath, "utf8")));
   const decision = topicDecisionSchema.parse(
-    (0, import_yaml12.parse)(await fs13.readFile(path14.join(workspace, "discovery", "topic-decision.yaml"), "utf8"))
+    (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "discovery", "topic-decision.yaml"), "utf8"))
   );
   const report = {
     schemaVersion: 1,
@@ -35598,8 +36327,8 @@ async function generateLearningReport(workspace) {
       "\u54EA\u4E9B\u7ED3\u8BBA\u4ECD\u7F3A\u5C11\u8DB3\u591F\u6837\u672C\uFF0C\u4E0D\u80FD\u636E\u6B64\u4FEE\u6539\u6743\u5A01\u8BBE\u5B9A\uFF1F"
     ]
   };
-  const reportRoot = path14.join(workspace, "reports", "learning");
-  const output = path14.join(
+  const reportRoot = path15.join(workspace, "reports", "learning");
+  const output = path15.join(
     reportRoot,
     `${(/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-")}.json`
   );
@@ -35609,8 +36338,8 @@ async function generateLearningReport(workspace) {
 }
 
 // src/documents.ts
-var fs14 = __toESM(require("node:fs/promises"), 1);
-var path15 = __toESM(require("node:path"), 1);
+var fs15 = __toESM(require("node:fs/promises"), 1);
+var path16 = __toESM(require("node:path"), 1);
 var import_jszip = __toESM(require_lib3(), 1);
 function xmlEscape(value) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;");
@@ -35630,11 +36359,11 @@ async function committedChapters(workspace) {
   const chapters = [];
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
-    const source2 = path15.join(workspace, "chapters", directory, "final.md");
+    const source2 = path16.join(workspace, "chapters", directory, "final.md");
     if (!await pathExists(source2)) {
       throw new Error(`Committed chapter is missing accepted prose: chapters/${directory}/final.md`);
     }
-    const markdown = (await fs14.readFile(source2, "utf8")).trim();
+    const markdown = (await fs15.readFile(source2, "utf8")).trim();
     chapters.push({
       chapter,
       title: chapterTitle(markdown, chapter),
@@ -35668,9 +36397,9 @@ ${chapter.plainText}`))
     "document.xml",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr/></w:body></w:document>`
   );
-  const output = path15.join(workspace, "exports", `${novelId}.docx`);
-  await fs14.mkdir(path15.dirname(output), { recursive: true });
-  await fs14.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
+  const output = path16.join(workspace, "exports", `${novelId}.docx`);
+  await fs15.mkdir(path16.dirname(output), { recursive: true });
+  await fs15.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
   return output;
 }
 async function exportEpub(workspace, title, novelId, language, chapters) {
@@ -35699,9 +36428,9 @@ async function exportEpub(workspace, title, novelId, language, chapters) {
       `<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" lang="${xmlEscape(language)}"><head><title>${xmlEscape(chapter.title)}</title></head><body><h1>${xmlEscape(chapter.title)}</h1>${paragraphs}</body></html>`
     );
   }
-  const output = path15.join(workspace, "exports", `${novelId}.epub`);
-  await fs14.mkdir(path15.dirname(output), { recursive: true });
-  await fs14.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
+  const output = path16.join(workspace, "exports", `${novelId}.epub`);
+  await fs15.mkdir(path16.dirname(output), { recursive: true });
+  await fs15.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
   return output;
 }
 async function exportDocument(workspace, format) {
@@ -35733,30 +36462,30 @@ function splitManuscript(source2) {
   return sections.filter(Boolean);
 }
 async function importManuscript(workspace, sourcePath, title) {
-  const extension = path15.extname(sourcePath).toLowerCase();
+  const extension = path16.extname(sourcePath).toLowerCase();
   if (extension !== ".md" && extension !== ".txt") {
     throw new Error("Manuscript import currently supports Markdown (.md) and text (.txt).");
   }
-  const source2 = await fs14.readFile(sourcePath, "utf8");
+  const source2 = await fs15.readFile(sourcePath, "utf8");
   const chapters = splitManuscript(source2);
   if (chapters.length === 0) throw new Error("No manuscript content could be detected.");
   await initializeWorkspace(workspace, { title });
-  const importRoot = path15.join(workspace, "imports", "chapters");
-  await fs14.mkdir(importRoot, { recursive: true });
+  const importRoot = path16.join(workspace, "imports", "chapters");
+  await fs15.mkdir(importRoot, { recursive: true });
   for (const [index, chapter] of chapters.entries()) {
     await atomicWriteText(
-      path15.join(importRoot, `${String(index + 1).padStart(4, "0")}.md`),
+      path16.join(importRoot, `${String(index + 1).padStart(4, "0")}.md`),
       `${chapter}
 `
     );
   }
-  const manifest = path15.join(workspace, "imports", "manifest.json");
+  const manifest = path16.join(workspace, "imports", "manifest.json");
   await atomicWriteText(
     manifest,
     `${JSON.stringify({
       schemaVersion: 1,
       importedAt: (/* @__PURE__ */ new Date()).toISOString(),
-      sourceName: path15.basename(sourcePath),
+      sourceName: path16.basename(sourcePath),
       detectedChapters: chapters.length,
       status: "awaiting-continuity-extraction",
       note: "Imported prose is not accepted canon until Codex extracts and the author confirms continuity."
@@ -35767,7 +36496,7 @@ async function importManuscript(workspace, sourcePath, title) {
 }
 
 // src/diagnostics.ts
-var path16 = __toESM(require("node:path"), 1);
+var path17 = __toESM(require("node:path"), 1);
 async function runDoctor(workspace) {
   const checks = [];
   const major = Number(process.versions.node.split(".")[0]);
@@ -35795,8 +36524,8 @@ async function runDoctor(workspace) {
     });
   }
   if (workspace) {
-    const resolved = path16.resolve(workspace);
-    const statePath = path16.join(resolved, "novel-state.yaml");
+    const resolved = path17.resolve(workspace);
+    const statePath = path17.join(resolved, "novel-state.yaml");
     const exists = await pathExists(statePath);
     checks.push({
       id: "workspace",
@@ -35826,7 +36555,7 @@ async function runDoctor(workspace) {
   return {
     ok: checks.every((check2) => check2.ok),
     nodeVersion: process.versions.node,
-    workspace: workspace ? path16.resolve(workspace) : null,
+    workspace: workspace ? path17.resolve(workspace) : null,
     checks
   };
 }
@@ -35850,7 +36579,7 @@ async function guideWorkspace(workspace) {
     return {
       title: state.novel.title,
       nextAction: "\u5B8C\u6210\u4EBA\u7269\u4E0E\u4E16\u754C\u57FA\u7840\u8BBE\u5B9A",
-      prompt: `\u8BF7\u8BFB\u53D6 Codex Novel Skill\uFF0C\u7EE7\u7EED ${workspace}\u3002\u6839\u636E\u5DF2\u6279\u51C6\u9009\u9898\u548C\u5F00\u7BC7\u94A9\u5B50\uFF0C\u5B8C\u5584\u6545\u4E8B\u5723\u7ECF\u3001\u4E16\u754C\u89C4\u5219\u3001\u89D2\u8272\u5361\u548C\u98CE\u683C\u8BBE\u5B9A\uFF0C\u91CD\u8981\u8BBE\u5B9A\u7B49\u6211\u786E\u8BA4\u3002`
+      prompt: `\u8BF7\u8BFB\u53D6 Codex Novel Skill\uFF0C\u7EE7\u7EED ${workspace}\u3002\u6839\u636E\u5DF2\u6279\u51C6\u9009\u9898\u548C\u5F00\u7BC7\u94A9\u5B50\uFF0C\u5B8C\u5584\u6545\u4E8B\u5723\u7ECF\u3001\u4E16\u754C\u89C4\u5219\u3001\u89D2\u8272\u5361\u3001\u98CE\u683C\u8BBE\u5B9A\u3001\u6838\u5FC3\u8FB9\u754C\u548C\u63ED\u79D8\u65F6\u95F4\u8868\uFF0C\u91CD\u8981\u8BBE\u5B9A\u7B49\u6211\u786E\u8BA4\u3002`
     };
   }
   if (state.workflow.phase === "foundation_approved") {
@@ -35909,6 +36638,11 @@ function friendlyError(message) {
 
 \u5DF2\u6279\u51C6\u8BBE\u5B9A\u540E\u6765\u88AB\u6539\u52A8\u3002\u8BF7\u5148\u786E\u8BA4\u6539\u52A8\u8303\u56F4\uFF0C\u518D\u4F7F\u7528 invalidate \u8BA9\u4F9D\u8D56\u5185\u5BB9\u660E\u786E\u5931\u6548\u3002`;
   }
+  if (message.includes("ENOENT") && (message.includes("story-guardrails.yaml") || message.includes("reveal-policy.yaml") || message.includes("evidence.yaml"))) {
+    return `${message}
+
+\u8FD9\u662F v0.4 \u65B0\u589E\u7684\u8D28\u91CF\u95E8\u7981\u6587\u4EF6\u3002\u4E0D\u8981\u8BA9\u7CFB\u7EDF\u81EA\u52A8\u731C\u6D4B\u65E7\u4E66\u89C4\u5219\uFF1B\u8BF7\u53C2\u7167 README \u7684\u201C\u4ECE v0.3 \u5347\u7EA7\u5DE5\u4F5C\u533A\u201D\u8865\u9F50\u6587\u4EF6\uFF0C\u518D\u4F5C\u5E9F\u5E76\u91CD\u65B0\u6279\u51C6\u57FA\u7840\u8BBE\u5B9A\u3002`;
+  }
   if (message.includes("No continuity-committed chapters are available to export")) {
     return `${message}
 
@@ -35936,6 +36670,8 @@ function usage() {
     "  topics <workspace> [--policy-date YYYY-MM-DD]",
     "  hooks <workspace> [--json]",
     "  arcs <workspace> [--json]",
+    "  guardrails <workspace> [--json]",
+    "  reveals <workspace> [--json]",
     "  phase <workspace> --to <phase>",
     "  context <workspace> [--max-chars 20000]",
     "  quality <workspace> [--source draft|final]",
@@ -35984,7 +36720,7 @@ async function interactiveGuide() {
     if (form !== "long-serial" && form !== "short-complete") {
       throw new Error("\u4F5C\u54C1\u5F62\u6001\u53EA\u80FD\u662F long-serial \u6216 short-complete\u3002");
     }
-    const resolved = path17.resolve(workspace);
+    const resolved = path18.resolve(workspace);
     await initializeWorkspace(resolved, { title });
     console.log(
       `
@@ -36024,7 +36760,7 @@ async function main() {
     const action = args[1];
     const revisionWorkspace = args[2];
     if (!revisionWorkspace) throw new Error("revision requires create/list/restore and a workspace path.");
-    const workspace2 = path17.resolve(revisionWorkspace);
+    const workspace2 = path18.resolve(revisionWorkspace);
     if (action === "create") {
       const name = option(args, "--name");
       if (!name) throw new Error("revision create requires --name.");
@@ -36056,7 +36792,7 @@ async function main() {
     }
     const source2 = option(args, "--file");
     if (!source2) throw new Error("metrics import requires --file.");
-    const result = await importPublicationMetrics(path17.resolve(args[2]), path17.resolve(source2));
+    const result = await importPublicationMetrics(path18.resolve(args[2]), path18.resolve(source2));
     console.log(args.includes("--json") ? JSON.stringify(result, null, 2) : `\u5DF2\u5BFC\u5165 ${result.imported} \u6761\u53D1\u5E03\u6307\u6807\uFF0C\u5171 ${result.total} \u6761\u3002`);
     return;
   }
@@ -36064,7 +36800,7 @@ async function main() {
   if (!workspaceArg) throw new Error(`Missing workspace path.
 
 ${usage()}`);
-  const workspace = path17.resolve(workspaceArg);
+  const workspace = path18.resolve(workspaceArg);
   const json2 = args.includes("--json");
   if (command === "init") {
     const title = option(args, "--title");
@@ -36183,6 +36919,38 @@ Report: ${result.output}`
     if (report.idleArcs.length > 0) process.exitCode = 2;
     return;
   }
+  if (command === "guardrails") {
+    const summary = await guardrailSummary(workspace);
+    console.log(
+      json2 ? JSON.stringify(summary, null, 2) : [
+        `\u6838\u5FC3\u8BBE\u5B9A\uFF1A${summary.premise}`,
+        `\u62DB\u724C\u673A\u5236\uFF1A${summary.signatureMechanism}`,
+        `\u89C4\u6A21\u4E0A\u9650\uFF1A${summary.maxScope}`,
+        `\u5E55\u540E\u5C42\u7EA7\u4E0A\u9650\uFF1A${summary.maxHiddenAntagonistLayers}`,
+        `\u89D2\u8272\u80FD\u529B\u8FB9\u754C\uFF1A${summary.capabilityCharacters} \u4EBA`,
+        `\u6BCF\u7AE0\u5DE7\u5408\u9884\u7B97\uFF1A${summary.coincidenceBudget}`,
+        `\u7981\u7528\u73B0\u4EE3\u8BCD\uFF1A${summary.prohibitedModernTerms.join("\u3001") || "\u65E0"}`,
+        `\u7981\u7528\u5267\u60C5\u6377\u5F84\uFF1A${summary.prohibitedShortcuts.join("\u3001") || "\u65E0"}`
+      ].join("\n")
+    );
+    return;
+  }
+  if (command === "reveals") {
+    const report = await inspectRevealPolicy(workspace);
+    console.log(
+      json2 ? JSON.stringify(report, null, 2) : [
+        `\u5F53\u524D\u7AE0\u8282\uFF1A${report.chapter}\uFF1B\u5F85\u63ED\u79D8\uFF1A${report.planned}`,
+        `\u672C\u7AE0\u76EE\u6807\uFF1A${report.dueNow.join("\u3001") || "\u65E0"}`,
+        `\u5DF2\u903E\u671F\uFF1A${report.overdue.join("\u3001") || "\u65E0"}`,
+        `\u660E\u786E\u5EF6\u671F\uFF1A${report.delayed.map((item) => `${item.id}(${item.reason})`).join("\u3001") || "\u65E0"}`,
+        `\u4ECD\u53D7\u4FDD\u62A4\uFF1A${report.protected.map(
+          (item) => `${item.id}(\u6700\u65E9${item.earliestChapter}/\u76EE\u6807${item.targetChapter})`
+        ).join("\u3001") || "\u65E0"}`
+      ].join("\n")
+    );
+    if (report.overdue.length > 0) process.exitCode = 2;
+    return;
+  }
   if (command === "advance") {
     const to = chapterStatusSchema.parse(option(args, "--to"));
     const state = await advanceChapter(workspace, to);
@@ -36287,7 +37055,7 @@ Review template: ${result.templatePath}`
     const source2 = option(args, "--source");
     const title = option(args, "--title");
     if (!source2 || !title) throw new Error("import requires --source and --title.");
-    const result = await importManuscript(workspace, path17.resolve(source2), title);
+    const result = await importManuscript(workspace, path18.resolve(source2), title);
     console.log(
       `\u5DF2\u8BC6\u522B ${result.chapters} \u4E2A\u7AE0\u8282\u3002\u5BFC\u5165\u5185\u5BB9\u5C1A\u672A\u6210\u4E3A\u6743\u5A01\u6B63\u6587\uFF1B\u8BF7\u5148\u8BA9 Codex \u63D0\u53D6\u4EBA\u7269\u3001\u65F6\u95F4\u7EBF\u548C\u4F0F\u7B14\uFF1A${result.manifest}`
     );

@@ -19,6 +19,15 @@ export const chapterStatusSchema = z.enum([
 ]);
 
 export const artifactStatusSchema = z.enum(["missing", "draft", "accepted", "stale"]);
+export const scopeLevelSchema = z.enum([
+  "household",
+  "village",
+  "county",
+  "prefecture",
+  "province",
+  "court",
+  "national"
+]);
 
 export const artifactRecordSchema = z
   .object({
@@ -67,9 +76,29 @@ export const novelStateSchema = z
   })
   .strict();
 
-export const chapterContractSchema = z
+const sceneBeatSchema = z
   .object({
-    schemaVersion: z.literal(2),
+    id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+    type: z.enum([
+      "dialogue",
+      "action",
+      "investigation",
+      "intimacy",
+      "reveal",
+      "transition",
+      "other"
+    ]),
+    location: z.string().min(1),
+    participants: z.array(z.string().min(1)).min(1),
+    goal: z.string().min(1),
+    conflict: z.string().min(1),
+    valueShift: z.string().min(1),
+    emotionalChange: z.string().min(1)
+  })
+  .strict();
+
+const chapterContractBaseSchema = z
+  .object({
     chapter: z.number().int().positive(),
     title: z.string().min(1),
     goal: z.string().min(1),
@@ -90,30 +119,7 @@ export const chapterContractSchema = z
     netChange: z.string().min(1),
     endingPull: z.string().min(1),
     emotionalTarget: z.string().min(1),
-    sceneBeats: z
-      .array(
-        z
-          .object({
-            id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
-            type: z.enum([
-              "dialogue",
-              "action",
-              "investigation",
-              "intimacy",
-              "reveal",
-              "transition",
-              "other"
-            ]),
-            location: z.string().min(1),
-            participants: z.array(z.string().min(1)).min(1),
-            goal: z.string().min(1),
-            conflict: z.string().min(1),
-            valueShift: z.string().min(1),
-            emotionalChange: z.string().min(1)
-          })
-          .strict()
-      )
-      .min(1),
+    sceneBeats: z.array(sceneBeatSchema).min(1),
     targetLength: z
       .object({
         min: z.number().int().positive(),
@@ -122,8 +128,12 @@ export const chapterContractSchema = z
       })
       .strict()
   })
-  .strict()
-  .superRefine((contract, context) => {
+  .strict();
+
+function validateContractShape(
+  contract: z.infer<typeof chapterContractBaseSchema>,
+  context: z.RefinementCtx
+): void {
     if (!(contract.targetLength.min <= contract.targetLength.target &&
       contract.targetLength.target <= contract.targetLength.max)) {
       context.addIssue({
@@ -159,7 +169,118 @@ export const chapterContractSchema = z
       }
       sceneIds.add(scene.id);
     }
+}
+
+export const chapterContractV2Schema = chapterContractBaseSchema
+  .extend({ schemaVersion: z.literal(2) })
+  .strict()
+  .superRefine(validateContractShape);
+
+export const chapterContractV3Schema = chapterContractBaseSchema
+  .extend({
+    schemaVersion: z.literal(3),
+    scopeLevel: scopeLevelSchema,
+    antagonistLayer: z.number().int().min(0).max(3),
+    capabilityUses: z.array(
+      z
+        .object({
+          characterId: z.string().min(1),
+          capabilityId: z.string().min(1),
+          purpose: z.string().min(1),
+          supportCharacterId: z.string().min(1).nullable()
+        })
+        .strict()
+    ),
+    investigationChain: z
+      .object({
+        anomaly: z.string().min(1),
+        alternativeExplanations: z.array(z.string().min(1)).min(2),
+        eliminationTests: z.array(z.string().min(1)).min(1),
+        result: z.string().min(1),
+        limitation: z.string().min(1)
+      })
+      .strict()
+      .nullable(),
+    evidenceMoves: z.array(
+      z
+        .object({
+          evidenceId: z.string().min(1),
+          action: z.enum(["discover", "hypothesize", "test", "corroborate", "challenge", "admit"]),
+          claimId: z.string().min(1),
+          expectedResult: z.string().min(1)
+        })
+        .strict()
+    ),
+    revealIds: z.array(z.string().min(1)),
+    coincidences: z.array(
+      z
+        .object({
+          description: z.string().min(1),
+          cost: z.string().min(1)
+        })
+        .strict()
+    ),
+    supportingCharacterAgency: z.array(
+      z
+        .object({
+          characterId: z.string().min(1),
+          independentGoal: z.string().min(1),
+          decision: z.string().min(1)
+        })
+        .strict()
+    ),
+    outcomeCost: z.string().min(1),
+    failureConsequence: z.string().min(1),
+    periodChecks: z
+      .object({
+        physical: z.string().min(1),
+        institutional: z.string().min(1),
+        vocabulary: z.string().min(1),
+        antagonistCountermove: z.string().min(1)
+      })
+      .strict()
+  })
+  .strict()
+  .superRefine((contract, context) => {
+    validateContractShape(contract, context);
+    const hasInvestigation = contract.sceneBeats.some((scene) => scene.type === "investigation");
+    if (hasInvestigation && !contract.investigationChain) {
+      context.addIssue({
+        code: "custom",
+        path: ["investigationChain"],
+        message: "Investigation scenes require anomaly, alternatives, tests, result, and limitation."
+      });
+    }
+    for (const [index, agency] of contract.supportingCharacterAgency.entries()) {
+      if (!contract.participants.includes(agency.characterId)) {
+        context.addIssue({
+          code: "custom",
+          path: ["supportingCharacterAgency", index, "characterId"],
+          message: "Supporting character agency must reference a chapter participant."
+        });
+      }
+    }
+    const agencyIds = contract.supportingCharacterAgency.map((agency) => agency.characterId);
+    if (new Set(agencyIds).size !== agencyIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["supportingCharacterAgency"],
+        message: "A supporting character may have only one chapter agency commitment."
+      });
+    }
+    if (new Set(contract.revealIds).size !== contract.revealIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["revealIds"],
+        message: "Reveal IDs must be unique within a chapter contract."
+      });
+    }
   });
+
+export const chapterContractSchema = z.union([
+  chapterContractV3Schema,
+  chapterContractV2Schema
+]);
 
 const reviewCheckSchema = z
   .object({
@@ -168,19 +289,11 @@ const reviewCheckSchema = z
   })
   .strict();
 
-export const chapterReviewSchema = z
+const chapterReviewBaseSchema = z
   .object({
-    schemaVersion: z.literal(2),
     reviewRound: z.number().int().min(1).max(2),
     sourceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
     verdict: z.enum(["pass", "repair", "replan"]),
-    checks: z
-      .object({
-        characterVoice: reviewCheckSchema,
-        informationBoundaries: reviewCheckSchema,
-        sceneValueChanges: reviewCheckSchema
-      })
-      .strict(),
     blockingIssues: z.array(
       z
         .object({
@@ -193,7 +306,12 @@ export const chapterReviewSchema = z
             "scene",
             "pacing",
             "style",
-            "contract"
+            "contract",
+            "scope",
+            "capability",
+            "evidence",
+            "period",
+            "consequence"
           ]),
           evidence: z.string().min(1),
           repair: z.string().min(1)
@@ -202,8 +320,14 @@ export const chapterReviewSchema = z
     ),
     warnings: z.array(z.string().min(1))
   })
-  .strict()
-  .superRefine((review, context) => {
+  .strict();
+
+function validateReviewShape(
+  review: z.infer<typeof chapterReviewBaseSchema> & {
+    checks: Record<string, z.infer<typeof reviewCheckSchema>>;
+  },
+  context: z.RefinementCtx
+): void {
     if (review.verdict === "pass" && review.blockingIssues.length > 0) {
       context.addIssue({
         code: "custom",
@@ -235,7 +359,47 @@ export const chapterReviewSchema = z
         message: "A non-passing review must fail at least one explicit check."
       });
     }
-  });
+}
+
+export const chapterReviewV2Schema = chapterReviewBaseSchema
+  .extend({
+    schemaVersion: z.literal(2),
+    checks: z
+      .object({
+        characterVoice: reviewCheckSchema,
+        informationBoundaries: reviewCheckSchema,
+        sceneValueChanges: reviewCheckSchema
+      })
+      .strict()
+  })
+  .strict()
+  .superRefine(validateReviewShape);
+
+export const chapterReviewV3Schema = chapterReviewBaseSchema
+  .extend({
+    schemaVersion: z.literal(3),
+    checks: z
+      .object({
+        characterVoice: reviewCheckSchema,
+        informationBoundaries: reviewCheckSchema,
+        sceneValueChanges: reviewCheckSchema,
+        corePremiseAlignment: reviewCheckSchema,
+        scopeDiscipline: reviewCheckSchema,
+        capabilityBoundaries: reviewCheckSchema,
+        evidenceChain: reviewCheckSchema,
+        periodAuthenticity: reviewCheckSchema,
+        supportingCharacterAgency: reviewCheckSchema,
+        consequenceIntegrity: reviewCheckSchema
+      })
+      .strict()
+  })
+  .strict()
+  .superRefine(validateReviewShape);
+
+export const chapterReviewSchema = z.union([
+  chapterReviewV3Schema,
+  chapterReviewV2Schema
+]);
 
 export const characterProfileSchema = z
   .object({
@@ -396,6 +560,160 @@ export const chapterContextManifestSchema = z
     }
   });
 
+export const storyGuardrailsSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    corePremise: z
+      .object({
+        oneSentence: z.string().min(1),
+        signatureMechanism: z.string().min(1),
+        protectedElements: z.array(z.string().min(1)).min(2),
+        forbiddenDrift: z.array(z.string().min(1)).min(1)
+      })
+      .strict(),
+    maxScope: scopeLevelSchema,
+    maxHiddenAntagonistLayers: z.number().int().min(0).max(3),
+    capabilityBoundaries: z
+      .array(
+        z
+          .object({
+            characterId: z.string().min(1),
+            allowed: z
+              .array(
+                z
+                  .object({
+                    id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+                    description: z.string().min(1)
+                  })
+                  .strict()
+              )
+              .min(1),
+            prohibited: z.array(z.string().min(1)).min(1),
+            requiresSupportFor: z.array(z.string().min(1))
+          })
+          .strict()
+      )
+      .min(1),
+    investigationRules: z
+      .object({
+        coincidenceBudgetPerChapter: z.number().int().min(0).max(2),
+        requireAlternativeExplanations: z.literal(true),
+        evidenceMustNotNameCulprit: z.literal(true),
+        requireVerificationLimitation: z.literal(true)
+      })
+      .strict(),
+    periodRules: z
+      .object({
+        era: z.string().min(1),
+        prohibitedModernTerms: z.array(z.string().min(1)),
+        institutionalConstraints: z.array(z.string().min(1)).min(1),
+        physicalConstraints: z.array(z.string().min(1)).min(1)
+      })
+      .strict(),
+    supportingCharacters: z.array(
+      z
+        .object({
+          characterId: z.string().min(1),
+          independentGoal: z.string().min(1),
+          uniqueDomain: z.string().min(1),
+          mayContradictProtagonist: z.boolean()
+        })
+        .strict()
+    ),
+    consequenceRules: z
+      .object({
+        failureCannotAutoReward: z.literal(true),
+        permanentCosts: z.array(z.string().min(1)).min(1)
+      })
+      .strict(),
+    prohibitedNarrativeShortcuts: z.array(z.string().min(1)).min(1)
+  })
+  .strict()
+  .superRefine((guardrails, context) => {
+    const characters = new Set<string>();
+    for (const [index, boundary] of guardrails.capabilityBoundaries.entries()) {
+      if (characters.has(boundary.characterId)) {
+        context.addIssue({
+          code: "custom",
+          path: ["capabilityBoundaries", index, "characterId"],
+          message: `Duplicate capability boundary: ${boundary.characterId}`
+        });
+      }
+      const capabilityIds = boundary.allowed.map((capability) => capability.id);
+      if (new Set(capabilityIds).size !== capabilityIds.length) {
+        context.addIssue({
+          code: "custom",
+          path: ["capabilityBoundaries", index, "allowed"],
+          message: "Capability IDs must be unique per character."
+        });
+      }
+      characters.add(boundary.characterId);
+    }
+  });
+
+export const revealPolicySchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    reveals: z.array(
+      z
+        .object({
+          id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+          subject: z.string().min(1),
+          earliestChapter: z.number().int().positive(),
+          targetChapter: z.number().int().positive(),
+          latestChapter: z.number().int().positive(),
+          prerequisiteEvidenceIds: z.array(z.string().min(1)),
+          status: z.enum(["planned", "revealed", "delayed", "cancelled"]),
+          revealedChapter: z.number().int().positive().nullable(),
+          delayReason: z.string().min(1).nullable()
+        })
+        .strict()
+    )
+  })
+  .strict()
+  .superRefine((policy, context) => {
+    const ids = new Set<string>();
+    for (const [index, reveal] of policy.reveals.entries()) {
+      if (ids.has(reveal.id)) {
+        context.addIssue({
+          code: "custom",
+          path: ["reveals", index, "id"],
+          message: `Duplicate reveal ID: ${reveal.id}`
+        });
+      }
+      if (!(reveal.earliestChapter <= reveal.targetChapter &&
+        reveal.targetChapter <= reveal.latestChapter)) {
+        context.addIssue({
+          code: "custom",
+          path: ["reveals", index],
+          message: "Expected earliestChapter <= targetChapter <= latestChapter."
+        });
+      }
+      if (reveal.status === "revealed" && reveal.revealedChapter === null) {
+        context.addIssue({
+          code: "custom",
+          path: ["reveals", index, "revealedChapter"],
+          message: "A revealed item requires revealedChapter."
+        });
+      }
+      if (reveal.status !== "revealed" && reveal.revealedChapter !== null) {
+        context.addIssue({
+          code: "custom",
+          path: ["reveals", index, "revealedChapter"],
+          message: "Only a revealed item may set revealedChapter."
+        });
+      }
+      if (reveal.status === "delayed" && !reveal.delayReason) {
+        context.addIssue({
+          code: "custom",
+          path: ["reveals", index, "delayReason"],
+          message: "A delayed reveal requires a reason."
+        });
+      }
+      ids.add(reveal.id);
+    }
+  });
+
 export const continuityDomainSchema = z.enum([
   "facts",
   "timeline",
@@ -403,7 +721,8 @@ export const continuityDomainSchema = z.enum([
   "resources",
   "relationships",
   "characters",
-  "storyCards"
+  "storyCards",
+  "evidence"
 ]);
 
 export const characterCardValueSchema = z
@@ -430,6 +749,34 @@ export const storyCardValueSchema = z
     payoffDebt: z.string().min(1)
   })
   .strict();
+
+export const evidenceValueSchema = z
+  .object({
+    kind: z.enum(["anomaly", "directional", "association", "adjudicative", "foreshadowing"]),
+    status: z.enum(["observed", "contested", "corroborated", "admitted", "discredited"]),
+    summary: z.string().min(1),
+    supportsClaimIds: z.array(z.string().min(1)),
+    contradictsClaimIds: z.array(z.string().min(1)),
+    sourceIds: z.array(z.string().min(1)).min(1),
+    verificationMethod: z.string().min(1),
+    limitations: z.array(z.string().min(1)).min(1),
+    expectedRevealChapter: z.number().int().positive().nullable(),
+    revealedChapter: z.number().int().positive().nullable()
+  })
+  .strict()
+  .superRefine((evidence, context) => {
+    if (
+      evidence.expectedRevealChapter !== null &&
+      evidence.revealedChapter !== null &&
+      evidence.revealedChapter < evidence.expectedRevealChapter
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["revealedChapter"],
+        message: "Evidence cannot reveal its protected meaning before the expected chapter."
+      });
+    }
+  });
 
 export const continuityEntrySchema = z
   .object({
@@ -1044,7 +1391,8 @@ export const checkpointSchema = z
         resources: z.array(z.string().min(1)),
         relationships: z.array(z.string().min(1)),
         characters: z.array(z.string().min(1)),
-        storyCards: z.array(z.string().min(1))
+        storyCards: z.array(z.string().min(1)),
+        evidence: z.array(z.string().min(1)).default([])
       })
       .strict(),
     qualityDebt: z.array(z.string().min(1)),
@@ -1307,6 +1655,10 @@ export type ArcGrid = z.infer<typeof arcGridSchema>;
 export type SerialPlan = z.infer<typeof serialPlanSchema>;
 export type PublicationMetric = z.infer<typeof publicationMetricSchema>;
 export type RevisionManifest = z.infer<typeof revisionManifestSchema>;
+export type StoryGuardrails = z.infer<typeof storyGuardrailsSchema>;
+export type RevealPolicy = z.infer<typeof revealPolicySchema>;
+export type EvidenceValue = z.infer<typeof evidenceValueSchema>;
+export type ScopeLevel = z.infer<typeof scopeLevelSchema>;
 export type TopicSelectionReport = z.infer<typeof topicSelectionReportSchema>;
 export type StoryMilestoneType = z.infer<typeof storyMilestoneTypeSchema>;
 

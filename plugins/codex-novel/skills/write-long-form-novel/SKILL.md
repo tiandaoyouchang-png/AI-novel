@@ -21,10 +21,11 @@ When a workspace exists:
 2. Read `novel-state.yaml`.
 3. Run `node <plugin-root>/dist/novelctl.cjs cards <workspace>` when the request involves character state, death, secrets, subplots, or current plot position.
 4. Run `node <plugin-root>/dist/novelctl.cjs arcs <workspace>` for a long serial before planning a volume or when a plot line may have gone idle.
-5. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
-6. Read only the accepted artifacts needed for the current step.
-7. Preserve user-edited prose and accepted decisions unless replacement is explicit.
-8. Recommend one recoverable next action. Use `guide <workspace>` when the author needs a plain-language prompt.
+5. Run `node <plugin-root>/dist/novelctl.cjs guardrails <workspace>` before planning or repairing prose. Run `reveals <workspace>` whenever a clue, culprit, motive, secret, identity, or reversal may be exposed.
+6. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
+7. Read only the accepted artifacts needed for the current step.
+8. Preserve user-edited prose and accepted decisions unless replacement is explicit.
+9. Recommend one recoverable next action. Use `guide <workspace>` when the author needs a plain-language prompt.
 
 When no workspace exists, remain in preview conversation until the user asks to create durable files. Then run:
 
@@ -82,6 +83,8 @@ Do not treat chat-only previews as accepted files. When an accepted upstream dec
 
 Before foundation approval, create one structured `planning/characters/<character-id>.yaml` profile for every recurring character and complete `planning/style-profile.yaml`. Character profiles hold stable motivation, moral boundaries, decision patterns, voice rules, and OOC risks; `continuity/characters.yaml` holds only changing state. `planning/style-examples.yaml` may contain only user-owned, explicitly authorized, or public-domain excerpts. Never configure imitation of a named author's distinctive expression.
 
+Also complete `planning/story-guardrails.yaml` and `planning/reveal-policy.yaml`. Lock the one-sentence premise, signature story mechanism, maximum scope, antagonist-layer ceiling, per-character allowed/prohibited abilities, coincidence budget, period/institution/physics constraints, supporting-character domains, permanent costs, prohibited shortcuts, and chapter-number reveal windows. For long serials, schedule at least one material reveal before foundation approval. Do not approve a foundation that says only “stay consistent”; use concrete, testable boundaries.
+
 Before moving a `long-serial` project into production, complete `planning/arc-grid.yaml`. Give each main plot, subplot, mystery, relationship line, and recurring character arc a stable ID, volume beats, promises, dependencies, payoff target, last advanced chapter, and maximum idle chapters. The arc grid plans the future; `continuity/story-cards.yaml` remains authoritative for what has actually happened. Never overwrite committed continuity with a plan. A `short-complete` project may keep the grid empty or use a small scene-payoff map.
 
 If an accepted brief, foundation, or volume plan was edited, run:
@@ -109,13 +112,13 @@ Use this chain:
 For every chapter:
 
 1. Create and validate `contract.yaml`; keep its length range inside the accepted `planning/market-position.yaml` policy.
-   The schema-v2 contract must include an `emotionalTarget` and at least one structured `sceneBeat` with goal, conflict, value shift, and emotional change.
+   New work uses schema-v3. Include an `emotionalTarget`, structured scene beats, scope level, every capability use, investigation alternatives and tests, evidence moves, scheduled reveal IDs, coincidences, supporting-character decisions, lasting outcome/failure costs, and physical/institutional/vocabulary/antagonist-countermove checks. Investigation scenes require at least two plausible explanations and a stated proof limitation.
 2. Run `node <plugin-root>/dist/novelctl.cjs context <workspace>` to compile bounded `context.md` and its machine-checkable source manifest. It selects only participating character profiles, relevant dynamic cards, matching authorized style examples, the prior structured handoff, and current indexed candidates.
 3. Write one coherent `draft.md`.
 4. Run `node <plugin-root>/dist/novelctl.cjs quality <workspace> --source draft`.
-5. Write schema-v2 `review.yaml` bound to the exact draft SHA-256 fingerprint. Record review round 1 or 2 and explicit evidence for character voice, information boundaries, and scene value changes.
-6. Apply targeted repair before considering a full rewrite.
-7. Copy the passing reviewed draft exactly to candidate `final.md`, then run the final quality check. Any prose change requires another draft and review round.
+5. Write schema-v3 `review.yaml` bound to the exact draft SHA-256 fingerprint. Record review round 1 or 2 and explicit text-bound evidence for character voice, information boundaries, scene value changes, premise alignment, scope discipline, capability boundaries, evidence chain, period authenticity, supporting-character agency, and consequence integrity.
+6. Apply targeted repair before considering a full rewrite. Then rerun the entire causal chain: physical possibility, institutional permission, character motive, simpler antagonist countermeasure, evidence status, reveal timing, and lasting consequence. A repair is not complete merely because the original issue disappeared.
+7. Copy the passing reviewed draft exactly to candidate `final.md`, then run the final quality check. Any prose change requires another draft and review round; never patch `final.md` after review.
 8. Extract `delta.yaml` from the final prose and include its SHA-256 fingerprint.
 9. Write `handoff.yaml` from that exact accepted prose. Record resolved and unresolved items, character carry, emotional carry, and next-chapter constraints with the same fingerprint.
 10. Commit continuity only after final prose is accepted.
@@ -160,6 +163,7 @@ Prefer the smallest context package that preserves causality:
 - current volume window;
 - participating character profiles;
 - active facts, resources, relationships, and unresolved threads;
+- active graded evidence, with protected meanings redacted until their earliest chapter;
 - relevant world-rule IDs;
 - explicit omissions and uncertainties.
 

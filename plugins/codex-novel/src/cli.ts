@@ -30,6 +30,10 @@ import {
 } from "./workspace.js";
 import { bookPhaseSchema, chapterStatusSchema } from "./schema.js";
 import { inspectArcGrid, validateHookExperiments } from "./planning.js";
+import {
+  guardrailSummary,
+  inspectRevealPolicy
+} from "./guardrails.js";
 import { createRevision, listRevisions, restoreRevision } from "./revisions.js";
 import {
   generateLearningReport,
@@ -57,6 +61,8 @@ function usage(): string {
     "  topics <workspace> [--policy-date YYYY-MM-DD]",
     "  hooks <workspace> [--json]",
     "  arcs <workspace> [--json]",
+    "  guardrails <workspace> [--json]",
+    "  reveals <workspace> [--json]",
     "  phase <workspace> --to <phase>",
     "  context <workspace> [--max-chars 20000]",
     "  quality <workspace> [--source draft|final]",
@@ -339,6 +345,44 @@ async function main(): Promise<void> {
           ].join("\n")
     );
     if (report.idleArcs.length > 0) process.exitCode = 2;
+    return;
+  }
+
+  if (command === "guardrails") {
+    const summary = await guardrailSummary(workspace);
+    console.log(
+      json
+        ? JSON.stringify(summary, null, 2)
+        : [
+            `核心设定：${summary.premise}`,
+            `招牌机制：${summary.signatureMechanism}`,
+            `规模上限：${summary.maxScope}`,
+            `幕后层级上限：${summary.maxHiddenAntagonistLayers}`,
+            `角色能力边界：${summary.capabilityCharacters} 人`,
+            `每章巧合预算：${summary.coincidenceBudget}`,
+            `禁用现代词：${summary.prohibitedModernTerms.join("、") || "无"}`,
+            `禁用剧情捷径：${summary.prohibitedShortcuts.join("、") || "无"}`
+          ].join("\n")
+    );
+    return;
+  }
+
+  if (command === "reveals") {
+    const report = await inspectRevealPolicy(workspace);
+    console.log(
+      json
+        ? JSON.stringify(report, null, 2)
+        : [
+            `当前章节：${report.chapter}；待揭秘：${report.planned}`,
+            `本章目标：${report.dueNow.join("、") || "无"}`,
+            `已逾期：${report.overdue.join("、") || "无"}`,
+            `明确延期：${report.delayed.map((item) => `${item.id}(${item.reason})`).join("、") || "无"}`,
+            `仍受保护：${report.protected.map((item) =>
+              `${item.id}(最早${item.earliestChapter}/目标${item.targetChapter})`
+            ).join("、") || "无"}`
+          ].join("\n")
+    );
+    if (report.overdue.length > 0) process.exitCode = 2;
     return;
   }
 

@@ -1,0 +1,23 @@
+schemaVersion: 1
+reveals:
+  - id: reveal-county-coverup
+    subject: 周嵩先默许私盐填补亏空，发现毒性后为保官位掩盖。
+    earliestChapter: 18
+    targetChapter: 24
+    latestChapter: 28
+    prerequisiteEvidenceIds:
+      - evidence-abnormal-bag-numbers
+      - evidence-replaced-seal
+    status: planned
+    revealedChapter: null
+    delayReason: null
+  - id: reveal-father-cancelled-number
+    subject: 沈父残页记录的是已注销却仍在货路中流通的旧盐引号。
+    earliestChapter: 9
+    targetChapter: 14
+    latestChapter: 17
+    prerequisiteEvidenceIds:
+      - evidence-father-reverse-route
+    status: planned
+    revealedChapter: null
+    delayReason: null
