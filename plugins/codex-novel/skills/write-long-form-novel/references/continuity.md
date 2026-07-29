@@ -11,6 +11,8 @@
 - `continuity/story-cards.yaml`: dynamic main-plot, subplot, and character-arc cards with current beat, next pressure, linked characters/threads, and payoff debt.
 - `continuity/evidence.yaml`: graded clues and proof with claim links, source IDs, verification method, limitations, status, and protected reveal timing.
 
+`planning/logic-debts.yaml` is not a continuity fact store. It records forward obligations created by review: what later prose must explain, prove, correct, or make costly, and by which chapter. The context compiler injects debts due now or next, and the chapter gate blocks overdue obligations that are absent from the contract.
+
 Each file uses `schemaVersion: 1` and an `entries` array. Every entry has a stable ID, active/retired status, structured value, source chapter, evidence, and update time. Do not store speculative next events as truth.
 
 After the foundation is accepted and before production, seed only confirmed starting state with `sourceChapter: 0`: living/dead/missing status, starting location, current goal, known pre-story injuries, and active plot premises. Cite the accepted character roster or story bible. Empty cards are expected before this seed step or the first continuity commit.
@@ -50,7 +52,9 @@ Apply continuity deltas only after:
 4. contradictions are resolved or explicitly blocked;
 5. a pre-change snapshot exists.
 
-Commit all related continuity modules as one journaled transaction. The CLI saves before/after snapshots, validates the final-prose fingerprint, applies all eight stores, updates accepted reveal statuses, and advances state last. On an interruption, keep the next chapter blocked and run `novelctl recover` to restore the continuity, reveal policy, and state before snapshot.
+Commit all related continuity modules as one journaled transaction. The CLI saves before/after snapshots, validates the final-prose fingerprint, applies all eight stores, updates accepted reveal statuses, closes review-proven logic debts, and advances state last. On an interruption, keep the next chapter blocked and run `novelctl recover` to restore the continuity, reveal policy, logic debts, and state before snapshot.
+
+To revise the latest unpublished committed chapter, run `novelctl revise --name "<purpose>"`. The command creates a named recovery point, verifies that live continuity and reveal state still match the original commit, reverses that chapter's transactional effects, preserves logic debts added after the commit, and reopens the accepted prose as a draft. Older or already published chapters require an explicit broader editorial decision instead of automatic rollback.
 
 ## Checkpoints
 

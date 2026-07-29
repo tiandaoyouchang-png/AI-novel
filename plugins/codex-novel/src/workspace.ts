@@ -44,6 +44,11 @@ import {
   validateChapterGuardrails,
   validateStoryGuardrails
 } from "./guardrails.js";
+import {
+  readLogicDebtLedger,
+  validateContractLogicDebts,
+  validateReviewLogicDebts
+} from "./logic-debts.js";
 
 const PHASE_TRANSITIONS: Record<BookPhase, readonly BookPhase[]> = {
   preview: ["brief_approved"],
@@ -207,6 +212,12 @@ const INITIAL_FILES: Record<string, string> = {
     "repeatedPhraseLength: 8",
     "minParagraphs: 5",
     "maxParagraphLength: 500",
+    ""
+  ].join("\n"),
+  "planning/logic-debts.yaml": [
+    "# Cross-chapter obligations created by accepted prose reviews.",
+    "schemaVersion: 1",
+    "debts: []",
     ""
   ].join("\n"),
   "planning/style-profile.yaml": [
@@ -638,6 +649,7 @@ export async function advanceChapter(
       );
     }
     await validateChapterGuardrails(workspace, contract);
+    await validateContractLogicDebts(workspace, contract);
     const position = marketPositionSchema.parse(
       parse(await fs.readFile(path.join(workspace, "planning/market-position.yaml"), "utf8"))
     );
@@ -667,6 +679,7 @@ export async function advanceChapter(
         `Review round must advance from ${before.workflow.reviewRound} to ${before.workflow.reviewRound + 1}.`
       );
     }
+    validateReviewLogicDebts(contract, review);
   }
   if (to === "accepted") {
     const quality = await readCurrentQualityReport(workspace, "final");
@@ -674,6 +687,10 @@ export async function advanceChapter(
     const review = chapterReviewSchema.parse(
       parse(await fs.readFile(path.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
+    const contract = chapterContractSchema.parse(
+      parse(await fs.readFile(path.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+    );
+    validateReviewLogicDebts(contract, review);
     if (review.verdict !== "pass") {
       throw new Error("Chapter cannot be accepted until review verdict is pass.");
     }
@@ -809,6 +826,7 @@ export async function validateWorkspace(workspace: string): Promise<NovelState> 
     throw new Error(`Required workspace directories are missing: ${missingDirectories.join(", ")}`);
   }
   await validateContinuityStores(workspace);
+  await readLogicDebtLedger(workspace);
   await validateCommittedChapterArtifacts(workspace, state);
   return state;
 }
@@ -818,6 +836,8 @@ export async function validateCommittedChapterArtifacts(
   state: NovelState
 ): Promise<void> {
   const issues: string[] = [];
+  const logicDebtLedger = await readLogicDebtLedger(workspace);
+  const logicDebts = new Map(logicDebtLedger.debts.map((debt) => [debt.id, debt]));
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
     const chapterRoot = path.join(workspace, "chapters", directory);
@@ -841,6 +861,27 @@ export async function validateCommittedChapterArtifacts(
 
       if (contract.chapter !== chapter) issues.push(`chapter ${chapter}: contract number mismatch`);
       if (review.verdict !== "pass") issues.push(`chapter ${chapter}: review is not passing`);
+      try {
+        validateReviewLogicDebts(contract, review);
+      } catch (error) {
+        issues.push(
+          `chapter ${chapter}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+      if (contract.schemaVersion === 3) {
+        for (const resolution of contract.logicDebtResolutions) {
+          const debt = logicDebts.get(resolution.debtId);
+          if (
+            !debt ||
+            debt.status !== "resolved" ||
+            debt.resolvedChapter !== chapter
+          ) {
+            issues.push(
+              `chapter ${chapter}: logic debt ${resolution.debtId} is not transactionally resolved`
+            );
+          }
+        }
+      }
       if (review.sourceFingerprint !== finalFingerprint) {
         issues.push(`chapter ${chapter}: accepted prose differs from reviewed prose`);
       }

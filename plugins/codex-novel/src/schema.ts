@@ -179,6 +179,16 @@ export const chapterContractV2Schema = chapterContractBaseSchema
 export const chapterContractV3Schema = chapterContractBaseSchema
   .extend({
     schemaVersion: z.literal(3),
+    logicDebtResolutions: z
+      .array(
+        z
+          .object({
+            debtId: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+            plannedResolution: z.string().min(1)
+          })
+          .strict()
+      )
+      .default([]),
     scopeLevel: scopeLevelSchema,
     antagonistLayer: z.number().int().min(0).max(3),
     capabilityUses: z.array(
@@ -275,6 +285,14 @@ export const chapterContractV3Schema = chapterContractBaseSchema
         message: "Reveal IDs must be unique within a chapter contract."
       });
     }
+    const debtIds = contract.logicDebtResolutions.map((resolution) => resolution.debtId);
+    if (new Set(debtIds).size !== debtIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["logicDebtResolutions"],
+        message: "A logic debt may have only one planned resolution per chapter."
+      });
+    }
   });
 
 export const chapterContractSchema = z.union([
@@ -294,6 +312,17 @@ const chapterReviewBaseSchema = z
     reviewRound: z.number().int().min(1).max(2),
     sourceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
     verdict: z.enum(["pass", "repair", "replan"]),
+    debtChecks: z
+      .array(
+        z
+          .object({
+            debtId: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+            status: z.enum(["pass", "fail"]),
+            evidence: z.string().min(1)
+          })
+          .strict()
+      )
+      .default([]),
     blockingIssues: z.array(
       z
         .object({
@@ -345,18 +374,31 @@ function validateReviewShape(
     const failedChecks = Object.entries(review.checks)
       .filter(([, check]) => check.status === "fail")
       .map(([name]) => name);
-    if (review.verdict === "pass" && failedChecks.length > 0) {
+    const failedDebts = review.debtChecks
+      .filter((check) => check.status === "fail")
+      .map((check) => check.debtId);
+    if (review.verdict === "pass" && (failedChecks.length > 0 || failedDebts.length > 0)) {
       context.addIssue({
         code: "custom",
         path: ["checks"],
-        message: `A passing review cannot contain failed checks: ${failedChecks.join(", ")}`
+        message:
+          "A passing review cannot contain failed checks: " +
+          [...failedChecks, ...failedDebts.map((id) => `debt:${id}`)].join(", ")
       });
     }
-    if (review.verdict !== "pass" && failedChecks.length === 0) {
+    if (review.verdict !== "pass" && failedChecks.length === 0 && failedDebts.length === 0) {
       context.addIssue({
         code: "custom",
         path: ["checks"],
-        message: "A non-passing review must fail at least one explicit check."
+        message: "A non-passing review must fail at least one explicit or logic-debt check."
+      });
+    }
+    const debtIds = review.debtChecks.map((check) => check.debtId);
+    if (new Set(debtIds).size !== debtIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["debtChecks"],
+        message: "A logic debt may have only one review check."
       });
     }
 }
@@ -711,6 +753,82 @@ export const revealPolicySchema = z
         });
       }
       ids.add(reveal.id);
+    }
+  });
+
+export const logicDebtLedgerSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    debts: z.array(
+      z
+        .object({
+          id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+          category: z.enum([
+            "causality",
+            "evidence",
+            "continuity",
+            "period",
+            "character",
+            "consequence",
+            "workflow"
+          ]),
+          summary: z.string().min(1),
+          createdAfterChapter: z.number().int().nonnegative(),
+          dueChapter: z.number().int().positive(),
+          acceptanceCriteria: z.array(z.string().min(1)).min(1),
+          status: z.enum(["open", "resolved", "waived"]),
+          resolvedChapter: z.number().int().positive().nullable(),
+          resolutionEvidence: z.string().min(1).nullable()
+        })
+        .strict()
+    )
+  })
+  .strict()
+  .superRefine((ledger, context) => {
+    const ids = new Set<string>();
+    for (const [index, debt] of ledger.debts.entries()) {
+      if (ids.has(debt.id)) {
+        context.addIssue({
+          code: "custom",
+          path: ["debts", index, "id"],
+          message: `Duplicate logic debt ID: ${debt.id}`
+        });
+      }
+      if (debt.dueChapter <= debt.createdAfterChapter) {
+        context.addIssue({
+          code: "custom",
+          path: ["debts", index, "dueChapter"],
+          message: "Logic debt must be due after the chapter that created it."
+        });
+      }
+      if (
+        debt.status === "open" &&
+        (debt.resolvedChapter !== null || debt.resolutionEvidence !== null)
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["debts", index],
+          message: "Open logic debt cannot contain resolution fields."
+        });
+      }
+      if (
+        debt.status === "resolved" &&
+        (debt.resolvedChapter === null || debt.resolutionEvidence === null)
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["debts", index],
+          message: "Resolved logic debt requires a chapter and source-bound evidence."
+        });
+      }
+      if (debt.status === "waived" && debt.resolutionEvidence === null) {
+        context.addIssue({
+          code: "custom",
+          path: ["debts", index, "resolutionEvidence"],
+          message: "Waived logic debt requires an explicit reason."
+        });
+      }
+      ids.add(debt.id);
     }
   });
 
@@ -1658,6 +1776,7 @@ export type RevisionManifest = z.infer<typeof revisionManifestSchema>;
 export type StoryGuardrails = z.infer<typeof storyGuardrailsSchema>;
 export type RevealPolicy = z.infer<typeof revealPolicySchema>;
 export type EvidenceValue = z.infer<typeof evidenceValueSchema>;
+export type LogicDebtLedger = z.infer<typeof logicDebtLedgerSchema>;
 export type ScopeLevel = z.infer<typeof scopeLevelSchema>;
 export type TopicSelectionReport = z.infer<typeof topicSelectionReportSchema>;
 export type StoryMilestoneType = z.infer<typeof storyMilestoneTypeSchema>;

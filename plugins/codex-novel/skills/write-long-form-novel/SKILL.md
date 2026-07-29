@@ -22,10 +22,11 @@ When a workspace exists:
 3. Run `node <plugin-root>/dist/novelctl.cjs cards <workspace>` when the request involves character state, death, secrets, subplots, or current plot position.
 4. Run `node <plugin-root>/dist/novelctl.cjs arcs <workspace>` for a long serial before planning a volume or when a plot line may have gone idle.
 5. Run `node <plugin-root>/dist/novelctl.cjs guardrails <workspace>` before planning or repairing prose. Run `reveals <workspace>` whenever a clue, culprit, motive, secret, identity, or reversal may be exposed.
-6. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
-7. Read only the accepted artifacts needed for the current step.
-8. Preserve user-edited prose and accepted decisions unless replacement is explicit.
-9. Recommend one recoverable next action. Use `guide <workspace>` when the author needs a plain-language prompt.
+6. Run `node <plugin-root>/dist/novelctl.cjs debts <workspace>` before planning when prior review identified a causal explanation, consequence, evidence requirement, or other obligation that later prose must pay off.
+7. Run `node <plugin-root>/dist/novelctl.cjs search <workspace> --query "<terms>"` when an existing derived index can narrow older handoffs or continuity sources. Treat results only as candidates and read their authoritative files.
+8. Read only the accepted artifacts needed for the current step.
+9. Preserve user-edited prose and accepted decisions unless replacement is explicit.
+10. Recommend one recoverable next action. Use `guide <workspace>` when the author needs a plain-language prompt.
 
 When no workspace exists, remain in preview conversation until the user asks to create durable files. Then run:
 
@@ -103,6 +104,14 @@ node <plugin-root>/dist/novelctl.cjs revision create <workspace> --name "<purpos
 
 Use `revision list` to inspect history. Use `revision restore --id <id>` only when the author asks to restore; it creates a safety revision first and invalidates the disposable retrieval index. Do not manually edit state to simulate a rollback.
 
+When the author wants to revise the latest continuity-committed chapter, use the narrower chapter workflow:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs revise <workspace> --name "<purpose>" [--chapter N]
+```
+
+This command accepts only the latest unpublished committed chapter. It creates a named restore point, rolls back that chapter's continuity and reveal effects, reopens the accepted prose as `draft.md`, preserves current planning, and removes accepted downstream artifacts so the normal context, planning, review, acceptance, and commit gates must run again. It rejects older or published chapters and out-of-band authoritative-state edits.
+
 ## Produce one chapter safely
 
 Use this chain:
@@ -112,11 +121,11 @@ Use this chain:
 For every chapter:
 
 1. Create and validate `contract.yaml`; keep its length range inside the accepted `planning/market-position.yaml` policy.
-   New work uses schema-v3. Include an `emotionalTarget`, structured scene beats, scope level, every capability use, investigation alternatives and tests, evidence moves, scheduled reveal IDs, coincidences, supporting-character decisions, lasting outcome/failure costs, and physical/institutional/vocabulary/antagonist-countermove checks. Investigation scenes require at least two plausible explanations and a stated proof limitation.
+   New work uses schema-v3. Include an `emotionalTarget`, structured scene beats, scope level, every capability use, investigation alternatives and tests, evidence moves, scheduled reveal IDs, due logic-debt resolutions, coincidences, supporting-character decisions, lasting outcome/failure costs, and physical/institutional/vocabulary/antagonist-countermove checks. Investigation scenes require at least two plausible explanations and a stated proof limitation.
 2. Run `node <plugin-root>/dist/novelctl.cjs context <workspace>` to compile bounded `context.md` and its machine-checkable source manifest. It selects only participating character profiles, relevant dynamic cards, matching authorized style examples, the prior structured handoff, and current indexed candidates.
 3. Write one coherent `draft.md`.
 4. Run `node <plugin-root>/dist/novelctl.cjs quality <workspace> --source draft`.
-5. Write schema-v3 `review.yaml` bound to the exact draft SHA-256 fingerprint. Record review round 1 or 2 and explicit text-bound evidence for character voice, information boundaries, scene value changes, premise alignment, scope discipline, capability boundaries, evidence chain, period authenticity, supporting-character agency, and consequence integrity.
+5. Write schema-v3 `review.yaml` bound to the exact draft SHA-256 fingerprint. Record review round 1 or 2 and explicit text-bound evidence for character voice, information boundaries, scene value changes, premise alignment, scope discipline, capability boundaries, evidence chain, period authenticity, supporting-character agency, consequence integrity, and every declared logic-debt resolution.
 6. Apply targeted repair before considering a full rewrite. Then rerun the entire causal chain: physical possibility, institutional permission, character motive, simpler antagonist countermeasure, evidence status, reveal timing, and lasting consequence. A repair is not complete merely because the original issue disappeared.
 7. Copy the passing reviewed draft exactly to candidate `final.md`, then run the final quality check. Any prose change requires another draft and review round; never patch `final.md` after review.
 8. Extract `delta.yaml` from the final prose and include its SHA-256 fingerprint.
