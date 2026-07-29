@@ -140,7 +140,10 @@ Codex Novel 将小说创作拆成一组可验证的阶段，并把“聊天中�
 ```bash
 node plugins/codex-novel/dist/novelctl.cjs guardrails novels/my-story
 node plugins/codex-novel/dist/novelctl.cjs reveals novels/my-story
+node plugins/codex-novel/dist/novelctl.cjs debts novels/my-story
 ```
+
+审稿中出现的“第二节必须解释”“第六节必须拿出证据”不再只写在聊天或自由文本里。它们进入 `planning/logic-debts.yaml`，带有到期章节和验收标准。到期债务必须写入章节合同，并由绑定准确正文指纹的审查证据验收；只有连续性事务成功提交后，债务才会关闭。
 
 ### 8. 有界上下文，而不是把整本书反复塞给模型
 
@@ -199,6 +202,8 @@ flowchart LR
 如果中途异常，可以使用 `recover` 恢复到提交前快照。
 
 作者还可以为大改建立命名修订版本。每个版本保存权威文件指纹和相对上一版本的差异摘要。执行恢复时，系统会先自动保存“恢复前版本”，再恢复目标文件并使旧检索索引失效。
+
+如果只是返修最新一节已提交但尚未发布的正文，使用 `revise`。系统会自动建立恢复点，撤回该节写入的连续性、揭秘和逻辑债务结果，保留当前规划，把已验收正文放回草稿，并强制重新经过上下文、审查、验收和提交。旧章节或已经发布的章节不会被自动打开。
 
 ### 10. 连载库存与发布后学习
 
@@ -466,6 +471,7 @@ node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
 | `arcs` | 检查跨卷主线、支线、角色弧和闲置剧情线 |
 | `guardrails` | 查看核心设定、案件规模、能力、巧合和时代门禁 |
 | `reveals` | 查看本章应揭示、已逾期和仍受保护的真相 |
+| `debts` | 查看本章到期、逾期和后续逻辑债务 |
 | `phase` | 推进作品级阶段 |
 | `context` | 为当前章节编译有界上下文 |
 | `quality` | 对草稿或最终正文执行机械质量检查 |
@@ -477,6 +483,7 @@ node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
 | `search` | 从索引中查找仍与权威源文件一致的候选资料 |
 | `invalidate` | 在上游决策变化时显式作废相关产物 |
 | `revision` | 创建、列出或安全恢复命名修订版本 |
+| `revise` | 安全返修最新一节未发布的已提交正文 |
 | `cadence` | 查看连载库存、缓冲天数和发布进度 |
 | `metrics import` | 导入作者提供的本地章节指标 |
 | `learn` | 生成发布后假设复盘底稿 |
@@ -518,6 +525,13 @@ node plugins/codex-novel/dist/novelctl.cjs invalidate novels/my-story \
 node plugins/codex-novel/dist/novelctl.cjs revision create novels/my-story --name "第三章加强反转前"
 node plugins/codex-novel/dist/novelctl.cjs revision list novels/my-story
 node plugins/codex-novel/dist/novelctl.cjs revision restore novels/my-story --id <版本ID>
+
+# 返修最新一节已提交但尚未发布的正文
+node plugins/codex-novel/dist/novelctl.cjs revise novels/my-story \
+  --name "第一节行政逻辑精修"
+
+# 写下一节前检查必须兑现的解释、证据和后果
+node plugins/codex-novel/dist/novelctl.cjs debts novels/my-story
 
 # 导入旧稿；导入内容不会直接成为已验收正文
 node plugins/codex-novel/dist/novelctl.cjs import novels/old-story \

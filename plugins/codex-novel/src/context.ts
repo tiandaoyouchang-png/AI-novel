@@ -5,6 +5,7 @@ import {
   atomicWriteText,
   appendEvent,
   fingerprintFile,
+  pathExists,
   readState,
   sha256Text
 } from "./io.js";
@@ -33,6 +34,10 @@ import {
   queryRetrievalIndex,
   readRetrievalCandidate
 } from "./retrieval.js";
+import {
+  LOGIC_DEBT_FILE,
+  readLogicDebtLedger
+} from "./logic-debts.js";
 
 const DOMAIN_FILES: Record<ContinuityDomain, string> = {
   facts: "facts.yaml",
@@ -114,6 +119,14 @@ export async function compileChapterContext(
   if (contract.chapter !== chapter) {
     throw new Error(`Chapter contract ${contract.chapter} does not match current chapter ${chapter}.`);
   }
+  const logicDebtLedger = await readLogicDebtLedger(workspace);
+  const relevantLogicDebts = logicDebtLedger.debts.filter(
+    (debt) =>
+      debt.status === "open" &&
+      (debt.dueChapter <= chapter + 1 ||
+        contract.schemaVersion === 3 &&
+        contract.logicDebtResolutions.some((resolution) => resolution.debtId === debt.id))
+  );
   const topicCandidates = topicCandidatesSchema.parse(
     parse(
       await fs.readFile(
@@ -263,6 +276,9 @@ export async function compileChapterContext(
     ...Object.values(DOMAIN_FILES).map((file) => `continuity/${file}`),
     `chapters/${chapterDirectory}/contract.yaml`
   ];
+  if (await pathExists(path.join(workspace, LOGIC_DEBT_FILE))) {
+    sourceFiles.push(LOGIC_DEBT_FILE);
+  }
   sourceFiles.push(...retrievalCandidates.map((candidate) => candidate.path));
   if (chapter > 1 && state.continuity.lastCommittedChapter >= chapter - 1) {
     const previous = String(chapter - 1).padStart(4, "0");
@@ -295,9 +311,28 @@ export async function compileChapterContext(
     `- protected facts: ${contract.protectedFacts.join("; ") || "none"}`,
     `- prohibited crossings: ${contract.prohibitedCrossings.join("; ") || "none"}`,
     "",
-    "## Scene Plan",
+    "## Logic Debts",
     ""
   ];
+  if (relevantLogicDebts.length === 0) {
+    sections.push("- No open logic debt is due in this chapter or the next.", "");
+  } else {
+    for (const debt of relevantLogicDebts) {
+      const planned = contract.schemaVersion === 3
+        ? contract.logicDebtResolutions.find((item) => item.debtId === debt.id)
+        : undefined;
+      sections.push(
+        `- ${debt.id} [${debt.category}] due=${debt.dueChapter}: ${debt.summary}; ` +
+        `acceptance=${debt.acceptanceCriteria.join("; ")}; ` +
+        `chapter plan=${planned?.plannedResolution ?? "not declared"}`
+      );
+    }
+    sections.push("");
+  }
+  sections.push(
+    "## Scene Plan",
+    ""
+  );
   for (const scene of contract.sceneBeats) {
     sections.push(
       `### ${scene.id} [${scene.type}]`,

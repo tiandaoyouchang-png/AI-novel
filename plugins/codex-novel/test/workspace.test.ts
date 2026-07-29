@@ -9,7 +9,8 @@ import { compileChapterContext } from "../src/context.js";
 import {
   commitContinuityDelta,
   getContinuityCards,
-  recoverContinuityTransaction
+  recoverContinuityTransaction,
+  reopenLatestCommittedChapter
 } from "../src/continuity.js";
 import { fingerprintFile, pathExists, readState, writeState } from "../src/io.js";
 import {
@@ -34,6 +35,7 @@ import {
 } from "../src/production.js";
 import { exportDocument, importManuscript } from "../src/documents.js";
 import { friendlyError, guideWorkspace, runDoctor } from "../src/diagnostics.js";
+import { readLogicDebtLedger, writeLogicDebtLedger } from "../src/logic-debts.js";
 import {
   advanceChapter,
   exportNovel,
@@ -1589,6 +1591,186 @@ test("cross-volume arc grid reports idle active arcs", async (t) => {
   assert.equal(report.totalArcs, 1);
   assert.equal(report.idleArcs.length, 1);
   assert.ok(report.warnings.some((warning) => /连续 12 章未推进/.test(warning)));
+});
+
+test("latest unpublished committed chapter can reopen without rolling back current planning", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "章节安全返修测试" });
+  await enterProduction(workspace);
+  await commitTestChapter(workspace, 1);
+
+  const volumePath = path.join(workspace, "planning/volumes/current-volume.md");
+  const volumeBefore = await fs.readFile(volumePath, "utf8");
+  const finalBefore = await fs.readFile(path.join(workspace, "chapters/0001/final.md"), "utf8");
+  await updatePublishedThrough(workspace, 1);
+  await assert.rejects(
+    () => reopenLatestCommittedChapter(workspace, "不应允许返修"),
+    /already marked published/
+  );
+  await updatePublishedThrough(workspace, 0);
+  await fs.writeFile(
+    path.join(workspace, "planning/logic-debts.yaml"),
+    [
+      "schemaVersion: 1",
+      "debts:",
+      "  - id: preserve-review-obligation",
+      "    category: causality",
+      "    summary: 提交后审稿新增的后续解释义务",
+      "    createdAfterChapter: 1",
+      "    dueChapter: 2",
+      "    acceptanceCriteria:",
+      "      - 第二章必须给出正文证据",
+      "    status: open",
+      "    resolvedChapter: null",
+      "    resolutionEvidence: null"
+    ].join("\n"),
+    "utf8"
+  );
+
+  const reopened = await reopenLatestCommittedChapter(workspace, "第一章句子精修", 1);
+  assert.equal(reopened.state.workflow.chapterStatus, "not_started");
+  assert.equal(reopened.state.workflow.reviewRound, 0);
+  assert.equal(reopened.state.continuity.lastCommittedChapter, 0);
+  assert.equal(await fs.readFile(reopened.draft, "utf8"), finalBefore);
+  assert.equal(await fs.readFile(volumePath, "utf8"), volumeBefore);
+  assert.equal(await pathExists(path.join(workspace, "chapters/0001/final.md")), false);
+  assert.equal(await pathExists(path.join(workspace, "chapters/0001/review.yaml")), false);
+  assert.equal(await pathExists(path.join(workspace, "chapters/0001/delta.yaml")), false);
+  const facts = parse(
+    await fs.readFile(path.join(workspace, "continuity/facts.yaml"), "utf8")
+  ) as { entries: Array<{ id: string }> };
+  assert.equal(facts.entries.some((entry) => entry.id === "fact-chapter-1"), false);
+  assert.equal((await readLogicDebtLedger(workspace)).debts[0]?.id, "preserve-review-obligation");
+  assert.ok((await listRevisions(workspace)).some((revision) => revision.id === reopened.revisionId));
+  await validateWorkspace(workspace);
+});
+
+test("due logic debts require a contract plan, passing review evidence, and transactional resolution", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "逻辑债务门禁测试" });
+  await enterProduction(workspace);
+  await fs.writeFile(
+    path.join(workspace, "planning/logic-debts.yaml"),
+    [
+      "schemaVersion: 1",
+      "debts:",
+      "  - id: explain-prior-identity-checks",
+      "    category: causality",
+      "    summary: 解释旧身份为何此前未在日常业务中暴露",
+      "    createdAfterChapter: 0",
+      "    dueChapter: 1",
+      "    acceptanceCriteria:",
+      "      - 正文给出有限且可复核的触发机制",
+      "    status: open",
+      "    resolvedChapter: null",
+      "    resolutionEvidence: null"
+    ].join("\n"),
+    "utf8"
+  );
+  await writeAcceptedArtifact(workspace, "chapters/0001/contract.yaml", contractYaml(1));
+  await compileChapterContext(workspace);
+  await assert.rejects(
+    () => advanceChapter(workspace, "planned"),
+    /must resolve due logic debts/
+  );
+
+  const contractWithDebt = contractYaml(1).replace(
+    "schemaVersion: 3",
+    [
+      "schemaVersion: 3",
+      "logicDebtResolutions:",
+      "  - debtId: explain-prior-identity-checks",
+      "    plannedResolution: 用当前身份核验与历史关系核验的范围差异解释"
+    ].join("\n")
+  );
+  await writeAcceptedArtifact(workspace, "chapters/0001/contract.yaml", contractWithDebt);
+  await compileChapterContext(workspace);
+  await advanceChapter(workspace, "planned");
+  await fs.writeFile(path.join(workspace, "chapters/0001/draft.md"), `${chapterProse}\n`, "utf8");
+  await advanceChapter(workspace, "drafted");
+  await runQualityCheck(workspace, "draft");
+  const fingerprint = await fingerprintFile(path.join(workspace, "chapters/0001/draft.md"));
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/review.yaml",
+    passingReviewYaml(fingerprint)
+  );
+  await assert.rejects(
+    () => advanceChapter(workspace, "reviewed"),
+    /Review must check planned logic debt resolutions/
+  );
+
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/review.yaml",
+    [
+      passingReviewYaml(fingerprint),
+      "debtChecks:",
+      "  - debtId: explain-prior-identity-checks",
+      "    status: pass",
+      "    evidence: 第一章明确区分当前有效身份核验与历史关系核验"
+    ].join("\n")
+  );
+  await advanceChapter(workspace, "reviewed");
+  await fs.writeFile(path.join(workspace, "chapters/0001/final.md"), `${chapterProse}\n`, "utf8");
+  await runQualityCheck(workspace, "final");
+  await advanceChapter(workspace, "accepted");
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/delta.yaml",
+    [
+      "schemaVersion: 1",
+      "chapter: 1",
+      `sourceFingerprint: ${fingerprint}`,
+      "changes:",
+      "  - domain: facts",
+      "    operation: upsert",
+      "    id: fact-chapter-1",
+      "    value:",
+      "      statement: 第一章已经形成可验证变化",
+      "    evidence: 第一章终稿"
+    ].join("\n")
+  );
+  await writeAcceptedArtifact(
+    workspace,
+    "chapters/0001/handoff.yaml",
+    handoffYaml(1, fingerprint)
+  );
+  await advanceChapter(workspace, "continuity_committed");
+  const debt = (await readLogicDebtLedger(workspace)).debts[0]!;
+  assert.equal(debt.status, "resolved");
+  assert.equal(debt.resolvedChapter, 1);
+  assert.match(debt.resolutionEvidence ?? "", /历史关系核验/);
+  await validateWorkspace(workspace);
+
+  const committedLedger = await readLogicDebtLedger(workspace);
+  await writeLogicDebtLedger(workspace, {
+    schemaVersion: 1,
+    debts: [
+      ...committedLedger.debts,
+      {
+        id: "later-review-obligation",
+        category: "evidence",
+        summary: "提交后新增的后续证据义务",
+        createdAfterChapter: 1,
+        dueChapter: 2,
+        acceptanceCriteria: ["第二章提供独立证据"],
+        status: "open",
+        resolvedChapter: null,
+        resolutionEvidence: null
+      }
+    ]
+  });
+  await reopenLatestCommittedChapter(workspace, "回退已兑现债务并保留后续义务");
+  const reopenedDebts = await readLogicDebtLedger(workspace);
+  assert.equal(reopenedDebts.debts.find((item) => item.id === debt.id)?.status, "open");
+  assert.equal(
+    reopenedDebts.debts.find((item) => item.id === "later-review-obligation")?.status,
+    "open"
+  );
+  await validateWorkspace(workspace);
 });
 
 test("named revisions restore authoritative files and keep a safety snapshot", async (t) => {

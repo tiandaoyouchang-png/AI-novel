@@ -22,6 +22,7 @@ Write schema-v3 `chapters/NNNN/contract.yaml` with:
 - an `investigationChain` for investigation scenes: anomaly, at least two alternative explanations, elimination tests, result, and limitation;
 - `evidenceMoves` that distinguish discover, hypothesize, test, corroborate, challenge, and admit;
 - scheduled `revealIds`, never earlier than their reveal window and only after corroborated prerequisites;
+- `logicDebtResolutions` for every open debt due in this chapter, with a concrete planned resolution;
 - an explicit coincidence list within the chapter budget;
 - an independent goal and decision for each configured supporting character who appears;
 - `outcomeCost` and a lasting `failureConsequence`;
@@ -92,11 +93,15 @@ blockingIssues:
     evidence: concise location or fact
     repair: bounded instruction
 warnings: []
+debtChecks:
+  - debtId: stable-debt-id
+    status: pass | fail
+    evidence: exact prose-bound evidence that satisfies or misses the acceptance criteria
 ```
 
 Use `repair` for local problems and `replan` only when the chapter responsibility is structurally impossible. Do not rewrite prose inside the review.
 
-A passing review requires all ten explicit checks to pass. A non-passing review must fail at least one check and identify a blocking issue. After any repair, recheck the complete causal chain rather than only the original failure. After review round two, do not start a third automatic rewrite; stop for author direction.
+A passing review requires all ten explicit checks and every declared logic-debt check to pass. A non-passing review must fail at least one check or debt check and identify a blocking issue. After any repair, recheck the complete causal chain rather than only the original failure. After review round two, do not start a third automatic rewrite; stop for author direction.
 
 The review fingerprint is a hard acceptance boundary. `final.md` must be byte-for-byte identical to the passing reviewed draft. If a repair changes prose, return to `drafted`, rerun quality and review, then promote that exact candidate.
 
@@ -119,6 +124,8 @@ changes:
 ```
 
 Do not commit a delta extracted from a rejected draft. Run the `continuity_committed` transition only after delta validation succeeds.
+
+A logic debt is not resolved by mentioning it in a plan or review. The chapter contract must declare the resolution, the exact reviewed prose must pass its debt check, and the continuity transaction must commit. The same transaction then records the resolved chapter and review evidence in `planning/logic-debts.yaml`.
 
 Evidence entries distinguish anomaly, directional, association, adjudicative, and foreshadowing roles. Record observed/contested/corroborated/admitted/discredited status, supported and contradicted claim IDs, source IDs, verification method, and at least one limitation. Every non-hypothesis evidence action in the chapter contract must have a matching evidence upsert in the delta with a compatible resulting status.
 

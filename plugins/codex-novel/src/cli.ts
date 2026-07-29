@@ -5,7 +5,11 @@ import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import { readState } from "./io.js";
 import { compileChapterContext } from "./context.js";
-import { getContinuityCards, recoverContinuityTransaction } from "./continuity.js";
+import {
+  getContinuityCards,
+  recoverContinuityTransaction,
+  reopenLatestCommittedChapter
+} from "./continuity.js";
 import { runQualityCheck } from "./quality.js";
 import {
   generateOpeningMilestone,
@@ -47,6 +51,7 @@ import {
   guideWorkspace,
   runDoctor
 } from "./diagnostics.js";
+import { inspectLogicDebts } from "./logic-debts.js";
 
 function usage(): string {
   return [
@@ -72,6 +77,8 @@ function usage(): string {
     "  search <workspace> --query <text> [--limit 8]",
     "  advance <workspace> --to <chapter-status>",
     "  next <workspace>",
+    "  revise <workspace> --name <purpose> [--chapter N]",
+    "  debts <workspace> [--json]",
     "  revision create <workspace> --name <name>",
     "  revision list <workspace> [--json]",
     "  revision restore <workspace> --id <revision-id>",
@@ -220,6 +227,44 @@ async function main(): Promise<void> {
   if (command === "status") {
     const state = await readState(workspace);
     console.log(json ? JSON.stringify(state, null, 2) : formatStatus(state));
+    return;
+  }
+
+  if (command === "revise") {
+    const name = option(args, "--name");
+    if (!name) throw new Error("revise requires --name.");
+    const chapterOption = option(args, "--chapter");
+    const chapter = chapterOption === undefined ? undefined : Number(chapterOption);
+    if (chapter !== undefined && (!Number.isInteger(chapter) || chapter < 1)) {
+      throw new Error("revise --chapter must be a positive integer.");
+    }
+    await validateWorkspace(workspace);
+    const result = await reopenLatestCommittedChapter(workspace, name, chapter);
+    console.log(
+      json
+        ? JSON.stringify(result, null, 2)
+        : [
+            `已打开第 ${result.state.workflow.currentChapter} 章返修。`,
+            `恢复点：${result.revisionId}`,
+            `草稿：${result.draft}`,
+            "下一步：更新合同（如需要），重新生成 context，推进到 planned，再运行质量与审查。"
+          ].join("\n")
+    );
+    return;
+  }
+
+  if (command === "debts") {
+    const report = await inspectLogicDebts(workspace);
+    console.log(
+      json
+        ? JSON.stringify(report, null, 2)
+        : [
+            `当前章节：${report.chapter}`,
+            `到期：${report.dueNow.map((debt) => debt.id).join(", ") || "无"}`,
+            `逾期：${report.overdue.map((debt) => debt.id).join(", ") || "无"}`,
+            `后续：${report.upcoming.map((debt) => `${debt.id}@${debt.dueChapter}`).join(", ") || "无"}`
+          ].join("\n")
+    );
     return;
   }
 

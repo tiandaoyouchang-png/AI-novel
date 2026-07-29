@@ -66,6 +66,8 @@ Before approval, include:
 
 `reveal-policy.yaml` is a schema-v1 schedule for material answers. Each stable reveal ID has an earliest, target, and latest chapter, prerequisite evidence IDs, and a planned/delayed/revealed/cancelled status. The context compiler hides protected meanings before the earliest chapter. A continuity commit marks reveal IDs used by the accepted schema-v3 contract as revealed in the same journaled transaction.
 
+`logic-debts.yaml` is a schema-v1 ledger for review conclusions that future prose must prove or pay off. Each debt has a stable ID, category, creation boundary, due chapter, acceptance criteria, and open/resolved/waived status. Open due debts must appear in the chapter contract; they are resolved only when a fingerprint-bound passing review supplies text evidence and the chapter continuity transaction commits. Use this for causal explanations, evidence requirements, lasting consequences, period or institutional corrections, and continuity obligations. Do not use it as a general idea list.
+
 ### Volume planning
 
 `volumes/current-volume.md` defines the volume promise, escalation ladder, midpoint shift, climax, payoff, and transition into the next volume. Plan the current volume more firmly than distant volumes.
@@ -81,6 +83,8 @@ For `short-complete`, use this file as the whole-story plan: opening pressure, c
 `publication/metrics.json` contains only metrics explicitly imported by the author. It is local evidence for hypothesis review and cannot silently revise the accepted market position.
 
 Named revisions under `runtime/revisions/` are immutable recovery snapshots with file fingerprints and a difference summary. Restore through `novelctl`; never hand-edit a revision manifest or `novel-state.yaml`.
+
+`novelctl revise` is the safe path for reopening the latest unpublished continuity-committed chapter. It creates a named revision automatically, rolls back only that chapter's committed effects, preserves later planning additions such as new open logic debts, and forces a fresh production chain.
 
 ## Artifact states
 
