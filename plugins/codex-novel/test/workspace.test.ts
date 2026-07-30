@@ -37,6 +37,10 @@ import { exportDocument, importManuscript } from "../src/documents.js";
 import { friendlyError, guideWorkspace, runDoctor } from "../src/diagnostics.js";
 import { readLogicDebtLedger, writeLogicDebtLedger } from "../src/logic-debts.js";
 import {
+  prepareExternalReview,
+  recordExternalReview
+} from "../src/external-review.js";
+import {
   advanceChapter,
   exportNovel,
   initializeWorkspace,
@@ -1771,6 +1775,75 @@ test("due logic debts require a contract plan, passing review evidence, and tran
     "open"
   );
   await validateWorkspace(workspace);
+});
+
+test("external web review packages bind advisory feedback to committed prose", async (t) => {
+  const { parent, workspace } = await temporaryWorkspace();
+  t.after(() => fs.rm(parent, { recursive: true, force: true }));
+  await initializeWorkspace(workspace, { title: "外部二审测试" });
+  await enterProduction(workspace);
+  await commitTestChapter(workspace, 1);
+  await fs.writeFile(
+    path.join(workspace, "planning/external-review-policy.yaml"),
+    [
+      "schemaVersion: 1",
+      "enabled: true",
+      "provider: chatgpt-web",
+      "requiredBeforeNextChapter: true"
+    ].join("\n"),
+    "utf8"
+  );
+  await assert.rejects(
+    () => startNextChapter(workspace),
+    /requires a ChatGPT web review/
+  );
+
+  const prepared = await prepareExternalReview(workspace, 1);
+  assert.equal(prepared.chapter, 1);
+  assert.equal(prepared.alreadyPrepared, false);
+  const request = await fs.readFile(prepared.requestPath, "utf8");
+  assert.match(request, /严厉、具体、克制的中文商业小说编辑/);
+  assert.match(request, /连续性／逻辑债务候选/);
+  assert.match(request, /账册/);
+
+  const repeated = await prepareExternalReview(workspace, 1);
+  assert.equal(repeated.alreadyPrepared, true);
+  assert.equal(repeated.requestPath, prepared.requestPath);
+  await assert.rejects(
+    () => startNextChapter(workspace),
+    /has not received a current ChatGPT web review/
+  );
+
+  const responseSource = path.join(parent, "chatgpt-response.md");
+  await fs.writeFile(
+    responseSource,
+    [
+      "# 总体评价",
+      "",
+      "本节因果链完整，可以进入下一节。",
+      "",
+      "## 必须修复",
+      "",
+      "无。",
+      "",
+      "## 连续性／逻辑债务候选",
+      "",
+      "下一节需要兑现账册来源。"
+    ].join("\n"),
+    "utf8"
+  );
+  const recorded = await recordExternalReview(workspace, responseSource, 1);
+  const manifest = parse(await fs.readFile(recorded.manifestPath, "utf8")) as {
+    authority: string;
+    response: { status: string; responseFingerprint: string };
+  };
+  assert.equal(manifest.authority, "advisory-only");
+  assert.equal(manifest.response.status, "received");
+  assert.equal(manifest.response.responseFingerprint, recorded.responseFingerprint);
+  assert.match(await fs.readFile(recorded.responsePath, "utf8"), /下一节需要兑现账册来源/);
+  assert.equal((await readLogicDebtLedger(workspace)).debts.length, 0);
+  await validateWorkspace(workspace);
+  assert.equal((await startNextChapter(workspace)).workflow.currentChapter, 2);
 });
 
 test("named revisions restore authoritative files and keep a safety snapshot", async (t) => {

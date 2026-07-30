@@ -205,6 +205,34 @@ flowchart LR
 
 如果只是返修最新一节已提交但尚未发布的正文，使用 `revise`。系统会自动建立恢复点，撤回该节写入的连续性、揭秘和逻辑债务结果，保留当前规划，把已验收正文放回草稿，并强制重新经过上下文、审查、验收和提交。旧章节或已经发布的章节不会被自动打开。
 
+### 章节完成后的 ChatGPT 网页二审
+
+外部二审按作品启用。新工作区默认关闭，避免本地创作强制依赖网页、账号或网络；开启后可以要求“收到网页二审，才能进入下一节”。
+
+```yaml
+# planning/external-review-policy.yaml
+schemaVersion: 1
+enabled: true
+provider: chatgpt-web
+requiredBeforeNextChapter: true
+```
+
+章节完成连续性提交后：
+
+```bash
+# 生成绑定终稿指纹的网页审稿请求
+node plugins/codex-novel/dist/novelctl.cjs external-review \
+  novels/my-story --chapter 1
+
+# 将 ChatGPT 网页完整回复保存为外部建议
+node plugins/codex-novel/dist/novelctl.cjs external-review-record \
+  novels/my-story \
+  --chapter 1 \
+  --source /tmp/chatgpt-response.md
+```
+
+Codex 可以通过浏览器把 `request.md` 发送到 ChatGPT 网页版并取回回复。系统保存原始请求、正文指纹、回复和处理记录，但不会让外部模型自动修改正文、连续性、揭秘计划或逻辑债务。意见必须先标记为“采纳、已有规划覆盖、不采纳”；只有采纳的后续义务才可以人工进入逻辑债务账本。
+
 ### 10. 连载库存与发布后学习
 
 长篇根据“已连续性提交章节数－已发布章节数”计算真实可发布库存、缓冲天数和红黄绿健康状态。草稿和未验收正文不会计入库存。
@@ -472,6 +500,8 @@ node plugins/codex-novel/dist/novelctl.cjs <command> <workspace> [options]
 | `guardrails` | 查看核心设定、案件规模、能力、巧合和时代门禁 |
 | `reveals` | 查看本章应揭示、已逾期和仍受保护的真相 |
 | `debts` | 查看本章到期、逾期和后续逻辑债务 |
+| `external-review` | 为已提交章节生成 ChatGPT 网页二审请求包 |
+| `external-review-record` | 保存并绑定 ChatGPT 网页完整回复 |
 | `phase` | 推进作品级阶段 |
 | `context` | 为当前章节编译有界上下文 |
 | `quality` | 对草稿或最终正文执行机械质量检查 |

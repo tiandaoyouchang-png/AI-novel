@@ -131,9 +131,21 @@ For every chapter:
 8. Extract `delta.yaml` from the final prose and include its SHA-256 fingerprint.
 9. Write `handoff.yaml` from that exact accepted prose. Record resolved and unresolved items, character carry, emotional carry, and next-chapter constraints with the same fingerprint.
 10. Commit continuity only after final prose is accepted.
-11. Start the next chapter only after continuity is committed.
+11. When `planning/external-review-policy.yaml` enables ChatGPT web review, run `external-review`, use Computer Use to send the generated request to ChatGPT web, save the complete response with `external-review-record`, and write a brief triage. The external response is advisory: it may suggest repairs or logic debts but must never modify prose, continuity, reveal state, or contracts automatically.
+12. Start the next chapter only after continuity is committed and any required external-review response has been recorded.
 
 Use the bundled CLI's `advance <workspace> --to <status>` at each gate and `next <workspace>` after the commit. A failed transition is a real blocker; fix the missing artifact instead of editing `novel-state.yaml` by hand.
+
+Prepare and record an enabled external review with:
+
+```bash
+node <plugin-root>/dist/novelctl.cjs external-review <workspace> --chapter N
+node <plugin-root>/dist/novelctl.cjs external-review-record <workspace> \
+  --chapter N \
+  --source <chatgpt-response.md>
+```
+
+The request package is bound to the exact accepted-prose fingerprint. Use a new ChatGPT web conversation, send the complete generated `request.md`, and capture the complete answer rather than progress text. If a high-reasoning web response stalls, stop it and request a bounded final answer in the faster mode. Do not call an external model review a reader test. Before turning any suggestion into a logic debt, compare it with the accepted plan, reveal windows, evidence boundaries, and existing debts; record accepted, already-covered, and rejected advice in `triage.md`.
 
 The CLI enforces a maximum of two review rounds. If blocking issues remain after round two, stop for author direction. Do not use an AI-detector score as the sole acceptance criterion.
 

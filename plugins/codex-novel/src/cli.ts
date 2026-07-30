@@ -52,6 +52,10 @@ import {
   runDoctor
 } from "./diagnostics.js";
 import { inspectLogicDebts } from "./logic-debts.js";
+import {
+  prepareExternalReview,
+  recordExternalReview
+} from "./external-review.js";
 
 function usage(): string {
   return [
@@ -79,6 +83,8 @@ function usage(): string {
     "  next <workspace>",
     "  revise <workspace> --name <purpose> [--chapter N]",
     "  debts <workspace> [--json]",
+    "  external-review <workspace> [--chapter N] [--json]",
+    "  external-review-record <workspace> --source <response.md> [--chapter N] [--json]",
     "  revision create <workspace> --name <name>",
     "  revision list <workspace> [--json]",
     "  revision restore <workspace> --id <revision-id>",
@@ -263,6 +269,55 @@ async function main(): Promise<void> {
             `到期：${report.dueNow.map((debt) => debt.id).join(", ") || "无"}`,
             `逾期：${report.overdue.map((debt) => debt.id).join(", ") || "无"}`,
             `后续：${report.upcoming.map((debt) => `${debt.id}@${debt.dueChapter}`).join(", ") || "无"}`
+          ].join("\n")
+    );
+    return;
+  }
+
+  if (command === "external-review") {
+    const chapterOption = option(args, "--chapter");
+    const chapter = chapterOption === undefined ? undefined : Number(chapterOption);
+    if (chapter !== undefined && (!Number.isInteger(chapter) || chapter < 1)) {
+      throw new Error("external-review --chapter must be a positive integer.");
+    }
+    await validateWorkspace(workspace);
+    const result = await prepareExternalReview(workspace, chapter);
+    console.log(
+      json
+        ? JSON.stringify(result, null, 2)
+        : [
+            `已生成第 ${result.chapter} 节 ChatGPT 网页二审请求。`,
+            `请求文件：${result.requestPath}`,
+            `状态文件：${result.manifestPath}`,
+            result.alreadyPrepared
+              ? "该正文指纹的请求包已存在，未重复覆盖。"
+              : "请把 request.md 全文发送到 ChatGPT 网页版；外部意见仅作建议。"
+          ].join("\n")
+    );
+    return;
+  }
+
+  if (command === "external-review-record") {
+    const sourceOption = option(args, "--source");
+    if (!sourceOption) throw new Error("external-review-record requires --source.");
+    const chapterOption = option(args, "--chapter");
+    const chapter = chapterOption === undefined ? undefined : Number(chapterOption);
+    if (chapter !== undefined && (!Number.isInteger(chapter) || chapter < 1)) {
+      throw new Error("external-review-record --chapter must be a positive integer.");
+    }
+    await validateWorkspace(workspace);
+    const result = await recordExternalReview(
+      workspace,
+      path.resolve(sourceOption),
+      chapter
+    );
+    console.log(
+      json
+        ? JSON.stringify(result, null, 2)
+        : [
+            `已保存第 ${result.chapter} 节 ChatGPT 网页二审意见。`,
+            `反馈文件：${result.responsePath}`,
+            "反馈不会自动修改正文、连续性或逻辑债务；请由作者决定采纳项。"
           ].join("\n")
     );
     return;
