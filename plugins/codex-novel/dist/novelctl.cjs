@@ -107,17 +107,17 @@ var require_visit = __commonJS({
     visit.BREAK = BREAK;
     visit.SKIP = SKIP;
     visit.REMOVE = REMOVE;
-    function visit_(key, node, visitor, path20) {
-      const ctrl = callVisitor(key, node, visitor, path20);
+    function visit_(key, node, visitor, path21) {
+      const ctrl = callVisitor(key, node, visitor, path21);
       if (identity.isNode(ctrl) || identity.isPair(ctrl)) {
-        replaceNode(key, path20, ctrl);
-        return visit_(key, ctrl, visitor, path20);
+        replaceNode(key, path21, ctrl);
+        return visit_(key, ctrl, visitor, path21);
       }
       if (typeof ctrl !== "symbol") {
         if (identity.isCollection(node)) {
-          path20 = Object.freeze(path20.concat(node));
+          path21 = Object.freeze(path21.concat(node));
           for (let i = 0; i < node.items.length; ++i) {
-            const ci = visit_(i, node.items[i], visitor, path20);
+            const ci = visit_(i, node.items[i], visitor, path21);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -128,13 +128,13 @@ var require_visit = __commonJS({
             }
           }
         } else if (identity.isPair(node)) {
-          path20 = Object.freeze(path20.concat(node));
-          const ck = visit_("key", node.key, visitor, path20);
+          path21 = Object.freeze(path21.concat(node));
+          const ck = visit_("key", node.key, visitor, path21);
           if (ck === BREAK)
             return BREAK;
           else if (ck === REMOVE)
             node.key = null;
-          const cv = visit_("value", node.value, visitor, path20);
+          const cv = visit_("value", node.value, visitor, path21);
           if (cv === BREAK)
             return BREAK;
           else if (cv === REMOVE)
@@ -155,17 +155,17 @@ var require_visit = __commonJS({
     visitAsync.BREAK = BREAK;
     visitAsync.SKIP = SKIP;
     visitAsync.REMOVE = REMOVE;
-    async function visitAsync_(key, node, visitor, path20) {
-      const ctrl = await callVisitor(key, node, visitor, path20);
+    async function visitAsync_(key, node, visitor, path21) {
+      const ctrl = await callVisitor(key, node, visitor, path21);
       if (identity.isNode(ctrl) || identity.isPair(ctrl)) {
-        replaceNode(key, path20, ctrl);
-        return visitAsync_(key, ctrl, visitor, path20);
+        replaceNode(key, path21, ctrl);
+        return visitAsync_(key, ctrl, visitor, path21);
       }
       if (typeof ctrl !== "symbol") {
         if (identity.isCollection(node)) {
-          path20 = Object.freeze(path20.concat(node));
+          path21 = Object.freeze(path21.concat(node));
           for (let i = 0; i < node.items.length; ++i) {
-            const ci = await visitAsync_(i, node.items[i], visitor, path20);
+            const ci = await visitAsync_(i, node.items[i], visitor, path21);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -176,13 +176,13 @@ var require_visit = __commonJS({
             }
           }
         } else if (identity.isPair(node)) {
-          path20 = Object.freeze(path20.concat(node));
-          const ck = await visitAsync_("key", node.key, visitor, path20);
+          path21 = Object.freeze(path21.concat(node));
+          const ck = await visitAsync_("key", node.key, visitor, path21);
           if (ck === BREAK)
             return BREAK;
           else if (ck === REMOVE)
             node.key = null;
-          const cv = await visitAsync_("value", node.value, visitor, path20);
+          const cv = await visitAsync_("value", node.value, visitor, path21);
           if (cv === BREAK)
             return BREAK;
           else if (cv === REMOVE)
@@ -209,23 +209,23 @@ var require_visit = __commonJS({
       }
       return visitor;
     }
-    function callVisitor(key, node, visitor, path20) {
+    function callVisitor(key, node, visitor, path21) {
       if (typeof visitor === "function")
-        return visitor(key, node, path20);
+        return visitor(key, node, path21);
       if (identity.isMap(node))
-        return visitor.Map?.(key, node, path20);
+        return visitor.Map?.(key, node, path21);
       if (identity.isSeq(node))
-        return visitor.Seq?.(key, node, path20);
+        return visitor.Seq?.(key, node, path21);
       if (identity.isPair(node))
-        return visitor.Pair?.(key, node, path20);
+        return visitor.Pair?.(key, node, path21);
       if (identity.isScalar(node))
-        return visitor.Scalar?.(key, node, path20);
+        return visitor.Scalar?.(key, node, path21);
       if (identity.isAlias(node))
-        return visitor.Alias?.(key, node, path20);
+        return visitor.Alias?.(key, node, path21);
       return void 0;
     }
-    function replaceNode(key, path20, node) {
-      const parent = path20[path20.length - 1];
+    function replaceNode(key, path21, node) {
+      const parent = path21[path21.length - 1];
       if (identity.isCollection(parent)) {
         parent.items[key] = node;
       } else if (identity.isPair(parent)) {
@@ -835,10 +835,10 @@ var require_Collection = __commonJS({
     var createNode = require_createNode();
     var identity = require_identity();
     var Node = require_Node();
-    function collectionFromPath(schema, path20, value) {
+    function collectionFromPath(schema, path21, value) {
       let v = value;
-      for (let i = path20.length - 1; i >= 0; --i) {
-        const k = path20[i];
+      for (let i = path21.length - 1; i >= 0; --i) {
+        const k = path21[i];
         if (typeof k === "number" && Number.isInteger(k) && k >= 0) {
           const a = [];
           a[k] = v;
@@ -857,7 +857,7 @@ var require_Collection = __commonJS({
         sourceObjects: /* @__PURE__ */ new Map()
       });
     }
-    var isEmptyPath = (path20) => path20 == null || typeof path20 === "object" && !!path20[Symbol.iterator]().next().done;
+    var isEmptyPath = (path21) => path21 == null || typeof path21 === "object" && !!path21[Symbol.iterator]().next().done;
     var Collection = class extends Node.NodeBase {
       constructor(type, schema) {
         super(type);
@@ -887,11 +887,11 @@ var require_Collection = __commonJS({
        * be a Pair instance or a `{ key, value }` object, which may not have a key
        * that already exists in the map.
        */
-      addIn(path20, value) {
-        if (isEmptyPath(path20))
+      addIn(path21, value) {
+        if (isEmptyPath(path21))
           this.add(value);
         else {
-          const [key, ...rest] = path20;
+          const [key, ...rest] = path21;
           const node = this.get(key, true);
           if (identity.isCollection(node))
             node.addIn(rest, value);
@@ -905,8 +905,8 @@ var require_Collection = __commonJS({
        * Removes a value from the collection.
        * @returns `true` if the item was found and removed.
        */
-      deleteIn(path20) {
-        const [key, ...rest] = path20;
+      deleteIn(path21) {
+        const [key, ...rest] = path21;
         if (rest.length === 0)
           return this.delete(key);
         const node = this.get(key, true);
@@ -920,8 +920,8 @@ var require_Collection = __commonJS({
        * scalar values from their surrounding node; to disable set `keepScalar` to
        * `true` (collections are always returned intact).
        */
-      getIn(path20, keepScalar) {
-        const [key, ...rest] = path20;
+      getIn(path21, keepScalar) {
+        const [key, ...rest] = path21;
         const node = this.get(key, true);
         if (rest.length === 0)
           return !keepScalar && identity.isScalar(node) ? node.value : node;
@@ -939,8 +939,8 @@ var require_Collection = __commonJS({
       /**
        * Checks if the collection includes a value with the key `key`.
        */
-      hasIn(path20) {
-        const [key, ...rest] = path20;
+      hasIn(path21) {
+        const [key, ...rest] = path21;
         if (rest.length === 0)
           return this.has(key);
         const node = this.get(key, true);
@@ -950,8 +950,8 @@ var require_Collection = __commonJS({
        * Sets a value in this collection. For `!!set`, `value` needs to be a
        * boolean to add/remove the item from the set.
        */
-      setIn(path20, value) {
-        const [key, ...rest] = path20;
+      setIn(path21, value) {
+        const [key, ...rest] = path21;
         if (rest.length === 0) {
           this.set(key, value);
         } else {
@@ -1498,7 +1498,7 @@ var require_stringify = __commonJS({
         props.push(doc.directives.tagString(tag));
       return props.join(" ");
     }
-    function stringify9(item, ctx, onComment, onChompKeep) {
+    function stringify10(item, ctx, onComment, onChompKeep) {
       if (identity.isPair(item))
         return item.toString(ctx, onComment, onChompKeep);
       if (identity.isAlias(item)) {
@@ -1527,7 +1527,7 @@ var require_stringify = __commonJS({
 ${ctx.indent}${str}`;
     }
     exports2.createStringifyContext = createStringifyContext;
-    exports2.stringify = stringify9;
+    exports2.stringify = stringify10;
   }
 });
 
@@ -1537,7 +1537,7 @@ var require_stringifyPair = __commonJS({
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
-    var stringify9 = require_stringify();
+    var stringify10 = require_stringify();
     var stringifyComment = require_stringifyComment();
     function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
       const { allNullValues, doc, indent, indentStep, options: { commentString, indentSeq, simpleKeys } } = ctx;
@@ -1559,7 +1559,7 @@ var require_stringifyPair = __commonJS({
       });
       let keyCommentDone = false;
       let chompKeep = false;
-      let str = stringify9.stringify(key, ctx, () => keyCommentDone = true, () => chompKeep = true);
+      let str = stringify10.stringify(key, ctx, () => keyCommentDone = true, () => chompKeep = true);
       if (!explicitKey && !ctx.inFlow && str.length > 1024) {
         if (simpleKeys)
           throw new Error("With simple keys, single line scalar must not span more than 1024 characters");
@@ -1611,7 +1611,7 @@ ${indent}:`;
         ctx.indent = ctx.indent.substring(2);
       }
       let valueCommentDone = false;
-      const valueStr = stringify9.stringify(value, ctx, () => valueCommentDone = true, () => chompKeep = true);
+      const valueStr = stringify10.stringify(value, ctx, () => valueCommentDone = true, () => chompKeep = true);
       let ws = " ";
       if (keyComment || vsb || vcb) {
         ws = vsb ? "\n" : "";
@@ -1752,7 +1752,7 @@ var require_addPairToJSMap = __commonJS({
     "use strict";
     var log = require_log();
     var merge2 = require_merge();
-    var stringify9 = require_stringify();
+    var stringify10 = require_stringify();
     var identity = require_identity();
     var toJS = require_toJS();
     function addPairToJSMap(ctx, map2, { key, value }) {
@@ -1788,7 +1788,7 @@ var require_addPairToJSMap = __commonJS({
       if (typeof jsKey !== "object")
         return String(jsKey);
       if (identity.isNode(key) && ctx?.doc) {
-        const strCtx = stringify9.createStringifyContext(ctx.doc, {});
+        const strCtx = stringify10.createStringifyContext(ctx.doc, {});
         strCtx.anchors = /* @__PURE__ */ new Set();
         for (const node of ctx.anchors.keys())
           strCtx.anchors.add(node.anchor);
@@ -1855,12 +1855,12 @@ var require_stringifyCollection = __commonJS({
   "node_modules/yaml/dist/stringify/stringifyCollection.js"(exports2) {
     "use strict";
     var identity = require_identity();
-    var stringify9 = require_stringify();
+    var stringify10 = require_stringify();
     var stringifyComment = require_stringifyComment();
     function stringifyCollection(collection, ctx, options) {
       const flow = ctx.inFlow ?? collection.flow;
-      const stringify10 = flow ? stringifyFlowCollection : stringifyBlockCollection;
-      return stringify10(collection, ctx, options);
+      const stringify11 = flow ? stringifyFlowCollection : stringifyBlockCollection;
+      return stringify11(collection, ctx, options);
     }
     function stringifyBlockCollection({ comment, items }, ctx, { blockItemPrefix, flowChars, itemIndent, onChompKeep, onComment }) {
       const { indent, options: { commentString } } = ctx;
@@ -1885,7 +1885,7 @@ var require_stringifyCollection = __commonJS({
           }
         }
         chompKeep = false;
-        let str2 = stringify9.stringify(item, itemCtx, () => comment2 = null, () => chompKeep = true);
+        let str2 = stringify10.stringify(item, itemCtx, () => comment2 = null, () => chompKeep = true);
         if (comment2)
           str2 += stringifyComment.lineComment(str2, itemIndent, commentString(comment2));
         if (chompKeep && comment2)
@@ -1952,7 +1952,7 @@ ${indent}${line}` : "\n";
         }
         if (comment)
           reqNewline = true;
-        let str = stringify9.stringify(item, itemCtx, () => comment = null);
+        let str = stringify10.stringify(item, itemCtx, () => comment = null);
         reqNewline || (reqNewline = lines.length > linesAtValue || str.includes("\n"));
         if (i < items.length - 1) {
           str += ",";
@@ -3313,7 +3313,7 @@ var require_stringifyDocument = __commonJS({
   "node_modules/yaml/dist/stringify/stringifyDocument.js"(exports2) {
     "use strict";
     var identity = require_identity();
-    var stringify9 = require_stringify();
+    var stringify10 = require_stringify();
     var stringifyComment = require_stringifyComment();
     function stringifyDocument(doc, options) {
       const lines = [];
@@ -3328,7 +3328,7 @@ var require_stringifyDocument = __commonJS({
       }
       if (hasDirectives)
         lines.push("---");
-      const ctx = stringify9.createStringifyContext(doc, options);
+      const ctx = stringify10.createStringifyContext(doc, options);
       const { commentString } = ctx.options;
       if (doc.commentBefore) {
         if (lines.length !== 1)
@@ -3350,7 +3350,7 @@ var require_stringifyDocument = __commonJS({
           contentComment = doc.contents.comment;
         }
         const onChompKeep = contentComment ? void 0 : () => chompKeep = true;
-        let body = stringify9.stringify(doc.contents, ctx, () => contentComment = null, onChompKeep);
+        let body = stringify10.stringify(doc.contents, ctx, () => contentComment = null, onChompKeep);
         if (contentComment)
           body += stringifyComment.lineComment(body, "", commentString(contentComment));
         if ((body[0] === "|" || body[0] === ">") && lines[lines.length - 1] === "---") {
@@ -3358,7 +3358,7 @@ var require_stringifyDocument = __commonJS({
         } else
           lines.push(body);
       } else {
-        lines.push(stringify9.stringify(doc.contents, ctx));
+        lines.push(stringify10.stringify(doc.contents, ctx));
       }
       if (doc.directives?.docEnd) {
         if (doc.comment) {
@@ -3466,9 +3466,9 @@ var require_Document = __commonJS({
           this.contents.add(value);
       }
       /** Adds a value to the document. */
-      addIn(path20, value) {
+      addIn(path21, value) {
         if (assertCollection(this.contents))
-          this.contents.addIn(path20, value);
+          this.contents.addIn(path21, value);
       }
       /**
        * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
@@ -3543,14 +3543,14 @@ var require_Document = __commonJS({
        * Removes a value from the document.
        * @returns `true` if the item was found and removed.
        */
-      deleteIn(path20) {
-        if (Collection.isEmptyPath(path20)) {
+      deleteIn(path21) {
+        if (Collection.isEmptyPath(path21)) {
           if (this.contents == null)
             return false;
           this.contents = null;
           return true;
         }
-        return assertCollection(this.contents) ? this.contents.deleteIn(path20) : false;
+        return assertCollection(this.contents) ? this.contents.deleteIn(path21) : false;
       }
       /**
        * Returns item at `key`, or `undefined` if not found. By default unwraps
@@ -3565,10 +3565,10 @@ var require_Document = __commonJS({
        * scalar values from their surrounding node; to disable set `keepScalar` to
        * `true` (collections are always returned intact).
        */
-      getIn(path20, keepScalar) {
-        if (Collection.isEmptyPath(path20))
+      getIn(path21, keepScalar) {
+        if (Collection.isEmptyPath(path21))
           return !keepScalar && identity.isScalar(this.contents) ? this.contents.value : this.contents;
-        return identity.isCollection(this.contents) ? this.contents.getIn(path20, keepScalar) : void 0;
+        return identity.isCollection(this.contents) ? this.contents.getIn(path21, keepScalar) : void 0;
       }
       /**
        * Checks if the document includes a value with the key `key`.
@@ -3579,10 +3579,10 @@ var require_Document = __commonJS({
       /**
        * Checks if the document includes a value at `path`.
        */
-      hasIn(path20) {
-        if (Collection.isEmptyPath(path20))
+      hasIn(path21) {
+        if (Collection.isEmptyPath(path21))
           return this.contents !== void 0;
-        return identity.isCollection(this.contents) ? this.contents.hasIn(path20) : false;
+        return identity.isCollection(this.contents) ? this.contents.hasIn(path21) : false;
       }
       /**
        * Sets a value in this document. For `!!set`, `value` needs to be a
@@ -3599,13 +3599,13 @@ var require_Document = __commonJS({
        * Sets a value in this document. For `!!set`, `value` needs to be a
        * boolean to add/remove the item from the set.
        */
-      setIn(path20, value) {
-        if (Collection.isEmptyPath(path20)) {
+      setIn(path21, value) {
+        if (Collection.isEmptyPath(path21)) {
           this.contents = value;
         } else if (this.contents == null) {
-          this.contents = Collection.collectionFromPath(this.schema, Array.from(path20), value);
+          this.contents = Collection.collectionFromPath(this.schema, Array.from(path21), value);
         } else if (assertCollection(this.contents)) {
-          this.contents.setIn(path20, value);
+          this.contents.setIn(path21, value);
         }
       }
       /**
@@ -5493,7 +5493,7 @@ var require_cst_scalar = __commonJS({
 var require_cst_stringify = __commonJS({
   "node_modules/yaml/dist/parse/cst-stringify.js"(exports2) {
     "use strict";
-    var stringify9 = (cst) => "type" in cst ? stringifyToken(cst) : stringifyItem(cst);
+    var stringify10 = (cst) => "type" in cst ? stringifyToken(cst) : stringifyItem(cst);
     function stringifyToken(token) {
       switch (token.type) {
         case "block-scalar": {
@@ -5546,7 +5546,7 @@ var require_cst_stringify = __commonJS({
         res += stringifyToken(value);
       return res;
     }
-    exports2.stringify = stringify9;
+    exports2.stringify = stringify10;
   }
 });
 
@@ -5565,9 +5565,9 @@ var require_cst_visit = __commonJS({
     visit.BREAK = BREAK;
     visit.SKIP = SKIP;
     visit.REMOVE = REMOVE;
-    visit.itemAtPath = (cst, path20) => {
+    visit.itemAtPath = (cst, path21) => {
       let item = cst;
-      for (const [field, index] of path20) {
+      for (const [field, index] of path21) {
         const tok = item?.[field];
         if (tok && "items" in tok) {
           item = tok.items[index];
@@ -5576,23 +5576,23 @@ var require_cst_visit = __commonJS({
       }
       return item;
     };
-    visit.parentCollection = (cst, path20) => {
-      const parent = visit.itemAtPath(cst, path20.slice(0, -1));
-      const field = path20[path20.length - 1][0];
+    visit.parentCollection = (cst, path21) => {
+      const parent = visit.itemAtPath(cst, path21.slice(0, -1));
+      const field = path21[path21.length - 1][0];
       const coll = parent?.[field];
       if (coll && "items" in coll)
         return coll;
       throw new Error("Parent collection not found");
     };
-    function _visit(path20, item, visitor) {
-      let ctrl = visitor(item, path20);
+    function _visit(path21, item, visitor) {
+      let ctrl = visitor(item, path21);
       if (typeof ctrl === "symbol")
         return ctrl;
       for (const field of ["key", "value"]) {
         const token = item[field];
         if (token && "items" in token) {
           for (let i = 0; i < token.items.length; ++i) {
-            const ci = _visit(Object.freeze(path20.concat([[field, i]])), token.items[i], visitor);
+            const ci = _visit(Object.freeze(path21.concat([[field, i]])), token.items[i], visitor);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -5603,10 +5603,10 @@ var require_cst_visit = __commonJS({
             }
           }
           if (typeof ctrl === "function" && field === "key")
-            ctrl = ctrl(item, path20);
+            ctrl = ctrl(item, path21);
         }
       }
-      return typeof ctrl === "function" ? ctrl(item, path20) : ctrl;
+      return typeof ctrl === "function" ? ctrl(item, path21) : ctrl;
     }
     exports2.visit = visit;
   }
@@ -6908,14 +6908,14 @@ var require_parser = __commonJS({
             case "scalar":
             case "single-quoted-scalar":
             case "double-quoted-scalar": {
-              const fs17 = this.flowScalar(this.type);
+              const fs18 = this.flowScalar(this.type);
               if (atNextItem || it.value) {
-                map2.items.push({ start, key: fs17, sep: [] });
+                map2.items.push({ start, key: fs18, sep: [] });
                 this.onKeyLine = true;
               } else if (it.sep) {
-                this.stack.push(fs17);
+                this.stack.push(fs18);
               } else {
-                Object.assign(it, { key: fs17, sep: [] });
+                Object.assign(it, { key: fs18, sep: [] });
                 this.onKeyLine = true;
               }
               return;
@@ -7043,13 +7043,13 @@ var require_parser = __commonJS({
             case "scalar":
             case "single-quoted-scalar":
             case "double-quoted-scalar": {
-              const fs17 = this.flowScalar(this.type);
+              const fs18 = this.flowScalar(this.type);
               if (!it || it.value)
-                fc.items.push({ start: [], key: fs17, sep: [] });
+                fc.items.push({ start: [], key: fs18, sep: [] });
               else if (it.sep)
-                this.stack.push(fs17);
+                this.stack.push(fs18);
               else
-                Object.assign(it, { key: fs17, sep: [] });
+                Object.assign(it, { key: fs18, sep: [] });
               return;
             }
             case "flow-map-end":
@@ -7257,7 +7257,7 @@ var require_public_api = __commonJS({
       }
       return doc;
     }
-    function parse17(src, reviver, options) {
+    function parse18(src, reviver, options) {
       let _reviver = void 0;
       if (typeof reviver === "function") {
         _reviver = reviver;
@@ -7276,7 +7276,7 @@ var require_public_api = __commonJS({
       }
       return doc.toJS(Object.assign({ reviver: _reviver }, options));
     }
-    function stringify9(value, replacer, options) {
+    function stringify10(value, replacer, options) {
       let _replacer = null;
       if (typeof replacer === "function" || Array.isArray(replacer)) {
         _replacer = replacer;
@@ -7298,10 +7298,10 @@ var require_public_api = __commonJS({
         return value.toString(options);
       return new Document.Document(value, _replacer, options).toString(options);
     }
-    exports2.parse = parse17;
+    exports2.parse = parse18;
     exports2.parseAllDocuments = parseAllDocuments;
     exports2.parseDocument = parseDocument;
-    exports2.stringify = stringify9;
+    exports2.stringify = stringify10;
   }
 });
 
@@ -7638,7 +7638,7 @@ var require_BufferList = __commonJS({
         this.head = this.tail = null;
         this.length = 0;
       };
-      BufferList.prototype.join = function join18(s) {
+      BufferList.prototype.join = function join19(s) {
         if (this.length === 0) return "";
         var p = this.head;
         var ret = "" + p.data;
@@ -10225,8 +10225,8 @@ var require_utils = __commonJS({
       var result = transform2[inputType][outputType](input);
       return result;
     };
-    exports2.resolve = function(path20) {
-      var parts = path20.split("/");
+    exports2.resolve = function(path21) {
+      var parts = path21.split("/");
       var result = [];
       for (var index = 0; index < parts.length; index++) {
         var part = parts[index];
@@ -16079,18 +16079,18 @@ var require_object = __commonJS({
       var object2 = new ZipObject(name, zipObjectContent, o);
       this.files[name] = object2;
     };
-    var parentFolder = function(path20) {
-      if (path20.slice(-1) === "/") {
-        path20 = path20.substring(0, path20.length - 1);
+    var parentFolder = function(path21) {
+      if (path21.slice(-1) === "/") {
+        path21 = path21.substring(0, path21.length - 1);
       }
-      var lastSlash = path20.lastIndexOf("/");
-      return lastSlash > 0 ? path20.substring(0, lastSlash) : "";
+      var lastSlash = path21.lastIndexOf("/");
+      return lastSlash > 0 ? path21.substring(0, lastSlash) : "";
     };
-    var forceTrailingSlash = function(path20) {
-      if (path20.slice(-1) !== "/") {
-        path20 += "/";
+    var forceTrailingSlash = function(path21) {
+      if (path21.slice(-1) !== "/") {
+        path21 += "/";
       }
-      return path20;
+      return path21;
     };
     var folderAdd = function(name, createFolders) {
       createFolders = typeof createFolders !== "undefined" ? createFolders : defaults.createFolders;
@@ -17090,7 +17090,7 @@ var require_lib3 = __commonJS({
 });
 
 // src/cli.ts
-var path19 = __toESM(require("node:path"), 1);
+var path20 = __toESM(require("node:path"), 1);
 var import_promises = require("node:readline/promises");
 var import_node_process = require("node:process");
 
@@ -17869,10 +17869,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path20) {
-  if (!path20)
+function getElementAtPath(obj, path21) {
+  if (!path21)
     return obj;
-  return path20.reduce((acc, key) => acc?.[key], obj);
+  return path21.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -18281,11 +18281,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path20, issues) {
+function prefixIssues(path21, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path20);
+    iss.path.unshift(path21);
     return iss;
   });
 }
@@ -18432,16 +18432,16 @@ function flattenError(error51, mapper = (issue2) => issue2.message) {
 }
 function formatError(error51, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error52, path20 = []) => {
+  const processError = (error52, path21 = []) => {
     for (const issue2 of error52.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path20, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path21, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path20, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path21, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path20, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path21, ...issue2.path]);
       } else {
-        const fullpath = [...path20, ...issue2.path];
+        const fullpath = [...path21, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -18468,17 +18468,17 @@ function formatError(error51, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error51, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error52, path20 = []) => {
+  const processError = (error52, path21 = []) => {
     var _a3, _b;
     for (const issue2 of error52.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path20, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path21, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path20, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path21, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path20, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path21, ...issue2.path]);
       } else {
-        const fullpath = [...path20, ...issue2.path];
+        const fullpath = [...path21, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -18510,8 +18510,8 @@ function treeifyError(error51, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path20 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path20) {
+  const path21 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path21) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -31203,13 +31203,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path20 = ref.slice(1).split("/").filter(Boolean);
-  if (path20.length === 0) {
+  const path21 = ref.slice(1).split("/").filter(Boolean);
+  if (path21.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path20[0] === defsKey) {
-    const key = path20[1];
+  if (path21[0] === defsKey) {
+    const key = path21[1];
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -33128,15 +33128,15 @@ async function loadCharacterProfiles(workspace) {
   const ids = /* @__PURE__ */ new Set();
   const names = /* @__PURE__ */ new Set();
   for (const file2 of files) {
-    const relative = `planning/characters/${file2}`;
+    const relative2 = `planning/characters/${file2}`;
     const profile = characterProfileSchema.parse(
-      (0, import_yaml2.parse)(await fs2.readFile(path3.join(workspace, relative), "utf8"))
+      (0, import_yaml2.parse)(await fs2.readFile(path3.join(workspace, relative2), "utf8"))
     );
     if (ids.has(profile.id)) throw new Error(`Duplicate character profile id: ${profile.id}`);
     if (names.has(profile.name)) throw new Error(`Duplicate character profile name: ${profile.name}`);
     ids.add(profile.id);
     names.add(profile.name);
-    loaded.push({ path: relative, profile });
+    loaded.push({ path: relative2, profile });
   }
   for (const { profile } of loaded) {
     const unknown2 = profile.relationshipVoices.map((item) => item.characterId).filter((characterId) => !ids.has(characterId));
@@ -33232,18 +33232,18 @@ function searchableText(input) {
 async function rebuildRetrievalIndex(workspace) {
   const state = await readState(workspace);
   const documents = [];
-  for (const { path: relative, profile } of await loadCharacterProfiles(workspace)) {
+  for (const { path: relative2, profile } of await loadCharacterProfiles(workspace)) {
     documents.push({
       id: `character-profile:${profile.id}`,
       kind: "character-profile",
-      path: relative,
-      fingerprint: await fingerprintFile(path4.join(workspace, relative)),
+      path: relative2,
+      fingerprint: await fingerprintFile(path4.join(workspace, relative2)),
       content: JSON.stringify(profile)
     });
   }
   for (const domain2 of Object.keys(DOMAIN_FILES)) {
-    const relative = `continuity/${DOMAIN_FILES[domain2]}`;
-    const absolute = path4.join(workspace, relative);
+    const relative2 = `continuity/${DOMAIN_FILES[domain2]}`;
+    const absolute = path4.join(workspace, relative2);
     const fingerprint = await fingerprintFile(absolute);
     const store = continuityStoreSchema.parse((0, import_yaml3.parse)(await fs3.readFile(absolute, "utf8")));
     if (domain2 === "evidence") continue;
@@ -33251,7 +33251,7 @@ async function rebuildRetrievalIndex(workspace) {
       documents.push({
         id: `continuity:${domain2}:${entry.id}`,
         kind: `continuity-${domain2}`,
-        path: relative,
+        path: relative2,
         fingerprint,
         content: `${entry.id}
 ${JSON.stringify(entry.value)}
@@ -33260,13 +33260,13 @@ ${entry.evidence}`
     }
   }
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
-    const relative = `chapters/${String(chapter).padStart(4, "0")}/handoff.yaml`;
-    const absolute = path4.join(workspace, relative);
+    const relative2 = `chapters/${String(chapter).padStart(4, "0")}/handoff.yaml`;
+    const absolute = path4.join(workspace, relative2);
     if (!await pathExists(absolute)) continue;
     documents.push({
       id: `handoff:${chapter}`,
       kind: "chapter-handoff",
-      path: relative,
+      path: relative2,
       fingerprint: await fingerprintFile(absolute),
       content: await fs3.readFile(absolute, "utf8")
     });
@@ -33339,15 +33339,15 @@ async function queryRetrievalIndex(workspace, terms, limit = 8) {
   }
   const candidates = [];
   for (const item of raw) {
-    const relative = String(item.path);
-    const absolute = path4.join(workspace, relative);
+    const relative2 = String(item.path);
+    const absolute = path4.join(workspace, relative2);
     if (!await pathExists(absolute)) continue;
     const fingerprint = String(item.fingerprint);
     if (await fingerprintFile(absolute) !== fingerprint) continue;
     candidates.push({
       id: String(item.id),
       kind: String(item.kind),
-      path: relative,
+      path: relative2,
       fingerprint,
       score: Number(item.score)
     });
@@ -33526,8 +33526,8 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     throw new Error("Context compilation is available only in production phase.");
   }
   const chapter = state.workflow.currentChapter;
-  const chapterDirectory2 = String(chapter).padStart(4, "0");
-  const chapterRoot = path6.join(workspace, "chapters", chapterDirectory2);
+  const chapterDirectory3 = String(chapter).padStart(4, "0");
+  const chapterRoot = path6.join(workspace, "chapters", chapterDirectory3);
   const contractPath = path6.join(chapterRoot, "contract.yaml");
   const contract = chapterContractSchema.parse((0, import_yaml5.parse)(await fs5.readFile(contractPath, "utf8")));
   if (contract.chapter !== chapter) {
@@ -33663,9 +33663,9 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     "planning/arc-grid.yaml",
     "planning/style-profile.yaml",
     "planning/style-examples.yaml",
-    ...characterProfiles.map(({ path: relative }) => relative),
+    ...characterProfiles.map(({ path: relative2 }) => relative2),
     ...Object.values(DOMAIN_FILES2).map((file2) => `continuity/${file2}`),
-    `chapters/${chapterDirectory2}/contract.yaml`
+    `chapters/${chapterDirectory3}/contract.yaml`
   ];
   if (await pathExists(path6.join(workspace, LOGIC_DEBT_FILE))) {
     sourceFiles.push(LOGIC_DEBT_FILE);
@@ -33679,9 +33679,9 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
     );
   }
   const sources = await Promise.all(
-    [...new Set(sourceFiles)].map(async (relative) => ({
-      path: relative,
-      fingerprint: await fingerprintFile(path6.join(workspace, relative))
+    [...new Set(sourceFiles)].map(async (relative2) => ({
+      path: relative2,
+      fingerprint: await fingerprintFile(path6.join(workspace, relative2))
     }))
   );
   const sections = [
@@ -34004,8 +34004,8 @@ async function compileChapterContext(workspace, maxChars = 2e4) {
 async function validateCurrentChapterContext(workspace) {
   const state = await readState(workspace);
   const chapter = state.workflow.currentChapter;
-  const chapterDirectory2 = String(chapter).padStart(4, "0");
-  const chapterRoot = path6.join(workspace, "chapters", chapterDirectory2);
+  const chapterDirectory3 = String(chapter).padStart(4, "0");
+  const chapterRoot = path6.join(workspace, "chapters", chapterDirectory3);
   const manifestPath = path6.join(chapterRoot, "context-manifest.yaml");
   const manifest = chapterContextManifestSchema.parse(
     (0, import_yaml5.parse)(await fs5.readFile(manifestPath, "utf8"))
@@ -34072,8 +34072,8 @@ async function generateCheckpoint(workspace, requestedLabel) {
   const qualityDebt = [];
   const sources = [];
   for (const domain2 of Object.keys(DOMAIN_FILES3)) {
-    const relative = `continuity/${DOMAIN_FILES3[domain2]}`;
-    const raw = await fs6.readFile(path7.join(workspace, relative), "utf8");
+    const relative2 = `continuity/${DOMAIN_FILES3[domain2]}`;
+    const raw = await fs6.readFile(path7.join(workspace, relative2), "utf8");
     const store = continuityStoreSchema.parse((0, import_yaml6.parse)(raw));
     active[domain2] = store.entries.filter((entry) => entry.status === "active").map((entry) => entry.id).sort();
     if (domain2 === "storyCards") {
@@ -34082,7 +34082,7 @@ async function generateCheckpoint(workspace, requestedLabel) {
         qualityDebt.push(`${entry.id}: ${card.payoffDebt}`);
       }
     }
-    sources.push({ path: relative, fingerprint: await fingerprintFile(path7.join(workspace, relative)) });
+    sources.push({ path: relative2, fingerprint: await fingerprintFile(path7.join(workspace, relative2)) });
   }
   const statePath = path7.join(workspace, "novel-state.yaml");
   const label = requestedLabel?.trim() || `chapter-${state.continuity.lastCommittedChapter}`;
@@ -34123,20 +34123,20 @@ var AUTHORITATIVE_TOP_LEVEL = [STATE_FILE, "author-intent.md", "current-focus.md
 function revisionId() {
   return `${(/* @__PURE__ */ new Date()).toISOString().replace(/\D/g, "").toLowerCase()}-${(0, import_node_crypto3.randomUUID)().slice(0, 8)}`;
 }
-function safeRelative(relative) {
-  const normalized = relative.split(path8.sep).join(path8.posix.sep);
+function safeRelative(relative2) {
+  const normalized = relative2.split(path8.sep).join(path8.posix.sep);
   if (path8.posix.isAbsolute(normalized) || normalized === ".." || normalized.startsWith("../") || normalized.includes("/../")) {
-    throw new Error(`Unsafe revision path: ${relative}`);
+    throw new Error(`Unsafe revision path: ${relative2}`);
   }
   return normalized;
 }
-async function walkFiles(root, relative = "") {
-  const directory = path8.join(root, relative);
+async function walkFiles(root, relative2 = "") {
+  const directory = path8.join(root, relative2);
   if (!await pathExists(directory)) return [];
   const entries = await fs7.readdir(directory, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
-    const child = path8.join(relative, entry.name);
+    const child = path8.join(relative2, entry.name);
     if (entry.isDirectory()) {
       files.push(...await walkFiles(root, child));
     } else if (entry.isFile()) {
@@ -34147,8 +34147,8 @@ async function walkFiles(root, relative = "") {
 }
 async function authoritativeFiles(workspace) {
   const files = [];
-  for (const relative of AUTHORITATIVE_TOP_LEVEL) {
-    if (await pathExists(path8.join(workspace, relative))) files.push(relative);
+  for (const relative2 of AUTHORITATIVE_TOP_LEVEL) {
+    if (await pathExists(path8.join(workspace, relative2))) files.push(relative2);
   }
   for (const root of AUTHORITATIVE_ROOTS) {
     files.push(...await walkFiles(workspace, root));
@@ -34182,9 +34182,9 @@ async function createRevision(workspace, name) {
   const previous = (await listRevisions(workspace)).at(-1) ?? null;
   const previousMap = new Map(previous?.files.map((file2) => [file2.path, file2.fingerprint]) ?? []);
   const currentFiles = await Promise.all(
-    files.map(async (relative) => ({
-      path: relative,
-      fingerprint: await fingerprintFile(path8.join(workspace, relative))
+    files.map(async (relative2) => ({
+      path: relative2,
+      fingerprint: await fingerprintFile(path8.join(workspace, relative2))
     }))
   );
   const currentMap = new Map(currentFiles.map((file2) => [file2.path, file2.fingerprint]));
@@ -34201,11 +34201,11 @@ async function createRevision(workspace, name) {
     baseRevisionId: previous?.id ?? null,
     files: currentFiles,
     diffSummary: {
-      added: files.filter((relative) => !previousMap.has(relative)),
+      added: files.filter((relative2) => !previousMap.has(relative2)),
       changed: files.filter(
-        (relative) => previousMap.has(relative) && previousMap.get(relative) !== currentMap.get(relative)
+        (relative2) => previousMap.has(relative2) && previousMap.get(relative2) !== currentMap.get(relative2)
       ),
-      removed: [...previousMap.keys()].filter((relative) => !currentMap.has(relative))
+      removed: [...previousMap.keys()].filter((relative2) => !currentMap.has(relative2))
     }
   });
   await fs7.mkdir(root, { recursive: true });
@@ -34242,20 +34242,20 @@ async function restoreRevision(workspace, id) {
   const safetyRevision = await createRevision(workspace, `\u6062\u590D\u524D\u81EA\u52A8\u5907\u4EFD\uFF1A${target.name}`);
   const currentFiles = await authoritativeFiles(workspace);
   const targetPaths = new Set(target.files.map((file2) => safeRelative(file2.path)));
-  for (const relative of targetPaths) {
-    const source2 = path8.join(revisionDirectory, "files", relative);
-    if (!await pathExists(source2)) throw new Error(`Revision snapshot is incomplete: ${relative}`);
+  for (const relative2 of targetPaths) {
+    const source2 = path8.join(revisionDirectory, "files", relative2);
+    if (!await pathExists(source2)) throw new Error(`Revision snapshot is incomplete: ${relative2}`);
     const actual = await fingerprintFile(source2);
-    const expected = target.files.find((file2) => file2.path === relative)?.fingerprint;
-    if (actual !== expected) throw new Error(`Revision snapshot fingerprint mismatch: ${relative}`);
+    const expected = target.files.find((file2) => file2.path === relative2)?.fingerprint;
+    if (actual !== expected) throw new Error(`Revision snapshot fingerprint mismatch: ${relative2}`);
   }
   for (const file2 of target.files) {
     const source2 = path8.join(revisionDirectory, "files", file2.path);
     const destination = path8.join(workspace, file2.path);
     await atomicWriteText(destination, await fs7.readFile(source2, "utf8"));
   }
-  for (const relative of currentFiles) {
-    if (!targetPaths.has(relative)) await fs7.rm(path8.join(workspace, relative), { force: true });
+  for (const relative2 of currentFiles) {
+    if (!targetPaths.has(relative2)) await fs7.rm(path8.join(workspace, relative2), { force: true });
   }
   await fs7.rm(path8.join(workspace, "derived", "retrieval.sqlite"), { force: true });
   await appendEvent(workspace, {
@@ -34516,12 +34516,12 @@ async function restoreFromRun(workspace, runId) {
 }
 async function commitContinuityDelta(workspace, before, after) {
   const chapter = before.workflow.currentChapter;
-  const chapterDirectory2 = String(chapter).padStart(4, "0");
-  const finalPath = path9.join(workspace, "chapters", chapterDirectory2, "final.md");
-  const deltaPath = path9.join(workspace, "chapters", chapterDirectory2, "delta.yaml");
-  const contractPath = path9.join(workspace, "chapters", chapterDirectory2, "contract.yaml");
+  const chapterDirectory3 = String(chapter).padStart(4, "0");
+  const finalPath = path9.join(workspace, "chapters", chapterDirectory3, "final.md");
+  const deltaPath = path9.join(workspace, "chapters", chapterDirectory3, "delta.yaml");
+  const contractPath = path9.join(workspace, "chapters", chapterDirectory3, "contract.yaml");
   const contract = await pathExists(contractPath) ? chapterContractSchema.parse((0, import_yaml7.parse)(await fs8.readFile(contractPath, "utf8"))) : null;
-  const reviewPath = path9.join(workspace, "chapters", chapterDirectory2, "review.yaml");
+  const reviewPath = path9.join(workspace, "chapters", chapterDirectory3, "review.yaml");
   const review = await pathExists(reviewPath) ? chapterReviewSchema.parse((0, import_yaml7.parse)(await fs8.readFile(reviewPath, "utf8"))) : null;
   const delta = continuityDeltaSchema.parse((0, import_yaml7.parse)(await fs8.readFile(deltaPath, "utf8")));
   if (delta.chapter !== chapter) {
@@ -34692,8 +34692,8 @@ async function reopenLatestCommittedChapter(workspace, name, requestedChapter) {
     );
   }
   const sourceRun = path9.join(workspace, "runtime", "runs", sourceRunId);
-  const chapterDirectory2 = String(chapter).padStart(4, "0");
-  const chapterRoot = path9.join(workspace, "chapters", chapterDirectory2);
+  const chapterDirectory3 = String(chapter).padStart(4, "0");
+  const chapterRoot = path9.join(workspace, "chapters", chapterDirectory3);
   const finalPath = path9.join(chapterRoot, "final.md");
   if (!await pathExists(finalPath)) {
     throw new Error(`Committed chapter ${chapter} is missing final.md.`);
@@ -35007,10 +35007,10 @@ var CONTINUITY_FILES = [
   "continuity/characters.yaml",
   "continuity/story-cards.yaml"
 ];
-async function source(workspace, relative) {
+async function source(workspace, relative2) {
   return {
-    path: relative,
-    fingerprint: await fingerprintFile(path11.join(workspace, relative))
+    path: relative2,
+    fingerprint: await fingerprintFile(path11.join(workspace, relative2))
   };
 }
 function reviewTemplate(bundleFingerprint) {
@@ -35058,7 +35058,7 @@ async function generateOpeningMilestone(workspace) {
     throw new Error("The opening milestone requires chapters 1-3 to be continuity-committed.");
   }
   const blockingIssues = [];
-  const characterProfilePaths = (await loadCharacterProfiles(workspace)).map(({ path: relative }) => relative);
+  const characterProfilePaths = (await loadCharacterProfiles(workspace)).map(({ path: relative2 }) => relative2);
   const globalSourcePaths = [
     "author-intent.md",
     "discovery/market-scan.yaml",
@@ -35076,7 +35076,7 @@ async function generateOpeningMilestone(workspace) {
     ...CONTINUITY_FILES
   ];
   const globalSources = await Promise.all(
-    globalSourcePaths.map((relative) => source(workspace, relative))
+    globalSourcePaths.map((relative2) => source(workspace, relative2))
   );
   const marketPosition = marketPositionSchema.parse(
     (0, import_yaml9.parse)(await fs10.readFile(path11.join(workspace, "planning/market-position.yaml"), "utf8"))
@@ -35094,7 +35094,7 @@ async function generateOpeningMilestone(workspace) {
       handoff: `${chapterRoot}/handoff.yaml`
     };
     const chapterSources = await Promise.all(
-      Object.values(paths).map((relative) => source(workspace, relative))
+      Object.values(paths).map((relative2) => source(workspace, relative2))
     );
     const contract = chapterContractSchema.parse(
       (0, import_yaml9.parse)(await fs10.readFile(path11.join(workspace, paths.contract), "utf8"))
@@ -35264,7 +35264,7 @@ async function generateStoryMilestone(workspace, type) {
       `${root}/handoff.yaml`
     ];
     const chapterSources = await Promise.all(
-      paths.map((relative) => source(workspace, relative))
+      paths.map((relative2) => source(workspace, relative2))
     );
     const contract = chapterContractSchema.parse(
       (0, import_yaml9.parse)(await fs10.readFile(path11.join(workspace, paths[0]), "utf8"))
@@ -35312,11 +35312,11 @@ async function generateStoryMilestone(workspace, type) {
     "planning/volumes/current-volume.md",
     "planning/style-profile.yaml",
     "planning/style-examples.yaml",
-    ...(await loadCharacterProfiles(workspace)).map(({ path: relative }) => relative),
+    ...(await loadCharacterProfiles(workspace)).map(({ path: relative2 }) => relative2),
     ...CONTINUITY_FILES
   ];
   const globalSources = await Promise.all(
-    globalPaths.map((relative) => source(workspace, relative))
+    globalPaths.map((relative2) => source(workspace, relative2))
   );
   const allSources = [...globalSources, ...chapters.flatMap((chapter) => chapter.sources)];
   const bundleFingerprint = sha256Text(
@@ -35405,9 +35405,9 @@ function weightedScore(scores) {
 }
 async function inputSources(workspace) {
   return Promise.all(
-    INPUT_PATHS.map(async (relative) => ({
-      path: relative,
-      fingerprint: await fingerprintFile(path12.join(workspace, relative))
+    INPUT_PATHS.map(async (relative2) => ({
+      path: relative2,
+      fingerprint: await fingerprintFile(path12.join(workspace, relative2))
     }))
   );
 }
@@ -35598,10 +35598,10 @@ async function validateTopicSelection(workspace, policyDate = (/* @__PURE__ */ n
 }
 
 // src/workspace.ts
-var fs14 = __toESM(require("node:fs/promises"), 1);
-var path15 = __toESM(require("node:path"), 1);
+var fs15 = __toESM(require("node:fs/promises"), 1);
+var path16 = __toESM(require("node:path"), 1);
 var import_node_crypto5 = require("node:crypto");
-var import_yaml13 = __toESM(require_dist(), 1);
+var import_yaml14 = __toESM(require_dist(), 1);
 
 // src/planning.ts
 var fs12 = __toESM(require("node:fs/promises"), 1);
@@ -35891,6 +35891,279 @@ async function guardrailSummary(workspace) {
   };
 }
 
+// src/external-review.ts
+var fs14 = __toESM(require("node:fs/promises"), 1);
+var path15 = __toESM(require("node:path"), 1);
+var import_yaml13 = __toESM(require_dist(), 1);
+var externalReviewManifestSchema = external_exports.object({
+  schemaVersion: external_exports.literal(1),
+  chapter: external_exports.number().int().positive(),
+  provider: external_exports.literal("chatgpt-web"),
+  sourceFingerprint: external_exports.string().regex(/^[a-f0-9]{64}$/),
+  preparedAt: external_exports.string().datetime(),
+  requestPath: external_exports.string().min(1),
+  authority: external_exports.literal("advisory-only"),
+  response: external_exports.object({
+    status: external_exports.enum(["pending", "received"]),
+    recordedAt: external_exports.string().datetime().nullable(),
+    responsePath: external_exports.string().min(1).nullable(),
+    responseFingerprint: external_exports.string().regex(/^[a-f0-9]{64}$/).nullable()
+  }).strict()
+}).strict();
+var externalReviewPolicySchema = external_exports.object({
+  schemaVersion: external_exports.literal(1),
+  enabled: external_exports.boolean(),
+  provider: external_exports.literal("chatgpt-web"),
+  requiredBeforeNextChapter: external_exports.boolean()
+}).strict().superRefine((policy, context) => {
+  if (!policy.enabled && policy.requiredBeforeNextChapter) {
+    context.addIssue({
+      code: "custom",
+      path: ["requiredBeforeNextChapter"],
+      message: "Disabled external review cannot be required before the next chapter."
+    });
+  }
+});
+var EXTERNAL_REVIEW_POLICY_FILE = "planning/external-review-policy.yaml";
+function now2() {
+  return (/* @__PURE__ */ new Date()).toISOString();
+}
+function chapterDirectory(chapter) {
+  return String(chapter).padStart(4, "0");
+}
+function reviewDirectory(workspace, chapter, sourceFingerprint) {
+  return path15.join(
+    workspace,
+    "reports",
+    "external-reviews",
+    `chapter-${chapterDirectory(chapter)}-${sourceFingerprint.slice(0, 12)}`
+  );
+}
+async function resolveCommittedChapter(workspace, requestedChapter) {
+  const state = await readState(workspace);
+  const chapter = requestedChapter ?? state.continuity.lastCommittedChapter;
+  if (!Number.isInteger(chapter) || chapter < 1) {
+    throw new Error("External review requires a positive committed chapter number.");
+  }
+  if (chapter > state.continuity.lastCommittedChapter) {
+    throw new Error(
+      `Chapter ${chapter} is not continuity-committed. Latest committed chapter is ${state.continuity.lastCommittedChapter}.`
+    );
+  }
+  const finalPath = path15.join(
+    workspace,
+    "chapters",
+    chapterDirectory(chapter),
+    "final.md"
+  );
+  if (!await pathExists(finalPath)) {
+    throw new Error(`Committed chapter ${chapter} is missing final.md.`);
+  }
+  return {
+    chapter,
+    finalPath,
+    prose: await fs14.readFile(finalPath, "utf8"),
+    sourceFingerprint: await fingerprintFile(finalPath)
+  };
+}
+function reviewRequest(title, audienceChannel, publicationFormat, chapter, prose) {
+  return [
+    "\u4F60\u662F\u4E00\u540D\u4E25\u5389\u3001\u5177\u4F53\u3001\u514B\u5236\u7684\u4E2D\u6587\u5546\u4E1A\u5C0F\u8BF4\u7F16\u8F91\u3002\u8BF7\u5BA1\u67E5\u4E0B\u9762\u8FD9\u4E00\u8282\u6210\u7A3F\u3002",
+    "",
+    `\u4F5C\u54C1\uFF1A${title}`,
+    `\u76EE\u6807\u6E20\u9053\uFF1A${audienceChannel}`,
+    `\u6210\u7A3F\u5F62\u6001\uFF1A${publicationFormat}`,
+    `\u7AE0\u8282\uFF1A\u7B2C ${chapter} \u8282`,
+    "",
+    "\u5BA1\u67E5\u89C4\u5219\uFF1A",
+    "1. \u53EA\u6839\u636E\u6240\u7ED9\u6B63\u6587\u5224\u65AD\uFF0C\u4E0D\u8865\u9020\u524D\u6587\u3001\u540E\u6587\u6216\u4F5C\u8005\u610F\u56FE\u3002",
+    "2. \u4F18\u5148\u68C0\u67E5\u6838\u5FC3\u8BBE\u5B9A\u662F\u5426\u88AB\u7A00\u91CA\u3001\u56E0\u679C\u4E0E\u8BC1\u636E\u94FE\u3001\u4EBA\u7269\u80FD\u529B\u8FB9\u754C\u3001\u914D\u89D2\u72EC\u7ACB\u6027\u3001\u65F6\u4EE3\u6216\u884C\u653F\u903B\u8F91\u3001\u573A\u666F\u539A\u5EA6\u3001\u8282\u594F\u548C\u8BED\u8A00\u3002",
+    "3. \u533A\u5206\u201C\u5FC5\u987B\u4FEE\u590D\u201D\u201C\u5EFA\u8BAE\u4F18\u5316\u201D\u201C\u53EF\u4EE5\u4FDD\u7559\u201D\uFF0C\u6BCF\u6761\u95EE\u9898\u5F15\u7528\u5177\u4F53\u53E5\u5B50\u6216\u573A\u666F\u3002",
+    "4. \u6307\u51FA\u53EF\u80FD\u9700\u8981\u5728\u540E\u7EED\u7AE0\u8282\u89E3\u91CA\u6216\u5151\u73B0\u7684\u4E8B\u9879\uFF0C\u5E76\u7ED9\u51FA\u5EFA\u8BAE\u6700\u665A\u5151\u73B0\u4F4D\u7F6E\uFF1B\u4E0D\u8981\u628A\u731C\u6D4B\u5199\u6210\u4E8B\u5B9E\u3002",
+    "5. \u4E0D\u8981\u91CD\u5199\u5168\u6587\uFF0C\u53EA\u7ED9\u53EF\u6267\u884C\u7684\u5C40\u90E8\u4FEE\u6539\u5EFA\u8BAE\u3002",
+    "",
+    "\u8BF7\u6309\u4EE5\u4E0B\u7ED3\u6784\u56DE\u7B54\uFF1A",
+    "- \u603B\u4F53\u8BC4\u4EF7\u4E0E\u5B8C\u6210\u5EA6\uFF08100 \u5206\u5236\uFF09",
+    "- \u5FC5\u987B\u4FEE\u590D",
+    "- \u5EFA\u8BAE\u4F18\u5316",
+    "- \u53EF\u4EE5\u4FDD\u7559",
+    "- \u8FDE\u7EED\u6027\uFF0F\u903B\u8F91\u503A\u52A1\u5019\u9009",
+    "- \u662F\u5426\u5EFA\u8BAE\u8FDB\u5165\u4E0B\u4E00\u8282",
+    "",
+    "--- \u6B63\u6587\u5F00\u59CB ---",
+    prose.trim(),
+    "--- \u6B63\u6587\u7ED3\u675F ---",
+    ""
+  ].join("\n");
+}
+async function readExternalReviewPolicy(workspace) {
+  const target = path15.join(workspace, EXTERNAL_REVIEW_POLICY_FILE);
+  if (!await pathExists(target)) {
+    return {
+      schemaVersion: 1,
+      enabled: false,
+      provider: "chatgpt-web",
+      requiredBeforeNextChapter: false
+    };
+  }
+  return externalReviewPolicySchema.parse((0, import_yaml13.parse)(await fs14.readFile(target, "utf8")));
+}
+async function prepareExternalReview(workspace, requestedChapter) {
+  const state = await readState(workspace);
+  const source2 = await resolveCommittedChapter(workspace, requestedChapter);
+  const directory = reviewDirectory(
+    workspace,
+    source2.chapter,
+    source2.sourceFingerprint
+  );
+  const requestPath = path15.join(directory, "request.md");
+  const manifestPath = path15.join(directory, "manifest.yaml");
+  if (await pathExists(manifestPath)) {
+    const manifest2 = externalReviewManifestSchema.parse(
+      (0, import_yaml13.parse)(await fs14.readFile(manifestPath, "utf8"))
+    );
+    if (manifest2.sourceFingerprint !== source2.sourceFingerprint) {
+      throw new Error("External review manifest does not match the accepted chapter prose.");
+    }
+    return {
+      chapter: source2.chapter,
+      sourceFingerprint: source2.sourceFingerprint,
+      requestPath,
+      manifestPath,
+      alreadyPrepared: true
+    };
+  }
+  const request = reviewRequest(
+    state.novel.title,
+    state.novel.audienceChannel,
+    state.novel.publicationFormat,
+    source2.chapter,
+    source2.prose
+  );
+  const relativeRequestPath = path15.relative(workspace, requestPath);
+  const manifest = {
+    schemaVersion: 1,
+    chapter: source2.chapter,
+    provider: "chatgpt-web",
+    sourceFingerprint: source2.sourceFingerprint,
+    preparedAt: now2(),
+    requestPath: relativeRequestPath,
+    authority: "advisory-only",
+    response: {
+      status: "pending",
+      recordedAt: null,
+      responsePath: null,
+      responseFingerprint: null
+    }
+  };
+  await Promise.all([
+    atomicWriteText(requestPath, request),
+    atomicWriteText(
+      manifestPath,
+      (0, import_yaml13.stringify)(externalReviewManifestSchema.parse(manifest), { lineWidth: 0 })
+    )
+  ]);
+  await appendEvent(workspace, {
+    at: manifest.preparedAt,
+    action: "external_review_prepared",
+    chapter: source2.chapter,
+    provider: manifest.provider,
+    sourceFingerprint: source2.sourceFingerprint
+  });
+  return {
+    chapter: source2.chapter,
+    sourceFingerprint: source2.sourceFingerprint,
+    requestPath,
+    manifestPath,
+    alreadyPrepared: false
+  };
+}
+async function recordExternalReview(workspace, responseSource, requestedChapter) {
+  const source2 = await resolveCommittedChapter(workspace, requestedChapter);
+  const directory = reviewDirectory(
+    workspace,
+    source2.chapter,
+    source2.sourceFingerprint
+  );
+  const manifestPath = path15.join(directory, "manifest.yaml");
+  if (!await pathExists(manifestPath)) {
+    throw new Error("Prepare the external review request before recording its response.");
+  }
+  const manifest = externalReviewManifestSchema.parse(
+    (0, import_yaml13.parse)(await fs14.readFile(manifestPath, "utf8"))
+  );
+  if (manifest.sourceFingerprint !== source2.sourceFingerprint) {
+    throw new Error("External review response is stale for the current accepted chapter prose.");
+  }
+  const response = (await fs14.readFile(responseSource, "utf8")).trim();
+  if (response.length < 20) {
+    throw new Error("External review response is too short to record.");
+  }
+  const responsePath = path15.join(directory, "response.md");
+  const responseFingerprint = sha256Text(`${response}
+`);
+  const recordedAt = now2();
+  const updated = {
+    ...manifest,
+    response: {
+      status: "received",
+      recordedAt,
+      responsePath: path15.relative(workspace, responsePath),
+      responseFingerprint
+    }
+  };
+  await Promise.all([
+    atomicWriteText(responsePath, `${response}
+`),
+    atomicWriteText(
+      manifestPath,
+      (0, import_yaml13.stringify)(externalReviewManifestSchema.parse(updated), { lineWidth: 0 })
+    )
+  ]);
+  await appendEvent(workspace, {
+    at: recordedAt,
+    action: "external_review_recorded",
+    chapter: source2.chapter,
+    provider: manifest.provider,
+    sourceFingerprint: source2.sourceFingerprint,
+    responseFingerprint
+  });
+  return {
+    chapter: source2.chapter,
+    responsePath,
+    manifestPath,
+    responseFingerprint
+  };
+}
+async function requireExternalReviewComplete(workspace, chapter) {
+  const policy = await readExternalReviewPolicy(workspace);
+  if (!policy.enabled || !policy.requiredBeforeNextChapter) return;
+  const source2 = await resolveCommittedChapter(workspace, chapter);
+  const directory = reviewDirectory(
+    workspace,
+    source2.chapter,
+    source2.sourceFingerprint
+  );
+  const manifestPath = path15.join(directory, "manifest.yaml");
+  if (!await pathExists(manifestPath)) {
+    throw new Error(
+      `Chapter ${chapter} requires a ChatGPT web review before starting the next chapter. Run external-review first.`
+    );
+  }
+  const manifest = externalReviewManifestSchema.parse(
+    (0, import_yaml13.parse)(await fs14.readFile(manifestPath, "utf8"))
+  );
+  if (manifest.sourceFingerprint !== source2.sourceFingerprint || manifest.response.status !== "received" || !manifest.response.responsePath || !manifest.response.responseFingerprint) {
+    throw new Error(
+      `Chapter ${chapter} has not received a current ChatGPT web review response.`
+    );
+  }
+  const responsePath = path15.join(workspace, manifest.response.responsePath);
+  if (!await pathExists(responsePath) || await fingerprintFile(responsePath) !== manifest.response.responseFingerprint) {
+    throw new Error(`Chapter ${chapter} external review response is missing or stale.`);
+  }
+}
+
 // src/workspace.ts
 var PHASE_TRANSITIONS = {
   preview: ["brief_approved"],
@@ -35920,12 +36193,14 @@ var WORKSPACE_DIRECTORIES = [
   "exports",
   "publication",
   "reports/learning",
+  "reports/external-reviews",
   "imports/chapters"
 ];
 var OPTIONAL_WORKSPACE_DIRECTORIES = /* @__PURE__ */ new Set([
   "runtime/runs",
   "runtime/revisions",
   "reports/learning",
+  "reports/external-reviews",
   "imports/chapters"
 ]);
 var INITIAL_FILES = {
@@ -36058,6 +36333,14 @@ var INITIAL_FILES = {
     "debts: []",
     ""
   ].join("\n"),
+  "planning/external-review-policy.yaml": [
+    "# External review is advisory and opt-in per workspace.",
+    "schemaVersion: 1",
+    "enabled: false",
+    "provider: chatgpt-web",
+    "requiredBeforeNextChapter: false",
+    ""
+  ].join("\n"),
   "planning/style-profile.yaml": [
     "schemaVersion: 1",
     "pov: third-limited",
@@ -36110,14 +36393,14 @@ var INITIAL_FILES = {
   ].join("\n"),
   "runtime/events.jsonl": ""
 };
-function now2() {
+function now3() {
   return (/* @__PURE__ */ new Date()).toISOString();
 }
 function slugify2(input) {
   const slug = input.normalize("NFKC").toLowerCase().replace(/[^\p{Letter}\p{Number}]+/gu, "-").replace(/^-+|-+$/g, "");
   return slug || "novel";
 }
-function chapterDirectory(state) {
+function chapterDirectory2(state) {
   return String(state.workflow.currentChapter).padStart(4, "0");
 }
 async function artifactFingerprint(workspace, artifact) {
@@ -36131,11 +36414,11 @@ async function artifactFingerprint(workspace, artifact) {
       "planning/novel-brief.md",
       "planning/market-position.yaml"
     ];
-    const combined2 = (await Promise.all(briefFiles.map((relative) => fs14.readFile(path15.join(workspace, relative), "utf8")))).join("\n---\n");
+    const combined2 = (await Promise.all(briefFiles.map((relative2) => fs15.readFile(path16.join(workspace, relative2), "utf8")))).join("\n---\n");
     return sha256Text(combined2);
   }
   if (artifact === "currentVolumePlan") {
-    return fingerprintFile(path15.join(workspace, "planning/volumes/current-volume.md"));
+    return fingerprintFile(path16.join(workspace, "planning/volumes/current-volume.md"));
   }
   const foundationFiles = [
     "planning/story-bible.md",
@@ -36146,9 +36429,9 @@ async function artifactFingerprint(workspace, artifact) {
     "planning/style-examples.yaml"
   ];
   const profiles = await loadCharacterProfiles(workspace);
-  foundationFiles.push(...profiles.map(({ path: relative }) => relative));
+  foundationFiles.push(...profiles.map(({ path: relative2 }) => relative2));
   const revealPolicy = revealPolicySchema.parse(
-    (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "planning/reveal-policy.yaml"), "utf8"))
+    (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "planning/reveal-policy.yaml"), "utf8"))
   );
   const stableRevealSchedule = revealPolicy.reveals.map((reveal) => ({
     ...reveal,
@@ -36158,9 +36441,9 @@ async function artifactFingerprint(workspace, artifact) {
   }));
   const combined = [
     ...await Promise.all(
-      foundationFiles.map((relative) => fs14.readFile(path15.join(workspace, relative), "utf8"))
+      foundationFiles.map((relative2) => fs15.readFile(path16.join(workspace, relative2), "utf8"))
     ),
-    (0, import_yaml13.stringify)({ schemaVersion: 1, reveals: stableRevealSchedule }, { lineWidth: 0 })
+    (0, import_yaml14.stringify)({ schemaVersion: 1, reveals: stableRevealSchedule }, { lineWidth: 0 })
   ].join("\n---\n");
   return sha256Text(combined);
 }
@@ -36179,11 +36462,11 @@ async function detectStaleArtifacts(workspace, state) {
 }
 async function hasUsableContent(filePath) {
   if (!await pathExists(filePath)) return false;
-  const raw = (await fs14.readFile(filePath, "utf8")).trim();
+  const raw = (await fs15.readFile(filePath, "utf8")).trim();
   if (raw.length < 40 || raw.includes("(TODO")) return false;
-  if (path15.extname(filePath) === ".yaml") {
+  if (path16.extname(filePath) === ".yaml") {
     try {
-      const parsed = (0, import_yaml13.parse)(raw);
+      const parsed = (0, import_yaml14.parse)(raw);
       return typeof parsed === "object" && parsed !== null;
     } catch {
       return false;
@@ -36193,20 +36476,20 @@ async function hasUsableContent(filePath) {
 }
 async function requireUsableFiles(workspace, files) {
   const missing = [];
-  for (const relative of files) {
-    if (!await hasUsableContent(path15.join(workspace, relative))) missing.push(relative);
+  for (const relative2 of files) {
+    if (!await hasUsableContent(path16.join(workspace, relative2))) missing.push(relative2);
   }
   if (missing.length > 0) {
     throw new Error(`Required accepted artifacts are missing or placeholders: ${missing.join(", ")}`);
   }
 }
 async function createTransitionSnapshot(workspace, before, after) {
-  const runId = `${now2().replace(/[:.]/g, "-")}-${(0, import_node_crypto5.randomUUID)().slice(0, 8)}`;
-  const runDirectory = path15.join(workspace, "runtime", "runs", runId);
-  await fs14.mkdir(runDirectory, { recursive: true });
+  const runId = `${now3().replace(/[:.]/g, "-")}-${(0, import_node_crypto5.randomUUID)().slice(0, 8)}`;
+  const runDirectory = path16.join(workspace, "runtime", "runs", runId);
+  await fs15.mkdir(runDirectory, { recursive: true });
   await Promise.all([
-    atomicWriteText(path15.join(runDirectory, "state.before.yaml"), (0, import_yaml13.stringify)(before)),
-    atomicWriteText(path15.join(runDirectory, "state.after.yaml"), (0, import_yaml13.stringify)(after))
+    atomicWriteText(path16.join(runDirectory, "state.before.yaml"), (0, import_yaml14.stringify)(before)),
+    atomicWriteText(path16.join(runDirectory, "state.after.yaml"), (0, import_yaml14.stringify)(after))
   ]);
   return runId;
 }
@@ -36224,14 +36507,14 @@ async function recordTransitionEvent(workspace, state, action, runId) {
   }
 }
 async function initializeWorkspace(target, options) {
-  const workspace = path15.resolve(target);
+  const workspace = path16.resolve(target);
   if (await pathExists(workspace)) {
     throw new Error(`Workspace already exists: ${workspace}`);
   }
-  const parent = path15.dirname(workspace);
-  await fs14.mkdir(parent, { recursive: true });
-  const temporary = path15.join(parent, `.${path15.basename(workspace)}.init-${(0, import_node_crypto5.randomUUID)()}`);
-  const createdAt = now2();
+  const parent = path16.dirname(workspace);
+  await fs15.mkdir(parent, { recursive: true });
+  const temporary = path16.join(parent, `.${path16.basename(workspace)}.init-${(0, import_node_crypto5.randomUUID)()}`);
+  const createdAt = now3();
   const state = {
     schemaVersion: 2,
     novel: {
@@ -36262,24 +36545,24 @@ async function initializeWorkspace(target, options) {
   };
   validateState(state);
   try {
-    await fs14.mkdir(temporary);
+    await fs15.mkdir(temporary);
     await Promise.all(
-      WORKSPACE_DIRECTORIES.map((relative) => fs14.mkdir(path15.join(temporary, relative), { recursive: true }))
+      WORKSPACE_DIRECTORIES.map((relative2) => fs15.mkdir(path16.join(temporary, relative2), { recursive: true }))
     );
     await Promise.all(
       Object.entries(INITIAL_FILES).map(
-        ([relative, content]) => atomicWriteText(path15.join(temporary, relative), content)
+        ([relative2, content]) => atomicWriteText(path16.join(temporary, relative2), content)
       )
     );
-    await atomicWriteText(path15.join(temporary, STATE_FILE), (0, import_yaml13.stringify)(state, { lineWidth: 0 }));
-    await fs14.rename(temporary, workspace);
+    await atomicWriteText(path16.join(temporary, STATE_FILE), (0, import_yaml14.stringify)(state, { lineWidth: 0 }));
+    await fs15.rename(temporary, workspace);
     try {
       await appendEvent(workspace, { at: createdAt, action: "workspace_initialized" });
     } catch {
     }
     return state;
   } catch (error51) {
-    await fs14.rm(temporary, { recursive: true, force: true });
+    await fs15.rm(temporary, { recursive: true, force: true });
     throw error51;
   }
 }
@@ -36320,11 +36603,11 @@ async function transitionPhase(workspace, to) {
   }
   const after = structuredClone(before);
   after.workflow.phase = to;
-  after.workflow.updatedAt = now2();
+  after.workflow.updatedAt = now3();
   after.workflow.blockingReason = null;
   if (to === "brief_approved") {
     const position = marketPositionSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "planning/market-position.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "planning/market-position.yaml"), "utf8"))
     );
     after.novel.audienceChannel = position.audienceChannel;
     after.novel.publicationFormat = position.publicationFormat;
@@ -36344,7 +36627,7 @@ async function transitionPhase(workspace, to) {
   if (to === "production") {
     after.artifacts.currentVolumePlan = {
       status: "accepted",
-      fingerprint: await fingerprintFile(path15.join(workspace, "planning/volumes/current-volume.md")),
+      fingerprint: await fingerprintFile(path16.join(workspace, "planning/volumes/current-volume.md")),
       acceptedAt: after.workflow.updatedAt
     };
   }
@@ -36373,7 +36656,7 @@ async function invalidateArtifact(workspace, artifact, reason) {
     after.workflow.phase = after.artifacts.foundation.status === "accepted" ? "foundation_approved" : after.artifacts.brief.status === "accepted" ? "brief_approved" : "preview";
   }
   after.workflow.blockingReason = reason.trim() || `${artifact} changed`;
-  after.workflow.updatedAt = now2();
+  after.workflow.updatedAt = now3();
   const runId = await createTransitionSnapshot(workspace, before, after);
   await writeState(workspace, after);
   await recordTransitionEvent(workspace, after, "artifact_invalidated", runId);
@@ -36396,7 +36679,7 @@ async function advanceChapter(workspace, to) {
   if (before.workflow.chapterStatus === "reviewed" && to === "drafted" && before.workflow.reviewRound >= 2) {
     throw new Error("The two-round repair budget is exhausted. Stop for author direction.");
   }
-  const chapter = chapterDirectory(before);
+  const chapter = chapterDirectory2(before);
   const requiredByStatus = {
     planned: [
       `chapters/${chapter}/contract.yaml`,
@@ -36414,7 +36697,7 @@ async function advanceChapter(workspace, to) {
   await requireUsableFiles(workspace, requiredByStatus[to] ?? []);
   if (to === "planned") {
     const contract = chapterContractSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
     );
     if (contract.chapter !== before.workflow.currentChapter) {
       throw new Error("Chapter contract does not match current chapter.");
@@ -36427,7 +36710,7 @@ async function advanceChapter(workspace, to) {
     await validateChapterGuardrails(workspace, contract);
     await validateContractLogicDebts(workspace, contract);
     const position = marketPositionSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "planning/market-position.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "planning/market-position.yaml"), "utf8"))
     );
     const policyIssues = chapterLengthPolicyIssues(contract, position);
     if (policyIssues.length > 0) {
@@ -36440,10 +36723,10 @@ async function advanceChapter(workspace, to) {
     const quality = await readCurrentQualityReport(workspace, "draft");
     if (!quality.ok) throw new Error("Draft quality gate has blocking issues.");
     const review = chapterReviewSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
     const contract = chapterContractSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
     );
     if (contract.schemaVersion === 3 && review.schemaVersion !== 3) {
       throw new Error("A schema-v3 chapter contract requires a schema-v3 review.");
@@ -36462,10 +36745,10 @@ async function advanceChapter(workspace, to) {
     const quality = await readCurrentQualityReport(workspace, "final");
     if (!quality.ok) throw new Error("Final quality gate has blocking issues.");
     const review = chapterReviewSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
     const contract = chapterContractSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "contract.yaml"), "utf8"))
     );
     validateReviewLogicDebts(contract, review);
     if (review.verdict !== "pass") {
@@ -36482,10 +36765,10 @@ async function advanceChapter(workspace, to) {
   }
   if (to === "continuity_committed") {
     const handoff = chapterHandoffSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "handoff.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "handoff.yaml"), "utf8"))
     );
     const finalFingerprint = await fingerprintFile(
-      path15.join(workspace, "chapters", chapter, "final.md")
+      path16.join(workspace, "chapters", chapter, "final.md")
     );
     if (handoff.chapter !== before.workflow.currentChapter) {
       throw new Error("Chapter handoff does not match the current chapter.");
@@ -36498,11 +36781,11 @@ async function advanceChapter(workspace, to) {
   after.workflow.chapterStatus = to;
   if (to === "reviewed") {
     const review = chapterReviewSchema.parse(
-      (0, import_yaml13.parse)(await fs14.readFile(path15.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
+      (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "chapters", chapter, "review.yaml"), "utf8"))
     );
     after.workflow.reviewRound = review.reviewRound;
   }
-  after.workflow.updatedAt = now2();
+  after.workflow.updatedAt = now3();
   after.workflow.blockingReason = null;
   if (to === "continuity_committed") {
     after.continuity.lastCommittedChapter = after.workflow.currentChapter;
@@ -36518,11 +36801,12 @@ async function startNextChapter(workspace) {
   if (before.workflow.chapterStatus !== "continuity_committed") {
     throw new Error("The current chapter must be continuity-committed before starting the next.");
   }
+  await requireExternalReviewComplete(workspace, before.workflow.currentChapter);
   const after = structuredClone(before);
   after.workflow.currentChapter += 1;
   after.workflow.chapterStatus = "not_started";
   after.workflow.reviewRound = 0;
-  after.workflow.updatedAt = now2();
+  after.workflow.updatedAt = now3();
   const runId = await createTransitionSnapshot(workspace, before, after);
   await writeState(workspace, after);
   await recordTransitionEvent(workspace, after, "next_chapter", runId);
@@ -36537,19 +36821,19 @@ async function exportNovel(workspace, format) {
   const sections = [];
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
-    const finalPath = path15.join(workspace, "chapters", directory, "final.md");
+    const finalPath = path16.join(workspace, "chapters", directory, "final.md");
     if (!await hasUsableContent(finalPath)) {
       throw new Error(`Committed chapter is missing accepted prose: chapters/${directory}/final.md`);
     }
-    sections.push((await fs14.readFile(finalPath, "utf8")).trim());
+    sections.push((await fs15.readFile(finalPath, "utf8")).trim());
     chapters.push(chapter);
   }
-  const output = path15.join(workspace, "exports", `${state.novel.id}.${format}`);
+  const output = path16.join(workspace, "exports", `${state.novel.id}.${format}`);
   await atomicWriteText(output, `${sections.join("\n\n")}
 `);
   try {
     await appendEvent(workspace, {
-      at: now2(),
+      at: now3(),
       action: "novel_exported",
       output,
       chapters
@@ -36582,17 +36866,18 @@ async function validateWorkspace(workspace) {
     await inspectArcGrid(workspace);
   }
   const requiredDirectories = WORKSPACE_DIRECTORIES.filter(
-    (relative) => !OPTIONAL_WORKSPACE_DIRECTORIES.has(relative)
+    (relative2) => !OPTIONAL_WORKSPACE_DIRECTORIES.has(relative2)
   );
   const missingDirectories = [];
-  for (const relative of requiredDirectories) {
-    if (!await pathExists(path15.join(workspace, relative))) missingDirectories.push(relative);
+  for (const relative2 of requiredDirectories) {
+    if (!await pathExists(path16.join(workspace, relative2))) missingDirectories.push(relative2);
   }
   if (missingDirectories.length > 0) {
     throw new Error(`Required workspace directories are missing: ${missingDirectories.join(", ")}`);
   }
   await validateContinuityStores(workspace);
   await readLogicDebtLedger(workspace);
+  await readExternalReviewPolicy(workspace);
   await validateCommittedChapterArtifacts(workspace, state);
   return state;
 }
@@ -36602,24 +36887,24 @@ async function validateCommittedChapterArtifacts(workspace, state) {
   const logicDebts = new Map(logicDebtLedger.debts.map((debt) => [debt.id, debt]));
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
-    const chapterRoot = path15.join(workspace, "chapters", directory);
+    const chapterRoot = path16.join(workspace, "chapters", directory);
     try {
       const contract = chapterContractSchema.parse(
-        (0, import_yaml13.parse)(await fs14.readFile(path15.join(chapterRoot, "contract.yaml"), "utf8"))
+        (0, import_yaml14.parse)(await fs15.readFile(path16.join(chapterRoot, "contract.yaml"), "utf8"))
       );
       const review = chapterReviewSchema.parse(
-        (0, import_yaml13.parse)(await fs14.readFile(path15.join(chapterRoot, "review.yaml"), "utf8"))
+        (0, import_yaml14.parse)(await fs15.readFile(path16.join(chapterRoot, "review.yaml"), "utf8"))
       );
       const quality = qualityReportSchema.parse(
-        JSON.parse(await fs14.readFile(path15.join(chapterRoot, "quality-final.json"), "utf8"))
+        JSON.parse(await fs15.readFile(path16.join(chapterRoot, "quality-final.json"), "utf8"))
       );
       const delta = continuityDeltaSchema.parse(
-        (0, import_yaml13.parse)(await fs14.readFile(path15.join(chapterRoot, "delta.yaml"), "utf8"))
+        (0, import_yaml14.parse)(await fs15.readFile(path16.join(chapterRoot, "delta.yaml"), "utf8"))
       );
       const handoff = chapterHandoffSchema.parse(
-        (0, import_yaml13.parse)(await fs14.readFile(path15.join(chapterRoot, "handoff.yaml"), "utf8"))
+        (0, import_yaml14.parse)(await fs15.readFile(path16.join(chapterRoot, "handoff.yaml"), "utf8"))
       );
-      const finalFingerprint = await fingerprintFile(path15.join(chapterRoot, "final.md"));
+      const finalFingerprint = await fingerprintFile(path16.join(chapterRoot, "final.md"));
       if (contract.chapter !== chapter) issues.push(`chapter ${chapter}: contract number mismatch`);
       if (review.verdict !== "pass") issues.push(`chapter ${chapter}: review is not passing`);
       try {
@@ -36680,17 +36965,17 @@ function formatStatus(state) {
 }
 
 // src/production.ts
-var fs15 = __toESM(require("node:fs/promises"), 1);
-var path16 = __toESM(require("node:path"), 1);
-var import_yaml14 = __toESM(require_dist(), 1);
+var fs16 = __toESM(require("node:fs/promises"), 1);
+var path17 = __toESM(require("node:path"), 1);
+var import_yaml15 = __toESM(require_dist(), 1);
 async function readPosition(workspace) {
   return marketPositionSchema.parse(
-    (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "planning", "market-position.yaml"), "utf8"))
+    (0, import_yaml15.parse)(await fs16.readFile(path17.join(workspace, "planning", "market-position.yaml"), "utf8"))
   );
 }
 async function readSerialPlan(workspace) {
   return serialPlanSchema.parse(
-    (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "publication", "serial-plan.yaml"), "utf8"))
+    (0, import_yaml15.parse)(await fs16.readFile(path17.join(workspace, "publication", "serial-plan.yaml"), "utf8"))
   );
 }
 async function inspectCadence(workspace) {
@@ -36741,8 +37026,8 @@ async function updatePublishedThrough(workspace, chapter) {
   const plan = await readSerialPlan(workspace);
   plan.publishedThroughChapter = chapter;
   await atomicWriteText(
-    path16.join(workspace, "publication", "serial-plan.yaml"),
-    (0, import_yaml14.stringify)(plan, { lineWidth: 0 })
+    path17.join(workspace, "publication", "serial-plan.yaml"),
+    (0, import_yaml15.stringify)(plan, { lineWidth: 0 })
   );
   await appendEvent(workspace, {
     at: (/* @__PURE__ */ new Date()).toISOString(),
@@ -36782,7 +37067,7 @@ function optionalNumber(value) {
   return parsed;
 }
 async function importPublicationMetrics(workspace, source2) {
-  const lines = (await fs15.readFile(source2, "utf8")).split(/\r?\n/).filter((line) => line.trim().length > 0);
+  const lines = (await fs16.readFile(source2, "utf8")).split(/\r?\n/).filter((line) => line.trim().length > 0);
   if (lines.length < 2) throw new Error("Metrics CSV must include a header and at least one data row.");
   const headers = parseCsvLine(lines[0]);
   for (const required2 of ["chapter", "observedAt"]) {
@@ -36802,8 +37087,8 @@ async function importPublicationMetrics(workspace, source2) {
       comments: optionalNumber(values[indexOf("comments")])
     });
   });
-  const output = path16.join(workspace, "publication", "metrics.json");
-  const existing = await pathExists(output) ? zodMetrics(JSON.parse(await fs15.readFile(output, "utf8"))) : [];
+  const output = path17.join(workspace, "publication", "metrics.json");
+  const existing = await pathExists(output) ? zodMetrics(JSON.parse(await fs16.readFile(output, "utf8"))) : [];
   const merged = /* @__PURE__ */ new Map();
   for (const metric of [...existing, ...imported]) {
     merged.set(`${metric.chapter}:${metric.observedAt}`, metric);
@@ -36831,13 +37116,13 @@ function average(values) {
   return present.reduce((sum, value) => sum + value, 0) / present.length;
 }
 async function generateLearningReport(workspace) {
-  const metricsPath = path16.join(workspace, "publication", "metrics.json");
+  const metricsPath = path17.join(workspace, "publication", "metrics.json");
   if (!await pathExists(metricsPath)) {
     throw new Error("No publication metrics are available. Import a CSV file first.");
   }
-  const metrics = zodMetrics(JSON.parse(await fs15.readFile(metricsPath, "utf8")));
+  const metrics = zodMetrics(JSON.parse(await fs16.readFile(metricsPath, "utf8")));
   const decision = topicDecisionSchema.parse(
-    (0, import_yaml14.parse)(await fs15.readFile(path16.join(workspace, "discovery", "topic-decision.yaml"), "utf8"))
+    (0, import_yaml15.parse)(await fs16.readFile(path17.join(workspace, "discovery", "topic-decision.yaml"), "utf8"))
   );
   const report = {
     schemaVersion: 1,
@@ -36863,8 +37148,8 @@ async function generateLearningReport(workspace) {
       "\u54EA\u4E9B\u7ED3\u8BBA\u4ECD\u7F3A\u5C11\u8DB3\u591F\u6837\u672C\uFF0C\u4E0D\u80FD\u636E\u6B64\u4FEE\u6539\u6743\u5A01\u8BBE\u5B9A\uFF1F"
     ]
   };
-  const reportRoot = path16.join(workspace, "reports", "learning");
-  const output = path16.join(
+  const reportRoot = path17.join(workspace, "reports", "learning");
+  const output = path17.join(
     reportRoot,
     `${(/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-")}.json`
   );
@@ -36874,8 +37159,8 @@ async function generateLearningReport(workspace) {
 }
 
 // src/documents.ts
-var fs16 = __toESM(require("node:fs/promises"), 1);
-var path17 = __toESM(require("node:path"), 1);
+var fs17 = __toESM(require("node:fs/promises"), 1);
+var path18 = __toESM(require("node:path"), 1);
 var import_jszip = __toESM(require_lib3(), 1);
 function xmlEscape(value) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;");
@@ -36895,11 +37180,11 @@ async function committedChapters(workspace) {
   const chapters = [];
   for (let chapter = 1; chapter <= state.continuity.lastCommittedChapter; chapter++) {
     const directory = String(chapter).padStart(4, "0");
-    const source2 = path17.join(workspace, "chapters", directory, "final.md");
+    const source2 = path18.join(workspace, "chapters", directory, "final.md");
     if (!await pathExists(source2)) {
       throw new Error(`Committed chapter is missing accepted prose: chapters/${directory}/final.md`);
     }
-    const markdown = (await fs16.readFile(source2, "utf8")).trim();
+    const markdown = (await fs17.readFile(source2, "utf8")).trim();
     chapters.push({
       chapter,
       title: chapterTitle(markdown, chapter),
@@ -36933,9 +37218,9 @@ ${chapter.plainText}`))
     "document.xml",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr/></w:body></w:document>`
   );
-  const output = path17.join(workspace, "exports", `${novelId}.docx`);
-  await fs16.mkdir(path17.dirname(output), { recursive: true });
-  await fs16.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
+  const output = path18.join(workspace, "exports", `${novelId}.docx`);
+  await fs17.mkdir(path18.dirname(output), { recursive: true });
+  await fs17.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
   return output;
 }
 async function exportEpub(workspace, title, novelId, language, chapters) {
@@ -36964,9 +37249,9 @@ async function exportEpub(workspace, title, novelId, language, chapters) {
       `<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" lang="${xmlEscape(language)}"><head><title>${xmlEscape(chapter.title)}</title></head><body><h1>${xmlEscape(chapter.title)}</h1>${paragraphs}</body></html>`
     );
   }
-  const output = path17.join(workspace, "exports", `${novelId}.epub`);
-  await fs16.mkdir(path17.dirname(output), { recursive: true });
-  await fs16.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
+  const output = path18.join(workspace, "exports", `${novelId}.epub`);
+  await fs17.mkdir(path18.dirname(output), { recursive: true });
+  await fs17.writeFile(output, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
   return output;
 }
 async function exportDocument(workspace, format) {
@@ -36998,30 +37283,30 @@ function splitManuscript(source2) {
   return sections.filter(Boolean);
 }
 async function importManuscript(workspace, sourcePath, title) {
-  const extension = path17.extname(sourcePath).toLowerCase();
+  const extension = path18.extname(sourcePath).toLowerCase();
   if (extension !== ".md" && extension !== ".txt") {
     throw new Error("Manuscript import currently supports Markdown (.md) and text (.txt).");
   }
-  const source2 = await fs16.readFile(sourcePath, "utf8");
+  const source2 = await fs17.readFile(sourcePath, "utf8");
   const chapters = splitManuscript(source2);
   if (chapters.length === 0) throw new Error("No manuscript content could be detected.");
   await initializeWorkspace(workspace, { title });
-  const importRoot = path17.join(workspace, "imports", "chapters");
-  await fs16.mkdir(importRoot, { recursive: true });
+  const importRoot = path18.join(workspace, "imports", "chapters");
+  await fs17.mkdir(importRoot, { recursive: true });
   for (const [index, chapter] of chapters.entries()) {
     await atomicWriteText(
-      path17.join(importRoot, `${String(index + 1).padStart(4, "0")}.md`),
+      path18.join(importRoot, `${String(index + 1).padStart(4, "0")}.md`),
       `${chapter}
 `
     );
   }
-  const manifest = path17.join(workspace, "imports", "manifest.json");
+  const manifest = path18.join(workspace, "imports", "manifest.json");
   await atomicWriteText(
     manifest,
     `${JSON.stringify({
       schemaVersion: 1,
       importedAt: (/* @__PURE__ */ new Date()).toISOString(),
-      sourceName: path17.basename(sourcePath),
+      sourceName: path18.basename(sourcePath),
       detectedChapters: chapters.length,
       status: "awaiting-continuity-extraction",
       note: "Imported prose is not accepted canon until Codex extracts and the author confirms continuity."
@@ -37032,7 +37317,7 @@ async function importManuscript(workspace, sourcePath, title) {
 }
 
 // src/diagnostics.ts
-var path18 = __toESM(require("node:path"), 1);
+var path19 = __toESM(require("node:path"), 1);
 async function runDoctor(workspace) {
   const checks = [];
   const major = Number(process.versions.node.split(".")[0]);
@@ -37060,8 +37345,8 @@ async function runDoctor(workspace) {
     });
   }
   if (workspace) {
-    const resolved = path18.resolve(workspace);
-    const statePath = path18.join(resolved, "novel-state.yaml");
+    const resolved = path19.resolve(workspace);
+    const statePath = path19.join(resolved, "novel-state.yaml");
     const exists = await pathExists(statePath);
     checks.push({
       id: "workspace",
@@ -37091,7 +37376,7 @@ async function runDoctor(workspace) {
   return {
     ok: checks.every((check2) => check2.ok),
     nodeVersion: process.versions.node,
-    workspace: workspace ? path18.resolve(workspace) : null,
+    workspace: workspace ? path19.resolve(workspace) : null,
     checks
   };
 }
@@ -37219,6 +37504,8 @@ function usage() {
     "  next <workspace>",
     "  revise <workspace> --name <purpose> [--chapter N]",
     "  debts <workspace> [--json]",
+    "  external-review <workspace> [--chapter N] [--json]",
+    "  external-review-record <workspace> --source <response.md> [--chapter N] [--json]",
     "  revision create <workspace> --name <name>",
     "  revision list <workspace> [--json]",
     "  revision restore <workspace> --id <revision-id>",
@@ -37258,7 +37545,7 @@ async function interactiveGuide() {
     if (form !== "long-serial" && form !== "short-complete") {
       throw new Error("\u4F5C\u54C1\u5F62\u6001\u53EA\u80FD\u662F long-serial \u6216 short-complete\u3002");
     }
-    const resolved = path19.resolve(workspace);
+    const resolved = path20.resolve(workspace);
     await initializeWorkspace(resolved, { title });
     console.log(
       `
@@ -37298,7 +37585,7 @@ async function main() {
     const action = args[1];
     const revisionWorkspace = args[2];
     if (!revisionWorkspace) throw new Error("revision requires create/list/restore and a workspace path.");
-    const workspace2 = path19.resolve(revisionWorkspace);
+    const workspace2 = path20.resolve(revisionWorkspace);
     if (action === "create") {
       const name = option(args, "--name");
       if (!name) throw new Error("revision create requires --name.");
@@ -37330,7 +37617,7 @@ async function main() {
     }
     const source2 = option(args, "--file");
     if (!source2) throw new Error("metrics import requires --file.");
-    const result = await importPublicationMetrics(path19.resolve(args[2]), path19.resolve(source2));
+    const result = await importPublicationMetrics(path20.resolve(args[2]), path20.resolve(source2));
     console.log(args.includes("--json") ? JSON.stringify(result, null, 2) : `\u5DF2\u5BFC\u5165 ${result.imported} \u6761\u53D1\u5E03\u6307\u6807\uFF0C\u5171 ${result.total} \u6761\u3002`);
     return;
   }
@@ -37338,7 +37625,7 @@ async function main() {
   if (!workspaceArg) throw new Error(`Missing workspace path.
 
 ${usage()}`);
-  const workspace = path19.resolve(workspaceArg);
+  const workspace = path20.resolve(workspaceArg);
   const json2 = args.includes("--json");
   if (command === "init") {
     const title = option(args, "--title");
@@ -37384,6 +37671,47 @@ ${usage()}`);
         `\u5230\u671F\uFF1A${report.dueNow.map((debt) => debt.id).join(", ") || "\u65E0"}`,
         `\u903E\u671F\uFF1A${report.overdue.map((debt) => debt.id).join(", ") || "\u65E0"}`,
         `\u540E\u7EED\uFF1A${report.upcoming.map((debt) => `${debt.id}@${debt.dueChapter}`).join(", ") || "\u65E0"}`
+      ].join("\n")
+    );
+    return;
+  }
+  if (command === "external-review") {
+    const chapterOption = option(args, "--chapter");
+    const chapter = chapterOption === void 0 ? void 0 : Number(chapterOption);
+    if (chapter !== void 0 && (!Number.isInteger(chapter) || chapter < 1)) {
+      throw new Error("external-review --chapter must be a positive integer.");
+    }
+    await validateWorkspace(workspace);
+    const result = await prepareExternalReview(workspace, chapter);
+    console.log(
+      json2 ? JSON.stringify(result, null, 2) : [
+        `\u5DF2\u751F\u6210\u7B2C ${result.chapter} \u8282 ChatGPT \u7F51\u9875\u4E8C\u5BA1\u8BF7\u6C42\u3002`,
+        `\u8BF7\u6C42\u6587\u4EF6\uFF1A${result.requestPath}`,
+        `\u72B6\u6001\u6587\u4EF6\uFF1A${result.manifestPath}`,
+        result.alreadyPrepared ? "\u8BE5\u6B63\u6587\u6307\u7EB9\u7684\u8BF7\u6C42\u5305\u5DF2\u5B58\u5728\uFF0C\u672A\u91CD\u590D\u8986\u76D6\u3002" : "\u8BF7\u628A request.md \u5168\u6587\u53D1\u9001\u5230 ChatGPT \u7F51\u9875\u7248\uFF1B\u5916\u90E8\u610F\u89C1\u4EC5\u4F5C\u5EFA\u8BAE\u3002"
+      ].join("\n")
+    );
+    return;
+  }
+  if (command === "external-review-record") {
+    const sourceOption = option(args, "--source");
+    if (!sourceOption) throw new Error("external-review-record requires --source.");
+    const chapterOption = option(args, "--chapter");
+    const chapter = chapterOption === void 0 ? void 0 : Number(chapterOption);
+    if (chapter !== void 0 && (!Number.isInteger(chapter) || chapter < 1)) {
+      throw new Error("external-review-record --chapter must be a positive integer.");
+    }
+    await validateWorkspace(workspace);
+    const result = await recordExternalReview(
+      workspace,
+      path20.resolve(sourceOption),
+      chapter
+    );
+    console.log(
+      json2 ? JSON.stringify(result, null, 2) : [
+        `\u5DF2\u4FDD\u5B58\u7B2C ${result.chapter} \u8282 ChatGPT \u7F51\u9875\u4E8C\u5BA1\u610F\u89C1\u3002`,
+        `\u53CD\u9988\u6587\u4EF6\uFF1A${result.responsePath}`,
+        "\u53CD\u9988\u4E0D\u4F1A\u81EA\u52A8\u4FEE\u6539\u6B63\u6587\u3001\u8FDE\u7EED\u6027\u6216\u903B\u8F91\u503A\u52A1\uFF1B\u8BF7\u7531\u4F5C\u8005\u51B3\u5B9A\u91C7\u7EB3\u9879\u3002"
       ].join("\n")
     );
     return;
@@ -37625,7 +37953,7 @@ Review template: ${result.templatePath}`
     const source2 = option(args, "--source");
     const title = option(args, "--title");
     if (!source2 || !title) throw new Error("import requires --source and --title.");
-    const result = await importManuscript(workspace, path19.resolve(source2), title);
+    const result = await importManuscript(workspace, path20.resolve(source2), title);
     console.log(
       `\u5DF2\u8BC6\u522B ${result.chapters} \u4E2A\u7AE0\u8282\u3002\u5BFC\u5165\u5185\u5BB9\u5C1A\u672A\u6210\u4E3A\u6743\u5A01\u6B63\u6587\uFF1B\u8BF7\u5148\u8BA9 Codex \u63D0\u53D6\u4EBA\u7269\u3001\u65F6\u95F4\u7EBF\u548C\u4F0F\u7B14\uFF1A${result.manifest}`
     );

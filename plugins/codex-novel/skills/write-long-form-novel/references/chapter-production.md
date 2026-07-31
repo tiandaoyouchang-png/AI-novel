@@ -146,3 +146,15 @@ nextConstraints: []
 ```
 
 The next chapter reads this structured handoff instead of copying several prior chapters or trusting a free-running append-only summary.
+
+## External web second review
+
+After continuity is committed, an opted-in workspace may require a ChatGPT web review before `next`. Generate the request with `novelctl external-review`; it includes the exact accepted prose and an editorial rubric for premise discipline, causality, evidence, capability boundaries, supporting-character agency, institutional logic, scene depth, pacing, and language.
+
+Record the complete answer with `novelctl external-review-record`. A received response satisfies only the external-review receipt gate. Triage every suggestion against the accepted plan and reveal policy:
+
+- `accepted`: a bounded current-chapter repair or genuinely new future obligation;
+- `already-covered`: an existing contract, plan beat, reveal, or logic debt already handles it;
+- `rejected`: it contradicts authority, reveals too early, enlarges scope, or is unsupported.
+
+Only an accepted future obligation may be added manually to `planning/logic-debts.yaml`. If accepted feedback requires changing the current committed prose, use `novelctl revise`; never patch `final.md` in place.

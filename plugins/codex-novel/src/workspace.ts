@@ -49,6 +49,10 @@ import {
   validateContractLogicDebts,
   validateReviewLogicDebts
 } from "./logic-debts.js";
+import {
+  readExternalReviewPolicy,
+  requireExternalReviewComplete
+} from "./external-review.js";
 
 const PHASE_TRANSITIONS: Record<BookPhase, readonly BookPhase[]> = {
   preview: ["brief_approved"],
@@ -80,6 +84,7 @@ const WORKSPACE_DIRECTORIES = [
   "exports",
   "publication",
   "reports/learning",
+  "reports/external-reviews",
   "imports/chapters"
 ];
 
@@ -87,6 +92,7 @@ const OPTIONAL_WORKSPACE_DIRECTORIES = new Set([
   "runtime/runs",
   "runtime/revisions",
   "reports/learning",
+  "reports/external-reviews",
   "imports/chapters"
 ]);
 
@@ -218,6 +224,14 @@ const INITIAL_FILES: Record<string, string> = {
     "# Cross-chapter obligations created by accepted prose reviews.",
     "schemaVersion: 1",
     "debts: []",
+    ""
+  ].join("\n"),
+  "planning/external-review-policy.yaml": [
+    "# External review is advisory and opt-in per workspace.",
+    "schemaVersion: 1",
+    "enabled: false",
+    "provider: chatgpt-web",
+    "requiredBeforeNextChapter: false",
     ""
   ].join("\n"),
   "planning/style-profile.yaml": [
@@ -744,6 +758,7 @@ export async function startNextChapter(workspace: string): Promise<NovelState> {
   if (before.workflow.chapterStatus !== "continuity_committed") {
     throw new Error("The current chapter must be continuity-committed before starting the next.");
   }
+  await requireExternalReviewComplete(workspace, before.workflow.currentChapter);
 
   const after: NovelState = structuredClone(before);
   after.workflow.currentChapter += 1;
@@ -827,6 +842,7 @@ export async function validateWorkspace(workspace: string): Promise<NovelState> 
   }
   await validateContinuityStores(workspace);
   await readLogicDebtLedger(workspace);
+  await readExternalReviewPolicy(workspace);
   await validateCommittedChapterArtifacts(workspace, state);
   return state;
 }

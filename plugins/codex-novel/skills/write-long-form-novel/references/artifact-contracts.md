@@ -86,6 +86,17 @@ Named revisions under `runtime/revisions/` are immutable recovery snapshots with
 
 `novelctl revise` is the safe path for reopening the latest unpublished continuity-committed chapter. It creates a named revision automatically, rolls back only that chapter's committed effects, preserves later planning additions such as new open logic debts, and forces a fresh production chain.
 
+`planning/external-review-policy.yaml` controls the optional ChatGPT web second-review gate per workspace. New workspaces default to disabled so the local workflow does not depend on a website or login. When enabled with `requiredBeforeNextChapter: true`, `novelctl next` requires a recorded response for the exact committed-prose fingerprint.
+
+`reports/external-reviews/chapter-NNNN-<fingerprint>/` contains:
+
+- `request.md`: the complete bounded editorial prompt and accepted prose sent to ChatGPT web;
+- `manifest.yaml`: provider, accepted-prose fingerprint, advisory authority, and pending/received response state;
+- `response.md`: the unedited external response;
+- `triage.md`: author or Codex decisions marking advice accepted, already covered, or rejected.
+
+These reports are advisory and rank below accepted prose, plans, continuity, contracts, and local reviews. Never convert them automatically into canon or logic debt.
+
 ## Artifact states
 
 - `missing`: no usable artifact exists.
